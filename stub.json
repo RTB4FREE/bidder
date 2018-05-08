@@ -1,0 +1,21 @@
+{
+    "adomain": "originator.com",
+    "name": "campaign-1-full-test",
+    "date": [
+        20130205,
+        20200101
+    ],
+    "template": {
+        "default": "999",
+        "exchange": {
+        }
+    },
+    "creatives": [
+      
+    ],
+    "adId": "change-me",
+    "price": -1.0,
+    "attributes": [
+      
+    ]
+}

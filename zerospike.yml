@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+  zookeeper:
+    image: "jplock/zookeeper"
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: "ches/kafka"
+    environment:
+      ZOOKEEPER_IP: "zookeeper"
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    restart: always
+
+  zerospike:
+    image: "64.94.191.15:5000/zerospike"
+    environment:
+      BROKERLIST: "kafka:9092"
+      THREADS: "2"
+    ports:
+      - "6000:6000"
+      - "6001:6001"
+      - "6002:6002"
+    command: bash -c "./wait-for-it.sh kafka:9092 --timeout=120 && sleep 1; ./zerospike"

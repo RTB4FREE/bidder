@@ -1,0 +1,26 @@
+{
+  "seatbid": [
+    {
+      "seat": "vdopia-id",
+      "bid": [
+        {
+          "impid": "35c22289-06e2-48e9-a0cd-94aeb79fab43-1",
+          "id": "35c22289-06e2-48e9-a0cd-94aeb79fab43",
+          "price": 1,
+          "adid": "ben:payday",
+          "nurl": "http://localhost:8080/rtb/win/vdopia/${AUCTION_PRICE}/42.378/-71.227/ben:payday/23-2-skiddoo/35c22289-06e2-48e9-a0cd-94aeb79fab43",
+          "cid": "ben:payday",
+          "crid": "23-2-skiddoo",
+          "iurl": "http://localhost:8080/images/320x50.jpg?adid=ben:payday&bidid=35c22289-06e2-48e9-a0cd-94aeb79fab43",
+          "adomain": [
+            "originator.com"
+          ],
+          "adm": "http%3A%2F%2Flocalhost%3A8080%2Fcontact.html%3F99201%26amp%3Badid%3Dben%3Apayday%26amp%3Bcrid%3D23-2-skiddoo%26amp%3Bcachebuster%3D27%26amp%3Bsite_cat%3DIAB1%2CIAB2%26amp%3Bregs_coppa%3D"
+        }
+      ]
+    }
+  ],
+  "id": "35c22289-06e2-48e9-a0cd-94aeb79fab43",
+  "bidid": "35c22289-06e2-48e9-a0cd-94aeb79fab43",
+  "cur": "USD"
+}

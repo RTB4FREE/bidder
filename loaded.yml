@@ -1,0 +1,82 @@
+#
+# Contains the full stack of the RTB4FREe stack (not including crosstalk, elk, mysql or campaign manager)
+# Does contain zookeeper and kafka.
+#
+version: "3"
+
+services:
+
+  zookeeper:
+    image: "zookeeper"
+    ports:
+      - "2181:2181"
+    networks:
+      - rtb_net
+
+  kafka:
+    image: "ches/kafka"
+    environment:
+      ZOOKEEPER_IP: "zookeeper"
+    ports:
+      - "9092:9092"
+    networks:
+      - rtb_net
+    depends_on:
+      - zookeeper
+
+  zerospike:
+    image: "jacamars/zerospike:v1"
+    environment:
+      BROKERLIST: "kafka:9092"
+    ports:
+      - "6000:6000"
+      - "6001:6001"
+      - "6002:6002"
+      - "7001:7001"
+    #volumes:
+    #  - "./cache.db:/cache.db"
+    networks:
+      - rtb_net
+    depends_on:
+      - kafka
+    command: bash -c "./wait-for-it.sh kafka:9092 --t=120 && sleep 1; ./zerospike"
+
+  bidder:
+    image: "jacamars/rtb4free:v1"
+    environment:
+      BROKERLIST: "kafka:9092"
+      PUBSUB: "zerospike"
+      EXTERNAL: "http://localhost:8080"
+      ACCOUNTING: "NONE"
+    ports:
+      - "8080:8080"
+      - "8155:8155"
+      - "7379:7379"
+      - "7000:7000"
+    #volumes:
+    #  - "./database.json:/database.json"
+    #  - "./payday.json:/Campaigns/payday.json"
+    networks:
+      - rtb_net
+    depends_on:
+      - kafka
+      - zerospike
+    command: bash -c "./wait-for-it.sh kafka:9092 --t=120 && ./wait-for-it.sh zerospike:6000 --t 120 && sleep 1; ./rtb4free"
+    #command:  bash -c "./wait-for-it.sh kafka:9092 -t 120 && ./wait-for-it.sh zerospike:6000 -t 120 && sleep 1; ./rtb4free-jmx"
+
+  simulator:
+    image: "jacamars/rtb4free:v1"
+    environment:
+      BIDDER: "bidder:8080"
+      WIN:    "10"
+      PIXEL:  "95"
+      CLICK:  "2"
+      SLEEP:  "100"
+      SILENT: "-silent"
+    networks:
+      - rtb_net
+    command: bash -c "./wait-for-it.sh $$BIDDER -t 120 && sleep 15;  ./load-elastic -host $$BIDDER -win $$WIN -pixel $$PIXEL -click $$CLICK $$SILENT -sleep $$SLEEP"
+
+networks:
+  rtb_net:
+    external: true

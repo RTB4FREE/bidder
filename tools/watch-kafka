@@ -1,0 +1,5 @@
+#!/bin/sh
+#
+# This loads the Database cache
+#
+java -Dlog4j.configuration="file:log4j.properties" -cp target/Bidder-0.0.1-SNAPSHOT-jar-with-dependencies.jar com.jacamars.dsp.rtb.tools.WatchKafka $1 $2 $3 $4 $5 $6 $7 $8

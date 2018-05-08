@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+   <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Real time map showing ad clicks on RTB4FREE">
+    <meta name="keywords" content="RTB,OpenRTB,JAVA,Advertising,real-time,display,native,video,vast,vpaid">
+    <meta name="author" content="RTB4FREE">
+
+    <title><!--#include virtual="SSI/brand_name.ssi" --> Bids</title>
+    <link rel="shortcut icon" href="images/alien.jpg">
+<!-- jQuery library -->
+    <link href=
+    "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+    rel="stylesheet">
+    <link href=
+    "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css"
+    rel="stylesheet">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js">
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ==" crossorigin="" />
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js" integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw==" crossorigin=""></script>
+
+    <script src=
+    "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+    <script src="js/rtb4free.js">
+    </script>
+
+  </head>
+  
+  
+    <body>
+  
+  <nav class="navbar navbar-fixed-top navbar-inverse">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="index.html">RTB 4 Free!</a>
+        </div>
+	at sun.nio.ch.FileDispatcherImpl.writev0(Native Method)
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="bidmapper.html">Bids</a></li>
+            <li><a href="winmapper.html">Wins</a></li>
+            <li><a href="clickmapper.html">Clicks</a></li>
+          </ul>
+        </div><!-- /.nav-collapse -->
+      </div><!-- /.container -->
+    </nav><!-- /.navbar -->
+
+
+    <div id="mapid" style="height: 800px; width: 100%;" ></div>
+
+</div>
+
+  </body>
+
+<script type="text/javascript">
+    lat = lon = 0
+    var mymap
+    var marker
+    var markers = [];
+
+    navigator.geolocation.getCurrentPosition(showPosition);
+    function showPosition(position) {
+        lat = position.coords.latitude
+        lon = position.coords.longitude;
+
+        mymap = L.map('mapid').setView([lat,lon], 10);
+
+        L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+        maxZoom: 20,
+        id: 'mapbox.streets',
+        accessToken: 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw'
+    }).addTo(mymap);
+       mymap.on('click', onMapClick);
+    }
+
+    function onMapClick(e) {
+        popup
+             .setLatLng(e.latlng)
+             .setContent("You clicked the map at " + e.latlng.toString())
+             .openOn(mymap);
+    }
+
+
+    function doit(x,y,cost) {
+	    if (x == 0)
+		    return;
+	    if (markers.length == 20) {
+		    marker = markers.shift();
+		    marker.setMap(null);
+		    marker = null;
+	    }
+	    marker = L.marker([x,y]).addTo(mymap);
+	    markers.push(marker);
+    }
+
+
+    function mapper(record) {
+	    var cost = record.seat + "/" + record.adid + "/" + record.impid + "/" + record.cost;
+	    var lat = record.lat;
+	    var lon = record.lon;
+	    if (typeof(lat) !== 'undefined') {
+		    doit(Number(lat),Number(lon),cost);
+	    }
+    }
+
+<!--#include virtual="SSI/bidloader.ssi" -->
+
+</script>
+
+</body>
+</html>

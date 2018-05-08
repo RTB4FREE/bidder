@@ -1,0 +1,105 @@
+{
+  "id": "123",
+  "at": 1,
+  "imp": [
+    {
+      "id": "2d567fb4-27ff-5d2c-7f65-bcaca54c262c",
+      "instl": 0,
+"pmp": {
+      "private_auction": 1,
+      "deals": [
+        {
+          "id": "fc_APAC",
+          "bidfloor": 0.1,
+          "wadomain": [
+            "c1exchange.com"
+          ]
+        }
+      ]
+    },
+      "banner": {
+        "h": 250,
+        "w": 300,
+        "mimes": [
+          "image/gif",
+          "image/jpeg",
+          "image/png",
+          "text/javascript"
+        ],
+        "pos": 0
+      },
+      "ext": {
+        "nex_screen": 0
+      }
+    }
+  ],
+  "app": {
+    "bundle": "",
+        "id": "",
+        "name": "MeetMe",
+        "domain": "",
+        "storeurl": "",
+        "cat": [""],
+        "sectioncat": [""],
+        "pagecat": [""],
+        "ver": "",
+        "paid": 0,
+        "privacypolicy": 1,
+        "publisher": {
+            "id": "12345",
+            "name": "",
+            "cat": [""],
+            "domain": ""
+    },
+    "ext": {
+      "nex_coppa": 0
+    }
+  },
+  "device": {
+    "didsha1": "132079238ec783b0b89dff308e1f9bdd08576273",
+    "ip": "68.63.27.26",
+    "carrier": "ATT",
+    "ua": "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_2_1 like Mac OS X; el-gr) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8C148 Safari/6533.18.5",
+    "ifa": "AA000DFE74168477C70D291f574D344790E0BB11",
+    "make": "Apple",
+    "model": "iPhone",
+    "osv": "3.1.2",
+    "connectiontype": 3,
+    "devicetype": 2,
+    "geo": {
+      "lat": 42.378,
+      "lon": -71.227,
+      "country": "SGP"
+    }
+  },
+  "user": {
+    "id": "ASDFJKL",
+    "yob": 1961,
+    "gender": "F",
+    "keywords": "sports",
+    "geo": {
+      "country": "USA",
+      "city": "Waltham",
+      "zip": "02451",
+      "region": "MA",
+      "type": 3
+    },
+    "ext": {
+      "nex_eth": "4",
+      "nex_marital": "M",
+      "nex_kids": "N",
+      "nex_hhi": 75000,
+      "nex_dma": "Boston"
+    }
+  },
+  "ext": {
+    "coppa": 0,
+    "udi": {
+      "googleadid": "5e2efab6-7721-4cfe-b542-97084d5aa62f",
+      "googlednt": 0,
+      "atuid": "a90377ab-190b-1036-f424-ac10fdb8ffef"
+    },
+    "operaminibrowser": 0,
+    "carriername": "Verizon Wireless"
+  }
+}

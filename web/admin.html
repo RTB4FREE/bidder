@@ -1,0 +1,2123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta content="width=device-width, initial-scale=1" name="viewport">
+<meta content="Bootstrap static html page for System administration."
+	name="description">
+<meta
+	content="RTB,OpenRTB,JAVA,Advertising,real-time,campaign,administration"
+	name="keywords">
+<meta content="RTB4FREE" name="author">
+
+<title><!--#include virtual="SSI/brand_name.ssi" --> Monitor</title>
+<!--#include virtual="SSI/brand_icon.ssi" -->
+
+<link
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+	rel="stylesheet">
+<link
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css"
+	rel="stylesheet">
+<link href="css/bootstrap-dialog.css" rel="stylesheet">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script src="js/bootstrap-dialog.js"></script>
+<script src="js/rtb4free.js" rtb4free_demo=false></script>
+<script type="text/javascript" src="js/jquery.sparkline.js"></script>
+
+<script src="js/tree.jquery.js"></script>
+<link rel="stylesheet" href="css/jqtree.css">
+
+<style type="text/css">
+.bs-example {
+	margin: 20px;
+}
+
+.form-signin {
+	max-width: 330px;
+	padding: 15px;
+	margin: 0 auto;
+}
+
+.form-signin .form-signin-heading, .form-signin .checkbox {
+	margin-bottom: 10px;
+}
+
+.form-signin .checkbox {
+	font-weight: normal;
+}
+
+.form-signin .form-control {
+	position: relative;
+	font-size: 16px;
+	height: auto;
+	padding: 10px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.form-signin .form-control:focus {
+	z-index: 2;
+}
+
+.form-signin input[type="text"] {
+	margin-bottom: -1px;
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+.form-signin input[type="password"] {
+	margin-bottom: 10px;
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+}
+
+.account-wall {
+	margin-top: 20px;
+	padding: 40px 0px 20px 0px;
+	background-color: #f7f7f7;
+	-moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+	-webkit-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+	box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+}
+
+.login-title {
+	color: #555;
+	font-size: 18px;
+	font-weight: 400;
+	display: block;
+}
+
+.profile-img {
+	width: 96px;
+	height: 96px;
+	margin: 0 auto 10px;
+	display: block;
+	-moz-border-radius: 50%;
+	-webkit-border-radius: 50%;
+	border-radius: 50%;
+}
+
+.need-help {
+	margin-top: 10px;
+}
+
+.new-account {
+	display: block;
+	margin-top: 10px;
+}
+
+.jqstooltip { box-sizing: content-box;}
+</style>
+</head>
+
+<body>
+
+
+	<div class="container">
+
+		<div class="row" id="login">
+			<div class="col-sm-6 col-md-4 col-md-offset-4">
+				<h1 class="text-center login-title">
+					Sign in to Monitor
+					<!--#include virtual="SSI/brand_name.ssi" -->
+				</h1>
+				<div>
+					<form class="form">
+						<input type="text" class="form-control" placeholder="Email"
+							required autofocus id="username" value='root'> <input
+							type="password" class="form-control" placeholder="Password"
+							required id="password" value='startrekisbetterthanstarwars'> <input type="button"
+							class="btn btn-primary btnSeccion" onclick="doFormLogin();"
+							value="Sign In">
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+
+function toggle(elementId) {
+	var ele = document.getElementById(elementId);
+	if(ele.style.display == "block") {
+    		ele.style.display = "none";
+  	}
+	else {
+		ele.style.display = "block";
+	}
+} 
+
+</script>
+
+	<div class="bs-example" style="display: none" id="bs-example">
+
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					<!--#include virtual="SSI/brand_name.ssi" -->
+				System Administration Page 
+						<a href="http://rtb4free.com/admin-mgmt.html" target='_blank;' class="btn btn-warning btn-sm"><i class="icon-white icon-heart"></i>Help</a>
+						<a id='savechanges' href="#" onclick="saveChanges(); return false;" class="btn btn-success btn-sm"><i class="icon-white icon-heart"></i>Save</a>  
+						<a href="admin.html" class="btn btn-danger btn-sm"><i class="icon-white icon-heart"></i>Logout</a>
+				</h3>
+			</div>
+			<div class="panel-body">
+
+
+				<p>
+					<span id='titlepage'>This page is used to manage the operational
+					<!--#include virtual="SSI/brand_name.ssi" -->
+					Instances on <b><span id='filename'></span></b></span>
+				</p>
+
+			</div>
+
+
+
+
+
+
+			<ul class="nav nav-tabs" id="myTab">
+
+				<li><a data-toggle="tab" href="#configuration"
+					onclick="setPaneOptions('config');">Configuration</a></li>
+
+				<li class='active'><a data-toggle="tab" href="#status"
+					onclick="setPaneOptions('status');">System Status</a></li>
+				<li><a data-toggle="tab" href="#campaigns"
+					onclick="setPaneOptions('campaigns');">Campaigns</a></li>
+				<li><a data-toggle="tab" href="#exchanges"
+					onclick="setPaneOptions('exchanges');">Exchanges</a></li>
+			</ul>
+
+			<div class="tab-content" id="myTabContent">
+					<div class="tab-pane fade" id="exchanges">
+
+
+					<div class="panel panel-success">
+						<div class="panel-heading">
+							<h3 class="panel-title">Exchange Summary Totals</h3>
+						</div>
+						<div class="panel-body">
+							<table id="addexchanges">
+								<tr>
+									<th>Exchange</th>
+									<th>Requests</th>
+									<th>Bids</th>
+									<th>Wins</th>
+									<th>Errors</th>
+									<th>%Bid</th>
+									<th>%Win</th>
+									<th>%Error</th>
+								</tr>									
+								</table>
+						</div>
+					</div>
+
+
+				</div>
+
+				<div class="tab-pane fade" id="campaigns">
+
+
+					<div class="panel panel-success">
+						<div class="panel-heading">
+							<h3 class="panel-title">Current Users</h3>
+						</div>
+						<div class="panel-body">
+							<input type="button" class="btn btn-primary btnSeccion"
+								onclick="doUpdateStatus();" value="Refresh">
+							<table id="addstatus" class='table table-striped'>
+								<tr>
+									<th>Campaign</th>
+								</tr>
+
+								<tr id="row0">
+									<td></td>
+								</tr>
+							</table>
+
+						</div>
+					</div>
+					
+					<div class="panel panel-success">
+						<div class="panel-heading">
+							<h3 class="panel-title">Campaign Performance by Exchange</h3>
+						</div>
+						<div class="panel-body">
+							<div id="treebox">...</div>
+
+						</div>
+					</div>
+
+
+				</div>
+
+				<div class="tab-pane fade" id="configuration">
+
+
+					<div class="panel panel-success">
+						<div class="panel-heading">
+							<h3 class="panel-title">Seats</h3>
+						</div>
+						<div class="panel-body">
+
+							<table id="addseats">
+								<tr>
+									<th>Name</th>
+									<th>Id</th>
+									<th>Bid Endpoint</th>
+									<th>E-Key</th>
+									<th>I-Key</th>
+								</tr>
+								<tr id="row0">
+									<td><input id="p_new_exchange_name" name="p_new_x"
+										placeholder="Name of exchange" size="50" type="text" value=""></td>
+
+									<td><input id="p_new_exchange_id" name="p_new"
+										placeholder="Id" size="10" type="text" value=""></td>
+
+									<td><input id="p_new_exchange_endpoint" name="p_new"
+										placeholder="Bid Endpoint" size="50" type="text" value=""></td>
+							
+									<td><input id="p_new_exchange_ekey" name="p_new"
+										placeholder="e-key" size="20" type="text" value=""></td>
+										
+									<td><input id="p_new_exchange_ikey" name="p_new"
+										placeholder="i-key" size="20" type="text" value=""></td>
+
+									<td><a href="javascript:doDynoSeats();">Add</a></td>
+								</tr>
+							</table>
+
+						</div>
+					</div>
+					
+					<div class="panel panel-success">
+						<div class="panel-heading">
+							<h3 class="panel-title">Navigable Maps</h3>
+						</div>
+						<div class="panel-body">
+
+							<table id="addlists">
+								<tr>
+									<th>File Name</th>
+									<th>Type</th>
+									<th>Symbol Name</th>
+								</tr>
+								<tr id="row0">
+									<td><input id="p_new_list_name" name="p_new_x"
+										placeholder="File Name" size="50" type="text" value=""></td>
+
+									<td><input id="p_new_list_type" name="p_new"
+										placeholder="Type" size="30" type="text" value=""></td>
+
+									<td><input id="p_new_list_symbol" name="p_new"
+										placeholder="Symbolic Name" size="20" type="text" value=""></td>
+
+									<td><a href="javascript:doDynoLists();">Add</a></td>
+								</tr>
+							</table>
+
+						</div>
+					</div>
+
+					<div class="panel panel-success">
+						<div class="panel-heading">
+							<h3 class="panel-title">Forensiq</h3>
+						</div>
+						<div class="panel-body">
+
+
+							<table>
+								<tr>
+									<td>Connections:</td>
+									<td><input id="forensiq_connections" name="p_new"
+										placeholder="Max connections to endpoint" size="32"
+										type="text" value=""></td>
+								</tr>
+
+								<tr>
+									<td>Threshhold:</td>
+									<td><input id="forensiq_threshhold" name="p_new"
+										placeholder="Threshhold for no-bid" size="32" type="text"
+										value=""></td>
+								</tr>
+
+								<tr>
+									<td>CK:</td>
+									<td><input id="forensiq_ck" name="p_new"
+										placeholder="Key goes here" size="32" type="text" value=""></td>
+								</tr>
+
+								<tr>
+									<td>Endpoint:</td>
+									<td><input id="forensiq_endpoint" name="p_new"
+										placeholder="Forensiq endpoint" size="32" type="text" value=""></td>
+								</tr>
+
+								<tr>
+									<td>Bid On Error:</td>
+									<td><input id="forensiq_bidonerror" name="p_new"
+										placeholder="Should we bid if forensiq errors?" size="32"
+										type="text" value=""></td>
+								</tr>
+
+							</table>
+
+
+						</div>
+					</div>
+
+					<div class="panel panel-success">
+						<div class="panel-heading">
+							<h3 class="panel-title">Application</h3>
+						</div>
+						<div class="panel-body">
+
+
+							<table>
+
+								<tr>
+									<td>Deadman Switch:</td>
+									<td><input id="app_deadmanswitch" name="p_new"
+										placeholder="" size="32" type="text" value=""></td>
+								</tr>
+								
+								<tr>
+									<td>Multi Bids:</td>
+									<td><input id="app_multibid" name="p_new"
+										placeholder="" size="32" type="text" value=""></td>
+								</tr>
+
+								<tr>
+									<td>Jetty Threads:</td>
+									<td><input id="app_threads" name="p_new" placeholder=""
+										size="32" type="text" value=""></td>
+								</tr>
+
+								<tr>
+									<td>Stop on Load:</td>
+									<td><input id="app_stopped" name="p_new" placeholder=""
+										size="32" type="text" value=""></td>
+								</tr>
+
+								<tr>
+									<td>TTL:</td>
+									<td><input id="app_ttl" name="p_new" placeholder=""
+										size="32" type="text" value=""></td>
+								</tr>
+
+								<tr>
+									<td>Pixel Track URL::</td>
+									<td><input id="app_pixel_track" name="p_new"
+										placeholder="" size="32" type="text" value=""></td>
+								</tr>
+
+								<tr>
+									<td>Win URL:</td>
+									<td><input id="app_winurl" name="p_new" placeholder=""
+										size="32" type="text" value=""></td>
+								</tr>
+
+								<tr>
+									<td>Redirect URL:</td>
+									<td><input id="app_redirect" name="p_new" placeholder=""
+										size="32" type="text" value=""></td>
+								</tr>
+								<tr>
+									<td>Admin Port:</td>
+									<td><input id="app_admin_port" name="p_new" placeholder="0 or a port number"
+										size="32" type="text" value=""></td>
+								</tr>
+								
+								<tr>
+									<td>Password:</td>
+									<td><input id="app_password" name="p_new" placeholder="Password"
+										size="32" type="text" value=""></td>
+								</tr>
+								
+
+							</table>
+							<br /> <br />
+
+
+							<div class="panel panel-info">
+								<div class="panel-heading">
+									<h3 class="panel-title">Logging</h3>
+								</div>
+								<div class="panel-body">
+									<table>
+
+										<tr>
+											<td>Verbosity</td>
+											<td><select class="selectpicker" id='verbosity_level'>
+													<option>5</option>
+													<option>4</option>
+													<option>3</option>
+													<option>2</option>
+													<option>1</option>
+													<option>-1</option>
+													<option>-2</option>
+													<option>-3</option>
+													<option>-4</option>
+													<option selected>-5</option>
+											</select></td>
+										</tr>
+
+										<tr>
+											<td>No Bid Reason&nbsp;</td>
+											<td><select class="selectpicker"
+												id='verbosity_nobidreason'>
+													<option selected>true</option>
+													<option>false</option>
+											</select></td>
+										</tr>
+
+
+									</table>
+								</div>
+
+
+								<div class="panel panel-info">
+									<div class="panel-heading">
+										<h3 class="panel-title">Geotags</h3>
+									</div>
+									<div class="panel-body">
+
+										<table>
+
+											<tr>
+												<td>States</td>
+												<td><input id="geotag_states" name="p_new"
+													placeholder="" size="32" type="text" value=""></td>
+											</tr>
+
+											<tr>
+												<td>Zipcodes</td>
+												<td><input id="geotag_zipcodes" name="p_new"
+													placeholder="" size="32" type="text" value=""></td>
+											</tr>
+
+										</table>
+
+
+
+									</div>
+								</div>
+
+
+								<div class="panel panel-info">
+									<div class="panel-heading">
+										<h3 class="panel-title">Aerospike</h3>
+									</div>
+									<div class="panel-body">
+
+										<table>
+
+											<tr>
+												<td>Hostname</td>
+												<td><input id="aerospike_host" name="p_new"
+													placeholder="Host" size="32" type="text" value="locallhost"></td>
+											</tr>
+											
+											<tr>
+												<td>Max Connections</td>
+												<td><input id="aerospike_maxconns" name="p_new"
+													placeholder="Max # connections" size="32" type="text" value=""></td>
+											</tr>
+
+											<tr>
+												<td>Port</td>
+												<td><input id="aerospike_port" name="p_new"
+													placeholder="Host" size="32" type="text" value="3000"></td>
+											</tr>						
+
+										</table>
+
+									</div>
+								</div>
+								
+									<div class="panel panel-info">
+									<div class="panel-heading">
+										<h3 class="panel-title">ZeroMQ</h3>
+									</div>
+									<div class="panel-body">
+
+										<table>
+								
+								<tr>
+											<td>Win Channel</td>
+												<td><input id="zeromq_win" name="p_new"
+													placeholder="wins channel" size="32" type="text" value=""></td>
+											</tr>
+
+											<tr>
+												<td>Bid Channel</td>
+												<td><input id="zeromq_bid" name="p_new"
+													placeholder="bids channel" size="32" type="text" value=""></td>
+											</tr>
+
+											<tr>
+												<td>No-Bid Channel</td>
+												<td><input id="zeromq_nobid" name="p_new"
+													placeholder="no bid channel" size="32" type="text" value=""></td>
+											</tr>
+
+											<tr>
+												<td>Requests Channel&nbsp;</td>
+												<td><input id="zeromq_request" name="p_new"
+													placeholder="bid request channel" size="32" type="text" value=""></td>
+											</tr>
+
+											<tr>
+											<td>Clicks Channel &nbsp;</td>
+											<td><input id="zeromq_click" name="p_new"
+													placeholder="clicks channel" size="32" type="text" value=""></td>
+											</tr>					
+	
+											<tr>
+												<td>Status Channel</td>
+												<td><input id="zeromq_status" name="p_new"
+													placeholder="status log channel" size="32" type="text" value="file::/logs/status&time=30"></td>
+											</tr>
+
+											<tr>
+												<td>Req Log Strategy:</td>
+												<td><input id="zeromq_strategy" name="p_new"
+														   placeholder="all,bids,wins" size="32" type="text" value=""></td>
+											</tr>
+									</table>
+
+									</div>
+								</div>
+								
+
+								<div class="panel panel-info">
+									<div class="panel-heading">
+										<h3 class="panel-title">Initial Campaigns</h3>
+									</div>
+									<div class="panel-body">
+										<table id="addinititalloads">
+											<tr>
+												<th>Campaign Ad Id</th>
+											</tr>
+											<tr id="row0">
+												<td><input id="p_new_image_url" name="p_new"
+													placeholder="Id" size="30" type="text" value=""></td>
+
+												<td><a href="javascript:doDynoInitLoadCells();">Add</a>
+												</td>
+											</tr>
+										</table>
+									</div>
+								</div>
+
+								<div class="panel panel-info">
+									<div class="panel-heading">
+										<h3 class="panel-title">Templates</h3>
+									</div>
+									<div class="panel-body">
+
+										<label for="default">Default</label> <input id="default"
+											placeholder="Default template" size='120' type="text">
+										<br>
+										<table id="addtemplate">
+											<tr>
+												<th>Exchange</th>
+												<th>Template</th>
+											</tr>
+											<tr id="row0">
+												<td><input id="p_new_exchange" name="p_new_x"
+													placeholder="exchange name" size="20" type="text" value=""></td>
+												<td><input id="p_new_template" name="p_new"
+													placeholder="template is here" size="100" type="text"
+													value=""></td>
+												<td><a href="javascript:doDynoTemplate();">Add</a></td>
+											</tr>
+										</table>
+									</div>
+								</div>
+
+
+
+
+
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="tab-pane fade in active" id="status">
+					Network status:
+					<table id='system-status'>
+						<tr>
+							<th style='text-align: center;'>Name</th>
+							<th style='text-align: center;'>Total</th>
+							<th style='text-align: center;'>Request</th>
+							<th style='text-align: center;'>Fraud</th>
+							<th style='text-align: center;'>Bid</th>
+							<th style='text-align: center;'>Nobid</th>
+							<th style='text-align: center;'>Win</th>
+							<th style='text-align: center;'>Pixel</th>
+							<th style='text-align: center;'>Click</th>
+							<th style='text-align: center;'>Errors</th>
+							<th style='text-align: center;'>%Bid</th>
+							<th style='text-align: center;'>%Win</th>
+							<th style='text-align: center;'>%Pixel</th>
+							<th style='text-align: center;'>%Click</th>
+							<th style='text-align: center;'>%Fraud</th>
+							<th style='text-align: center;'>Ad Spend</th>
+							<th style='text-align: center;'>QPS</th>
+							<th style='text-align: center;'>X-time(avg)</th>
+						</tr>
+					</table>
+
+					<hr />
+					Operational Status:
+					<table id='operstatus'>
+						<tr>
+							<th style='text-align: center;'>Name</th>
+							<th style='text-align: center;'>Running</th>
+							<th style='text-align: center;'>Campaigns</th>
+							<th style='text-align: center;'>Show No Bid Reason</th>
+							<th style='text-align: center;'>Select</th>
+						</tr>
+					</table>
+					<br /> Commands: <br />
+					<input type="button"
+						class="btn btn-primary btnSeccion" onclick="reloadStatus();"
+						value="Refresh">
+					<button type="button" class="btn btn-danger" id='stop-bidder'
+						onclick='doStopBidder()'>Stop Bidder</button>
+					<button type="button" class="btn btn-success" id='start-bidder'
+						onclick='doStartBidder()'>Start Bidder</button>
+					<button type="button" class="btn btn-success"
+						id='changenobidreason-bidder' onclick='doChangeNoBidReason()'>Change
+						No Bid Reason</button>
+					
+
+					<hr />
+					<p>CPU: <span class="dynamicCpu">...</span>
+					
+					</p>
+					<p>MEM: <span class="dynamicMem">...</span>
+					
+					</p>
+					<p>QPS: <span class="dynamicQps">...</span>
+
+					</p>
+					<p>ABT: <span class="dynamicAbt">...</span>
+					
+					</p>
+					<hr />
+					<i><b>System Console</b></i>&nbsp;&nbsp;&nbsp;<input  id="filter" name="filter"
+                                                                      placeholder="filter by inst" size="32" type="text" value=""></form>
+					<table id="logger" border="0" cellpadding=" " cellspacing="4"
+						width="100%" class="scrollTable" />
+					<thead>
+						<tr>
+							<th style="text-align:center;">Date</th>
+							<th style="...">Inst</th>
+							<th style="text-align:center;">Sev</th>
+							<th style="text-align:center;">From</th>
+							<th style="text-align:center;">Source</th>
+							<th>Message</th>
+						</tr>
+					</thead>
+					<tbody class="scrollContent">
+					</tbody>
+					</table>
+
+				</div>
+
+
+			</div>
+
+		</div>
+
+		<footer>
+			<p>
+				&copy; Ben M. Faul, Peter Loh, RTB4FREE.ORG 2018<br />Email:
+				Ben.Faul@rtb4free.com, Peter.Loh@rtb4free.com
+			</p>
+		</footer>
+
+	</div>
+</body>
+<script>
+
+document.getElementById("filter").addEventListener("keypress", function(event) {
+    //event.preventDefault();
+    if (event.keyCode == 13) {
+        var text = document.getElementById('filter').value
+        logger.setInstanceFilter(text)
+        alert("Ok, filter set to: " + text)
+    }
+});
+
+function revert() {
+    forensiqsClear();
+    appClear();
+	seatsDyno.clear();
+	listsDyno.clear()
+	initLoadsDyno.clear();
+	reloadStatus();
+	doFormLogin();
+}
+
+function forensiqsClear() {
+	document.getElementById('forensiq_threshhold').value = '';
+	document.getElementById('forensiq_ck').value = '';
+	document.getElementById('forensiq_endpoint').value = '';
+	document.getElementById('forensiq_bidonerror').value = '';
+}
+
+function appClear() {
+	document.getElementById('app_stopped').value = 'false';
+	document.getElementById('app_ttl').value = '';
+	document.getElementById('app_pixel_track').value = '';
+	document.getElementById("app_winurl").value = '';
+	document.getElementById("app_redirect").value = '';
+	document.getElementById("app_admin_port").value = '0';
+	
+	document.getElementById("verbosity_level").value = '-5';
+	document.getElementById("verbosity_nobidreason").value = "false";
+	
+	document.getElementById("geotag_states").value = "";
+	document.getElementById("geotag_zipcodes").value = "";
+}
+
+function doFormLogin() {
+	userName = document.getElementById("username").value;
+	var password = document.getElementById("password").value;
+	console.log("U="+userName+", P="+password);
+	
+	  msg = {};
+	  msg.command = "loginAdmin";
+	  msg.username = userName;
+	  msg.password = password;
+	  msg.subcommand = WHATTOGET;
+	  ////////////////////
+        $.ajax({
+         type: 'POST',
+         url:'ajax',
+         data: JSON.stringify(msg),
+         dataType: 'json',
+         success: function(data, textStatus, request){
+           if (request.status == 204) {
+            text = "";
+           } else {
+            text = request.responseText;
+            data = JSON.parse(text);
+            message = data.message;
+            text = JSON.stringify(data,null,2);
+            console.log("-----------------");
+            console.log(text);
+           }
+           if (data.error) {
+           		doModal(BootstrapDialog.TYPE_DANGER,"Error","Error logging in");
+           		return;
+           }
+           else {
+           
+           	
+				if (userName === 'demo')
+					setDemoButtons();
+           
+				var ele = document.getElementById("login");
+				ele.style.display = "none";
+	
+				ele = document.getElementById("bs-example");
+				ele.style.display = "block";
+	   		    
+				document.getElementById('filename').innerHTML = data.fileName;
+
+// O = operstatus, Z = Configuration, B = Blacklist, E = Exchanges, C = Campaigns
+				
+		   		clearFields();
+		   		
+		   		fillInApp(data);
+		   		
+		   		fillInGeo(data);
+		   		
+				fillInStatus(data);
+				
+				fillInSeats(data);
+	   			
+	   			fillInInits(data);
+	   			
+	   			fillInOperStatus(data);
+	   			
+	   			fillInRedis(data);
+	   			
+	   			fillInForensiq(data);
+	   			
+	   			fillInLists(data);
+	   			
+	   			/* templates */
+	   			fillInTemplate(data);
+	   			
+	   			fillInExchanges(data);
+	   			
+	   			fillInCampaigns(data);
+	   			
+	   			//updateStatus(data.running);
+     
+	
+				pinger = setInterval(reloadStatus,60000);
+	   		}
+
+         },
+         error: function (request, textStatus, errorThrown) {
+			goOffline();
+         }});
+    ////////////////////
+}
+
+function goOffline() {
+    if (pinger != null) {
+   		clearInterval(pinger);
+   		pinger = null;	
+   }
+   document.getElementById('titlepage').innerHTML = "<b>HTTP ERROR, SYSTEM IS OFFLINE</b>";
+   doModal(BootstrapDialog.TYPE_ERROR,"Error","HTTP ERROR, Server stopped responding.");
+}
+
+/*
+ * Respond to button click
+ */
+
+ function deleteTemplateRow(what) {
+        console.log("DELETE WHAT: " + what);
+        x = document.getElementById(what);
+        console.log("val = " + x.value);
+        tdyno.remove(what);
+        }
+        
+function addTemplateRow(id1, id2) {
+        o = document.getElementById(id1);
+        vals = [];
+        vals.push(o.value);
+        o.value = "";
+        o = document.getElementById(id2);
+        vals.push(o.value);
+        o.value = "";
+        vals.push("");
+        tdyno.add(vals); 
+ }
+ 
+function makeTemplate() {
+ 	var template = {};
+    template.default = document.getElementById("default").value;
+    template.exchange = {};
+    for (var i=2; i<tdyno.numRows();i++) {
+    	var a = tdyno.getObject(i,0)
+      	var b = tdyno.getObject(i,1)
+      	template.exchange[a.value] = b.value;
+    }  
+    return template;
+}
+
+function makeSeats() {
+	var seats = [];
+	for (var i=2; i<seatsDyno.numRows();i++) {
+     	var e = {};
+     	var a = seatsDyno.getObject(i,0)
+		var b = seatsDyno.getObject(i,1)
+     	var c = seatsDyno.getObject(i,2)
+     	var d = seatsDyno.getObject(i,3);
+     	var x = seatsDyno.getObject(i,4);
+    	e.name = a.value;
+    	e.id = b.value;
+    	e.bid = c.value;
+    	if (d.value != '') {
+    		var extension = {};
+    		extension.e_key = d.value;
+    		extension.i_key = x.value;
+    		e.extension = extension;
+    	}
+    	seats.push(e);
+ 	}
+	return seats;
+}
+
+function makeLists() {
+	var lists = [];
+	for (var i=2; i<listsDyno.numRows();i++) {
+     	var e = {};
+     	var a = listsDyno.getObject(i,0)
+		var b = listsDyno.getObject(i,1)
+     	var c = listsDyno.getObject(i,2)
+    	e.filename = a.value;
+    	e.type = b.value;
+    	e.name = c.value;
+    	lists.push(e);
+ 	}
+	return lists;
+}
+
+function makePreloadedCampaigns() {
+	var campaigns = [];
+	for(i=2;i<initLoadsDyno.numRows();i++) {
+		var b = initLoadsDyno.getObject(i,0);
+		c = {};
+		c.name = a.value;
+		c.id = b.value;
+		campaigns.push(c);
+	}
+	return campaigns;
+}
+
+function fillInTemplate(data) {
+	tdyno.clear();
+	var template = data.template;
+	document.getElementById("default").value = template.default;
+	var exchange = template.exchange;
+    for (var p in exchange) {
+    	if( exchange.hasOwnProperty(p) ) {
+        	tdyno.add([p,exchange[p],'']);
+        } 
+   }  
+}
+
+function fillInGeo(data) {
+	if (typeof(data.geotags) == 'undefined' || data.geotags == null)
+		return;
+
+	document.getElementById("geotag_states").value = data.geotags.states;
+	document.getElementById("geotag_zipcodes").value = data.geotags.zipcodes;
+}
+
+function fillInApp(data) {
+	var app = data.app;
+	document.getElementById('app_deadmanswitch').value = app.deadmanswitch;
+	document.getElementById('app_multibid').value = app.multibid;
+	document.getElementById('app_threads').value = app.threads;
+	document.getElementById('app_stopped').value = app.stopped;
+	document.getElementById('app_ttl').value = app.ttl;
+	document.getElementById('app_pixel_track').value = app['pixel-tracking-url'];
+	document.getElementById("app_winurl").value = app.winurl;
+	document.getElementById("app_redirect").value = app['redirect-url'];
+	document.getElementById("app_admin_port").value = app.adminPort;
+	document.getElementById("app_password").value = app.password;
+	
+}
+
+function fillInRedis(data) {
+
+	document.getElementById('aerospike_host').value = data.aerospike.host;
+	document.getElementById('aerospike_maxconns').value = data.aerospike.maxconns;
+	document.getElementById('aerospike_port').value = data.aerospike.port;
+	document.getElementById('zeromq_win').value = data.zeromq.winchannel;
+	document.getElementById('zeromq_bid').value = data.zeromq.bidchannel;
+	document.getElementById('zeromq_nobid').value = data.zeromq.nobid;
+	document.getElementById('zeromq_click').value = data.zeromq.clicks;
+	document.getElementById('zeromq_request').value = data.zeromq.request;
+	
+	document.getElementById('zeromq_status').value = data.zeromq.status;
+	document.getElementById('zeromq_strategy').value = data.zeromq.requeststrategy;
+
+	
+
+}
+
+function fillInForensiq(data) {
+
+	if (typeof data.forensiq === 'undefined') {
+		return;
+	}
+
+	if (data.forensiq == null)
+			return;
+	
+	document.getElementById('forensiq_connections').value = data.forensiq.connections;
+	document.getElementById('forensiq_threshhold').value = data.forensiq.threshhold;
+	document.getElementById('forensiq_ck').value = data.forensiq.ck;
+	document.getElementById('forensiq_endpoint').value = data.forensiq.endpoint;
+	document.getElementById('forensiq_bidonerror').value = data.forensiq.bidOnError;
+
+	
+}
+
+function fillInLists(data) {
+
+	if (typeof data.lists === 'undefined') {
+		return;
+	}
+
+	if (data.lists == null)
+			return;
+
+	var lists = data.lists;
+	listsDyno.clear();
+	for (var i=0; i<lists.length;i++) {
+		var list = lists[i];
+		listsDyno.add([list.filename,list.type,list.name,'']);
+	}
+
+	
+}
+
+function fillInExchanges(data) {
+	var bidders = data.status;
+	
+	exdyno.clear();
+	for (var i = 0; i<bidders.length;i++) {
+		var name = bidders[i].name;
+		var bidder = bidders[i].values;
+		exchanges = bidder.exchanges;
+		if (exchanges == null)
+			return;
+		
+		exdyno.add([name,'','','','','','',''])
+		for (var j=0; j<exchanges.length;j++) {
+			var exchange = exchanges[j];
+			percBid = 0.0;
+			percWin = 0.0;
+			percError = 0.0;
+			if (exchange.requests != 0) {
+				percBid = Number(100 * exchange.bids/exchange.requests).toFixed(2);
+				if (exchange.bids > 0)
+					percWin = Number(100 * exchange.wins/exchange.bids).toFixed(2);
+				percError = Number(100 * exchange.errors/exchange.requests).toFixed(2);
+			}
+			exdyno.add([exchange.name,exchange.requests,exchange.bids,exchange.wins,exchange.errors,
+				percBid,percWin,percError]);
+		}
+		if (i + 1 < bidders.length)
+			exdyno.add(['','','','','','','',''])
+	}
+}
+
+function fillInSeats(data) {
+	var seats = data.seats;
+	seatsDyno.clear();
+	for (var i=0; i<seats.length;i++) {
+		var seat = seats[i];
+		var e_key = ''
+		var i_key = ''
+		if (seat.extension) {
+			e_key = seat.extension.e_key;
+			i_key = seat.extension.i_key;
+		}
+		seatsDyno.add([seat.name,seat.id,seat.bid,e_key,i_key,'']);
+	}
+}
+
+function fillInInits(data) {
+	var inits = data.initials;
+	initLoadsDyno.clear();
+	for (var i=0; i<inits.length;i++) {
+		var camp = inits[i];
+		initLoadsDyno.add([camp.id,'']);
+	}
+}
+
+function doSparkLines(data) {
+	var sp = data.sparklines;
+	sp = JSON.parse(sp);
+	var abt = sp.avgbidtime;
+	var cpu = sp.cpu;
+	var mem = sp.memUsed;
+	var qps = sp.qps
+	var p = mem.split(" ");
+	mem = p[0].replace('M','');
+	mem = Number(mem)
+
+	abt = Number(abt)
+	cpu = Number(cpu);
+	cpuData.push(cpu);
+	memData.push(mem);
+	qpsData.push(qps);
+	abtData.push(abt)
+	if (cpuData.length > 300) {
+		cpuData.shift();
+		memData.shift();
+		qpsData.shift();
+		abtData.shift()
+	}
+	$('.dynamicCpu').sparkline(cpuData);
+	$('.dynamicMem').sparkline(memData);
+	$('.dynamicQps').sparkline(qpsData);
+	$('.dynamicAbt').sparkline(abtData);
+}
+
+function fillInOperStatus(data) {
+	operDyno.clear();
+	var summaries = data.summaries;
+	for (var i=0; i<summaries.length;i++) {
+		var summary = summaries[i];
+		operDyno.add([summary.name,!summary.values.stopped,summary.values.ncampaigns,summary.values.nobidreason,'']);
+	}
+}
+
+function fillInStatus(data) {
+		systemDyno.clear();
+			var status = data.status;
+	   			var total = 0, bid = 0, nobid = 0, win = 0, clicks = 0, pixels = 0, errors = 0, 
+	   					percBid = 0, percWin, percPixel, percClick, spend = 0, total_qps = 0, request = 0, fraud = 0, percFraud = 0;
+	   		    var d = new Date();
+				var now = d.getMilliseconds();
+				var qps = 0;
+	   			
+	   			for (var i=0; i<status.length;i++) {
+	   				  var e = status[i];
+	   				  
+	   				  if (e.values.cperf) {
+	   					  fillInCampPerf(e.values.cperf);  
+	   				  }
+	   				  
+	   				  var d = new Date();
+	   				  var v = e.values;
+	   				  var name = e.name;
+	   				  dataRecord = dataRecorder[name];
+	   				  if (typeof dataRecord === 'undefined') {
+	   				      dataRecord = {};
+   					      dataRecord.requestA = v.request + v.win;
+    				      dataRecord.time = d.getTime();
+    				      dataRecorder[name] = dataRecord;
+    				  } else {
+    				  	 var x = d.getTime() - dataRecord.time;
+    				  	 var y = v.request + v.win;    		
+						 x = x/1000;
+						 var requestA = y - dataRecord.requestA;
+						 qps = requestA/x;
+						 dataRecord.requestA = y;
+						 dataRecord.time = d.getTime();
+    				  }   				  
+	   				  
+	   				  var pbid = 0, pwin = 0;
+	   				  if (v.bid + v.nobid != 0)
+	   				  	pbid = Number( 100 * v.bid/(v.bid + v.nobid)).toFixed(2);
+	   				  if (v.bid != 0)
+	   				  	pwin = Number( 100 * v.win/v.bid).toFixed(2);
+	   				  if (v.win == 0)
+	   				  	ppix = 0;
+	   				  else
+	   				  	ppix = Number(100 * v.pixels/v.win).toFixed(2);
+	   				  if (v.pixels == 0)
+	   				  	pclc = Number(0).toFixed(2);
+	   				  else
+	   				    pclc = Number( 100 * v.clicks/v.win).toFixed(2);
+	   				    
+	   				  if (v.fraud == 0)
+	   				  	percFraud = Number(0).toFixed(2);
+	   				  else
+	   				    percFraud = Number( 100 * v.fraud/v.request).toFixed(2)
+	   				    
+	   				  
+	   				  var spnd = Number(v.adspend/1000).toFixed(6);
+	   				
+	   				  if (qps == 0)
+	   				  	sqps = "na";
+	   				  else {
+	   				 	 total_qps += qps;
+	   				  	 sqps = Number(qps).toFixed(2);
+	   				  }
+	   				  systemDyno.add([e.name, v.total,v.request,v.fraud,v.bid,v.nobid,v.win,v.pixels,v.clicks,v.errors,pbid,pwin,ppix,pclc,percFraud,spnd,sqps,Number(v.avgx).toFixed(6)]);
+	   				  total += v.total;
+	   				  bid += v.bid;
+	   				  nobid += v.nobid;
+	   				  win += v.win;
+	   				  clicks += v.clicks;
+	   				  pixels += v.pixels;
+	   				  errors += v.errors;
+	   				  spend += v.adspend/1000;		
+	   				  request += v.request;  
+	   				  fraud += v.fraud;
+	   			}
+	   			percFraud = 0;
+	   			percPix = percClc  = percWin = percBid = 0;
+	   			if (bid+nobid != 0)
+	   				percBid = Number(100 * bid/(bid+nobid)).toFixed(2);
+	   			if (bid != 0)
+	   				percWin = Number(100 * win/bid).toFixed(2);
+	   			if (win != 0) { 		
+	   				percPix = Number(100 * pixels/win).toFixed(2);
+	   				percClc = Number(100 * clicks/win).toFixed(2);
+	   			}
+	   			if (fraud != 0) 
+	   				percFraud = Number(fraud/request * 100).toFixed(2);
+	   			else 
+	   				percFraud = Number(0).toFixed(2);
+	   			
+	   			if (total_qps == 0) {
+	   				sqps = "na";
+	   			} else {
+	   		   	  sqps = Number(total_qps).toFixed(2);
+	   		    }
+	   			percClc = Number(percClc).toFixed(2);
+	   			lastTime = now;
+	   			spend = Number(spend).toFixed(6);
+	   			systemDyno.add(['','','', '','','','','','','','','','','','','','','']);
+	   			systemDyno.add(['Total', total,request,fraud,bid,nobid,win,pixels,clicks,errors,percBid,percWin,percPix, percClc,percFraud,spend, sqps,'na']);
+	   			
+			}
+			
+			function getExchange(name) {
+				for (var i=0;i<exchanges.length;i++) {
+					var e = exchanges[i];
+					if (e.name == name)
+						return e;
+				}
+				return null;
+			}
+			
+			function  fillInCampPerf(perf) {
+				if (exchanges == null || exchanges.length == 0)
+					return;
+				
+				var data = JSON.stringify(perf,null,2);
+				var xdata = []
+				var ids = 1;
+				for (var i=0;i<perf.length;i++) {
+					var ob = perf[i];
+					var exch = {};
+					exch.name = ob.exchange;
+					var e = getExchange(exch.name);
+					
+					if (e == null) { // happens when there are no bids for this exchange
+						e = {}
+						e.requests = 0;
+						e.bids = 0;
+					}
+					exch.name += ", total: " + e.requests.toString() + ", bids: " + e.bids.toString();
+					var val;
+					if (ob.total == 0)
+						val = 0;
+					else 
+						val = (100 * ob.bids / ob.total).toFixed(2);
+					exch.name += " [" + val.toString() + "%]"
+					
+					
+					exch.id = ids++;
+					exch.children = []
+					var camps = ob.campaigns;
+					for (var j=0;j<camps.length;j++) {
+						var childo = camps[j];
+						var ecamp = {};
+						ecamp.id = ids++;
+						ecamp.name = childo.campaign;
+						ecamp.name += ", total: " + childo.total.toString() + ", bids: " + childo.bids.toString();
+						var val;
+						if (childo.total == 0)
+							val = 0;
+						else 
+							val = (100 * childo.bids / childo.total).toFixed(2);
+						ecamp.name += " [" + val.toString() + "%]"
+						ecamp.children = [];
+						var creatives = childo.creatives;
+						for (var k=0;k<creatives.length;k++) {
+							var childx = creatives[k];
+							var ecrea = {};
+							ecrea.id = ids++;
+							ecrea.name = childx.creative;
+							ecrea.name += ", total: " + childx.total.toString() + ", bids: " + childx.bids.toString();
+							var val;
+							if (childx.total == 0)
+								val = 0;
+							else 
+								val = (100 * childx.bids / childx.total).toFixed(2);
+							ecrea.name += " [" + val.toString() + "%]"
+							ecrea.children = [];
+							var reasons = childx.reasons;
+							for(var a = 0; a < reasons.length;a++) {
+								var r = reasons[a];
+								var reas = {}
+								reas.id = ids++;
+								reas.name = r.name + ": " + r.count.toString()
+								
+								var val;
+								if (childx.total == 0)
+									val = 0;
+								else 
+									val = (100 * r.count / childx.total).toFixed(2);
+								reas.name += " [" + val.toString() + "%]"
+								
+								ecrea.children.push(reas);
+							}
+							ecamp.children.push(ecrea);
+						}
+						exch.children.push(ecamp);
+					}
+					xdata.push(exch);
+				}
+				
+				var state = $('#treedata'); 
+				if (!state || pane != 'campaigns') {
+					
+				} else {
+					state = state.tree('getState');
+					if (state && state.open_nodes.length > 0)
+						return;
+				}
+				
+				$("#treebox").empty().append('<div id="treedata"></div>');
+		        $("#treedata").tree({
+		            data: xdata
+		        });
+				
+			}
+
+function reloadStatus() {
+
+	  if (pinger == null)
+		  	return;
+	  
+	  msg = {};
+	  msg.command = "loginAdmin";
+	  msg.username = userName;
+	  msg.password = document.getElementById("password").value;
+	  ////////////////////
+        $.ajax({
+         type: 'POST',
+         url:'ajax',
+         data: JSON.stringify(msg),
+         dataType: 'json',
+         success: function(data, textStatus, request){
+           if (request.status == 204) {
+            text = "";
+           } else {
+            text = request.responseText;
+            data = JSON.parse(text);
+            message = data.message;
+            text = JSON.stringify(data,null,2);
+            console.log("-----------------");
+            console.log(text);
+           }
+           if (data.error) {
+           		doModal(BootstrapDialog.TYPE_DANGER,"Error","Error logging in");
+           		return;
+           }
+           else {
+	   		
+	   			systemDyno.clear();
+	   		    fillInStatus(data);	
+	   		    fillInOperStatus(data);
+	   		 	fillInExchanges(data);
+	   		    doSparkLines(data);
+	   		
+	   		}
+
+         },
+         error: function (request, textStatus, errorThrown) {
+        	 goOffline();
+         }});
+    ////////////////////
+}
+
+function clearFields() {
+
+}
+           
+    function deleteSeat(id) {
+    	seatsDyno.remove(id);
+    }
+    
+    function doDynoTemplate() {
+    	var name =  $('#p_new_exchange').val()
+ 	    var templ = $('#p_new_template').val()
+ 	    vals = [];
+ 	    vals.push(name);
+		vals.push(templ);
+		vals.push('');
+		tdyno.add(vals);
+    	$('#p_new_exchange').val('')
+ 	    $('#p_new_template').val('')
+    }
+    
+    function doDynoSeats() {
+    	var name =  $('#p_new_exchange_name').val()
+ 	    var id = $('#p_new_exchange_id').val()
+ 	    var endpoint = $('#p_new_exchange_endpoint').val()
+ 	    var ekey = $('#p_new_exchange_ekey').val()
+ 	    var ikey = $('#p_new_exchange_ikey').val()
+ 	    vals = [];
+ 	    vals.push(name);
+		vals.push(id)
+		vals.push(endpoint)
+		vals.push(ekey)
+ 	    vals.push(ikey);
+		vals.push('')
+ 	    seatsDyno.add(vals); 
+ 	    
+    	$('#p_new_exchange_name').val('')
+ 	    $('#p_new_exchange_id').val('')
+ 	    $('#p_new_exchange_endpoint').val('')
+ 	    $('#p_new_exchange_ekey').val('')
+ 	    $('#p_new_exchange_ikey').val('')
+    }
+    
+    function deleteList(id) {
+    	listsDyno.remove(id);
+    }
+    
+ 	function doDynoLists() {
+ 		filename =  $('#p_new_list_name').val()
+ 	    type = $('#p_new_list_type').val()
+ 	    name = $('#p_new_list_symbol').val()
+ 	    vals = [];
+ 	    vals.push(filename);
+		vals.push(type)
+		vals.push(name)
+ 	    vals.push("");
+ 	    listsDyno.add(vals); 
+ 	    
+ 		$('#p_new_list_name').val('')
+ 	    $('#p_new_list_type').val('')
+ 	    $('#p_new_list_symbol').val('')
+ 	}
+    
+    function doDynoUsers() {
+   		var msg = {
+   			command: 'addUser',
+       		name: $('#user_name').val(),
+       		pass: $('#user_pass').val(),
+       		dir: $('#user_dir').val(),
+       		phone: $('#user_phone').val(),
+       		email: $('#user_email').val(),
+       		credit: $('#user_credit').val()
+       	};
+       	
+     
+       	if (msg.name === '') {
+       		doModal(BootstrapDialog.TYPE_DANGER,"Error","The name field cannot be empty.");
+       		return;
+       	}
+       	 ////////////////////
+        $.ajax({
+         type: 'POST',
+         url:'ajax',
+         data: JSON.stringify(msg),
+         dataType: 'json',
+         success: function(data, textStatus, request){
+           if (request.status == 204) {
+            text = "";
+           } else {
+            text = request.responseText;
+            data = JSON.parse(text);
+            text = JSON.stringify(data,null,2);
+            console.log("-----------------");
+            console.log(text);
+           }
+           if (data.error) {
+           		doModal(BootstrapDialog.TYPE_DANGER,"Error",data.message);
+           		return;
+           }
+
+         },
+         error: function (request, textStatus, errorThrown) {
+        	 goOffline();
+         }});
+    ////////////////////
+    }
+   
+   function doStopBidder() {
+   		BootstrapDialog.show({
+    		icon: 'glyphicon glyphicon-send',
+   			type: BootstrapDialog.TYPE_DANGER,
+   			title: 'DANGER',
+            message: 'You are about to stop the running bidders!',
+            autospin: true,
+            buttons: [
+            {
+                label: 'Proceed?',
+                cssClass: 'btn-danger',
+                action: function(dialogRef) {
+                    dialogRef.enableButtons(false);
+                    dialogRef.setClosable(false)                                            
+                	executeBidderCommand(userName,"stop","*",null);
+                	setTimeout(function(){
+                        dialogRef.close();
+                        reloadStatus();
+                    }, 5000);
+                }
+            }, {
+                label: 'Close',
+                action: function(dialogItself){
+                    dialogItself.close();
+                }
+            }]
+        });
+   }
+   
+   function executeBidderCommand(userName,action,who,level) {
+   
+     var i = 1;
+     var entry = null, name=null,select=null;
+     var names = [];
+     while((entry = operDyno.getRowByIndex(i)) != null) {
+     	name = operDyno.getObject(i,0);
+     	name = name.value;
+     	select = operDyno.getObject(i,4);
+     	select = select.checked;
+     	if (select) {
+     		names.push(name);
+     	}
+     	i++;
+     }
+     
+     if (names.length == 0) {
+    	 doModal(BootstrapDialog.TYPE_ERROR,"Error","No bidders were selected");
+    	 return;
+     }
+   
+      for (i = 0; i < names.length;i++) {
+        name = names[i]
+      	execute(userName,action,name,level);
+      }
+   }
+   
+  
+  function execute(userName,action,who,level) {
+      msg = {};
+	  msg.command = "executeCommand";
+	  msg.username = userName;
+	  msg.action = action;
+	  msg.who = "*";
+	  msg.level = level;
+	  ////////////////////
+        $.ajax({
+         type: 'POST',
+         url:'ajax',
+         data: JSON.stringify(msg),
+         dataType: 'json',
+         success: function(data, textStatus, request){
+           if (request.status == 204) {
+            text = "";
+           } else {
+            text = request.responseText;
+            data = JSON.parse(text);
+            message = data.message;
+            text = JSON.stringify(data,null,2);
+            console.log("-----------------");
+            console.log(text);
+           }
+           if (data.error) {
+           		doModal(BootstrapDialog.TYPE_DANGER,"Error", message);
+           		return;
+           }
+			
+				console.log("OK STOPPED");
+
+         },
+         error: function (request, textStatus, errorThrown) {
+        	 goOffline();
+         }});
+    ////////////////////
+   }
+   
+   function doStartBidder() {
+   BootstrapDialog.show({
+   			type: BootstrapDialog.TYPE_INFO,
+   			title: 'INFO',
+            message: 'You are about to start the selected bidders!',
+            buttons: [
+            {
+                label: 'Proceed?',
+                cssClass: 'btn-success',
+                action: function(dialogRef) {
+   					dialogRef.enableButtons(false);
+                    dialogRef.setClosable(false)
+                	executeBidderCommand(userName,"start","*",null);
+                	setTimeout(function(){
+                        dialogRef.close();
+                        reloadStatus();
+                    }, 5000);
+                }
+            }, {
+                label: 'Close',
+                action: function(dialogItself){
+                    dialogItself.close();
+                }
+            }]
+        });
+   }
+   
+   function executeStartBidders() {
+   		console.log("-------------------> START");
+   }
+   
+     function doChangeNoBidReason() {
+  	 	BootstrapDialog.show({
+   			type: BootstrapDialog.TYPE_WARNING,
+   			title: 'WARNING',
+            message: function(dialogItself) {
+				var $form = $('<form></form>');
+        		//var $titleDrop = $('<input type="text" id="newlevel" />');
+        		
+        		var $titleDrop = "<select id='newlevel'>" +
+  									"<option value='false'>false</option>" +
+  									"<option value='true'>true</option>"
+									"</select>";
+        		
+        		dialogItself.setData('field-title-drop', $titleDrop);   // Put it in dialog data's container then you can get it easier by using dialog.getData() later.
+        		$form.append('You are about to change change the print no bid reason flag<br/><label>Print: &nbsp; </label>').append($titleDrop);
+
+        		return $form;
+            },
+          //  message: 'You are about to change the logging level of the selected bidders!',
+            buttons: [
+            {
+                label: 'Proceed?',
+                cssClass: 'btn-warning',
+                action: function(dialogRef) {
+   					dialogRef.enableButtons(false);
+                    dialogRef.setClosable(false)
+                    obj = document.getElementById("newlevel");
+                    var value = obj.value
+                	executeBidderCommand(userName,"nobidreason","*",value);
+                	setTimeout(function(){
+                        dialogRef.close();
+                        reloadStatus();
+                    }, 5000);
+                }
+            }, {
+                label: 'Close',
+                action: function(dialogItself){
+                    dialogItself.close();
+                }
+            }]
+        });
+   }
+   
+   function doReloadBidder() {
+   BootstrapDialog.show({
+   			type: BootstrapDialog.TYPE_DANGER,
+   			title: 'DANGER',
+            message: 'You are about to reload all the campaigns of the selected bidders!',
+            buttons: [
+            {
+                label: 'Proceed?',
+                cssClass: 'btn-danger',
+                action: function(dialogItself) {
+                	executeReloadBidders();
+                	dialogItself.close();
+                }
+            }, {
+                label: 'Close',
+                action: function(dialogItself){
+                    dialogItself.close();
+                }
+            }]
+        });
+   }
+   
+   function setDemoButtons() {
+     	$('#savechanges').addClass('disabled');;
+     	$('#start-bidder').addClass('disabled');
+     	$('#stop-bidder').addClass('disabled');
+     	$('#start-bidder').addClass('disabled');
+     	$('#reload-bidder').addClass('disabled');
+     	$('#changenobidreason-bidder').addClass('disabled');
+   }
+   
+   function setPaneOptions(panel) {
+   		pane = panel;
+   		
+   		doFormLogin();
+   		
+   		if (userName === 'demo')
+   			return;
+   			
+   		if (panel === 'status' || status === 'config') {
+   		   	$('#savechanges').addClass('disabled');;
+   		} else {
+   		    $('#savechanges').removeClass('disabled');
+
+   		}
+   }
+   
+   /*
+    * Send config or user info contents to bidder so it can write a new one
+    */
+   function saveChanges() {
+	   if (pane === 'config')
+	   	saveConfig();
+   }
+   	 
+   function saveConfig() {
+   		var config = {};
+   	    
+   	    config.forensiq = {};
+   	    config.forensiq.threshhold = document.getElementById('forensiq_threshhold').value;
+   	    if (config.forensiq.threshhold == '')
+   	    	config.forensiq.threshhold = 0;
+   	    else 
+   	    	config.forensiq.threshhold = Number(config.forensiq.threshhold);
+		config.forensiq.ck = document.getElementById('forensiq_ck').value;
+		if (config.forensiq.ck == '')
+			config.forensiq.ck = 'none';
+		config.forensiq.endpoint = document.getElementById('forensiq_endpoint').value;
+		config.forensiq.bidOnError = document.getElementById('forensiq_bidonerror').value;
+		if (config.forensiq.bidOnError == '')
+			config.forensiq.bidOnError = 'false';
+   	    
+   	    config.app = {};
+   	 	var stopped = document.getElementById('app_stopped').value;
+   	 	if (stopped == 'true')
+   	    	config.app.stopped = true;
+   	 	else
+   	 		config.app.stopped = false;
+        config.app.ttl = document.getElementById('app_ttl').value;
+        if (config.app.ttl == '')
+        	config.app.ttl = 300;
+        else
+        	config.app.ttl = Number(config.app.ttl);
+        
+        value = document.getElementById('app_deadmanswitch').value;
+        if (value != '') {
+        	config.app.deadmanswitch = value
+        } else 
+        	config.app.deadmanswitch = null;
+        
+        value = document.getElementById('app_multibid').value;
+        if (value != '') {
+        	if (value === 'true')
+        		config.app.multibid = true
+        	else
+        		config.app.multibid = false;
+        }
+        
+        config.app['pixel-tracking-url'] = document.getElementById('app_pixel_track').value;
+        config.app.winurl = document.getElementById("app_winurl").value;
+        config.app['redirect-url'] = document.getElementById("app_redirect").value;
+        
+        var val = document.getElementById("app_admin_port").value;
+        if (val == '')
+        	val = 0;
+        else 
+        	val = Number(val)
+        config.app.adminPort = val
+        
+        config.app.password = document.getElementById("app_password").value;
+        
+        config.app.verbosity = {};
+        config.app.verbosity.level = Number(document.getElementById('verbosity_level').value);
+        
+        val = document.getElementById('verbosity_nobidreason').value;
+        if (val == 'true')
+        	val = true;
+        else 
+        	val = false;
+        config.app.verbosity['nobid-reason']  = val;
+        
+        config.app.geotags = {};
+        config.app.geotags.states = document.getElementById('geotag_states').value;
+        config.app.geotags.zipcodes = document.getElementById('geotag_zipcodes').value;
+        
+        config.app.aerospike = {};
+        config.app.aerospike.host = document.getElementById('aerospike_host').value;
+        config.app.aerospike.maxconns = document.getElementById('aerospike_maxconns').value;
+        config.app.aerospike.port = document.getElementById('aerospike_port').value;
+        if (config.app.aerospike.port == '')
+        	config.app.aerospike.port = 3000;
+        else
+        	config.app.aerospike.port = Number(config.app.aerospike.port);
+        if (config.app.aerospike.maxconns == '')
+    		config.app.aerospike.port = 300;
+    	else
+    		config.app.aerospike.maxconns = Number(config.app.aerospike.maxconns);
+        
+        config.app.zeromq = {};
+        config.app.zeromq.bidchannel = document.getElementById('zeromq_bid').value
+        config.app.zeromq.responses = document.getElementById('zeromq_responses').value
+        config.app.zeromq.nobid = document.getElementById('zeromq_nobid').value;
+        config.app.zeromq.winchannel = document.getElementById('zeromq_win').value
+        config.app.zeromq.requests = document.getElementById('zeromq_request').value;
+        config.app.zeromq.clicks = document.getElementById('zeromq_click').value;
+        config.app.zeromq.requeststrategy = document.getElementById('zeromq_strategy').value;
+        config.app.zeromq.subscribers = {};
+        var hosts = document.getElementById('zeromq_subscribers').value;
+        config.app.zeromq.subscribers.hosts = hosts.split(",");
+        
+        config.app.zeromq.subscribers.commands = document.getElementById('zeromq_commandport').value;
+        config.app.zeromq.status = document.getElementById('zeromq_status').value;
+        config.app.zeromq.requeststrategy = document.getElementById('zeromq_strategy').strategy;
+        if (config.app.zeromq.subscribers.commands == '')
+        	config.app.zeromq.subscribers.commands = "5580";
+        
+        
+        config.seats = makeSeats(); 
+        config.lists = makeLists()
+        config.app.template = makeTemplate();
+        config.app.campaigns = makePreloadedCampaigns();
+
+      	  msg = {};
+      	  msg.command = "saveConfig";
+      	  msg.username = userName;
+      	  msg.password = document.getElementById("password").value;
+      	  msg.config = config;
+      	  ////////////////////
+              $.ajax({
+               type: 'POST',
+               url:'ajax',
+               data: JSON.stringify(msg),
+               dataType: 'json',
+               success: function(data, textStatus, request){
+                 if (request.status == 204) {
+                  text = "";
+                 } else {
+                  text = request.responseText;
+                  data = JSON.parse(text);
+                  message = data.message;
+                  text = JSON.stringify(data,null,2);
+                  console.log("-----------------");
+                  console.log(text);
+                 }
+                 if (data.error) {
+                 		doModal(BootstrapDialog.TYPE_DANGER,"Error",data.message);
+                 		return;
+                 }
+                 else {
+      	   		
+                	 doModal(BootstrapDialog.TYPE_INFO,"OK",data.message);
+      	   		
+      	   		}
+
+               },
+               error: function (request, textStatus, errorThrown) {
+              	 goOffline();
+               }});
+          ////////////////////   
+        
+   	}
+   
+   function executeReloadBidders() {
+   		console.log("-------------------> ChangeLog");
+   }
+   
+function updateStatus(running) {
+    /** 
+      * Update the status pane
+      */
+    table = document.getElementById("addstatus");
+    rows = table.rows;
+    for (var i = 2; i < rows.length; i++) {
+        row = rows[i];
+        cell = row.cells[1];
+        button = cell.children[0];
+        text = button.value;
+        button.style.background = "#A9A9A9";
+        for (var j = 0; j<running.length;j++) {
+       		if (text == 'Running') {
+            	button.value = "Stop";
+                button.style.background='#7FFF00';
+            }
+        }
+        console.log(text);
+    }
+    }
+    
+    function deleteStatusRowById(id) {
+    	table = document.getElementById("addstatus");
+    	rows = table.rows;
+   	  for (var i = 2; i < rows.length; i++) {
+        row = rows[i];
+        cell = row.cells[0];
+        label = cell.innerText;
+        if (label == id) {
+            delid = row.id;
+            campStatus.remove(delid);
+            return;
+        }
+    }
+    }
+    
+    function deleteInitial(what) {
+    	initLoadsDyno.remove(what);
+    }
+    
+    
+        function startStop(rowId) {
+    
+    if (document.getElementById("username").value === 'demo') {
+    	doModal(BootstrapDialog.TYPE_ERROR,"Error","Demo login can't stop or start campaigns.");
+    	return
+    }
+    
+    console.log("A="+rowId);
+    row = document.getElementById(rowId);
+    cell = row.cells[1];
+    a = cell.textContent;
+    cell = row.cells[2];
+    inp = cell.children[0];
+    b = inp.value;
+    campaign = getCampaign(a);
+    msg = {};
+    msg.username = userName;
+    if (b == 'Start') {
+        inp.value='Pending...';
+        msg.command = 'startcampaign';
+        msg.id = campaign.adId;
+    } else {
+        msg.command = 'stopcampaign';
+        msg.id = campaign.adId;
+        inp.value = "Start"
+    }
+    ////////////////////
+        $.ajax({
+         type: 'POST',
+         url:'ajax',
+         data: JSON.stringify(msg),
+         dataType: 'json',
+         success: function(data, textStatus, request){
+           if (request.status == 204) {
+            text = "";
+           } else {
+            text = request.responseText;
+            data = JSON.parse(text);
+            message = data.message;
+            text = JSON.stringify(data,null,2);
+            console.log("-----------------");
+            console.log(text);
+           }
+           if (data.error)
+                doModal(BootstrapDialog.TYPE_INFO,"Error",message);
+               
+          // updateStatus(data.running);
+         },
+         error: function (request, textStatus, errorThrown) {
+        	 goOffline();
+         }});
+    ////////////////////
+    }
+    
+    function getCampaign(id) {
+    	for (var i = 0; i < camps.length; i++) {
+        	var camp = camps[i];
+        	if (camp.adId == id)
+            	return camp;
+    	}
+    	return null;
+    }
+    
+    
+    function fillInCampaigns(data) {
+        running = data.running;
+        campStatus.clear();
+        for (i = 0; i < running.length; i++) {
+            campaign = running[i];
+            value = campStatus.add([campaign, '']);
+        }
+    }
+      
+      
+   //////////////////////////////
+   
+   xcells = [];
+   xcells.push("<input type='text' id='SUB_ID' size='30' readonly value=''/>");
+   xcells.push("<input type='text' id='SUB_ID' size='15' readonly value='' style='text-align:right;'/>");
+   xcells.push("<input type='text' id='SUB_ID' size='15' readonly value='' style='text-align:right;'/>");
+   xcells.push("<input type='text' id='SUB_ID' size='15' readonly value='' style='text-align:right;'/>");
+   xcells.push("<input type='text' id='SUB_ID' size='15' readonly value='' style='text-align:right;'/>");
+   xcells.push("<input type='text' id='SUB_ID' size='15' readonly value='' style='text-align:right;'/>");
+   xcells.push("<input type='text' id='SUB_ID' size='15' readonly value='' style='text-align:right;'/>");
+   xcells.push("<input type='text' id='SUB_ID' size='15' readonly value='' style='text-align:right;'/>");
+   exdyno = new DynamicTable("addexchanges",xcells);  
+
+   xcells = [];
+   xcells.push("<input type='text' id='SUB_ID' size='20'value='' placeholder='exchange name' />");
+   xcells.push("<input type='text' id='SUB_ID' size='100' value='' placeholder='template is here' />");
+   xcells.push("<a href=\"javascript:deleteTemplateRow('ROW_ID');\">Del<\/a><\/td>");
+
+  tdyno = new DynamicTable("addtemplate",xcells);     
+      
+   
+    zcells = [];
+    zcells.push('SUB_VALUE');
+    campStatus = new DynamicTable("addstatus",zcells);
+          
+ seatCells = []
+    seatCells.push("<input type='text' id='SUB_ID' size='50' value='' placeholder='Name' />");
+    seatCells.push("<input type='text' id='SUB_ID' size='10' value='' placeholder='Endpoint' />");
+    seatCells.push("<input type='text' id='SUB_ID' size='50' value='' placeholder='Id' />")
+    seatCells.push("<input type='text' id='SUB_ID' size='20' value='' placeholder='E-Key' />")
+    seatCells.push("<input type='text' id='SUB_ID' size='20' value='' placeholder='I-Key' />")
+    seatCells.push("<a href=\"javascript:deleteSeat('ROW_ID');\">Del<\/a><\/td>");
+    seatsDyno = new DynamicTable("addseats",seatCells);
+   
+ listCells = []
+	listCells.push("<input type='text' id='SUB_ID' size='50' value='' placeholder='File Name' />");
+ 	listCells.push("<input type='text' id='SUB_ID' size='30' value='' placeholder='Type' />");
+ 	listCells.push("<input type='text' id='SUB_ID' size='20' value='' placeholder='Symbol Name' />")
+ 	listCells.push("<a href=\"javascript:deleteList('ROW_ID');\">Del<\/a><\/td>");
+ 	listsDyno = new DynamicTable("addlists",listCells);
+    
+ systemCells = [];
+ 	systemCells.push("<input type='text' id='SUB_ID' size='30' readonly value=''/>");
+ 	systemCells.push("<input type='text' id='SUB_ID' size='8'  readonly value=''  style='text-align:right;'/>");
+ 	systemCells.push("<input type='text' id='SUB_ID' size='8'  readonly value=''  style='text-align:right;'/>");
+ 	systemCells.push("<input type='text' id='SUB_ID' size='8'  readonly value=''  style='text-align:right;'/>");
+ 	systemCells.push("<input type='text' id='SUB_ID' size='8'  readonly value=''  style='text-align:right;'/>");
+ 	systemCells.push("<input type='text' id='SUB_ID' size='8'  readonly value=''  style='text-align:right;'/>");
+ 	systemCells.push("<input type='text' id='SUB_ID' size='8'  readonly value=''  style='text-align:right;'/>");
+ 	systemCells.push("<input type='text' id='SUB_ID' size='8'  readonly value=''  style='text-align:right;'/>");
+ 	systemCells.push("<input type='text' id='SUB_ID' size='8'  readonly value=''  style='text-align:right;'/>");
+ 	systemCells.push("<input type='text' id='SUB_ID' size='8'  readonly value=''  style='text-align:right;'/>");
+ 	systemCells.push("<input type='text' id='SUB_ID' size='8'  readonly value=''  style='text-align:right;'/>");
+ 	systemCells.push("<input type='text' id='SUB_ID' size='8'  readonly value=''  style='text-align:right;'/>");
+ 	systemCells.push("<input type='text' id='SUB_ID' size='8'  readonly value=''  style='text-align:right;'/>"); 	
+ 	systemCells.push("<input type='text' id='SUB_ID' size='8'  readonly value=''  style='text-align:right;'/>");
+ 	systemCells.push("<input type='text' id='SUB_ID' size='8'  readonly value=''  style='text-align:right;'/>");
+ 	systemCells.push("<input type='text' id='SUB_ID' size='8'  readonly value=''  style='text-align:right;'/>");
+ 	systemCells.push("<input type='text' id='SUB_ID' size='8'  readonly value=''  style='text-align:right;'/>");
+ 	systemCells.push("<input type='text' id='SUB_ID' size='8'  readonly value=''  style='text-align:right;'/>");
+ 	systemDyno = new DynamicTable("system-status",systemCells);
+ 	
+operCells = [];
+ 	operCells.push("<input type='text' id='SUB_ID' size='30' readonly value=''/>");
+ 	operCells.push("<input type='text' id='SUB_ID' size='8'  readonly value=''/>");
+ 	operCells.push("<input type='text' id='SUB_ID' size='8'  readonly value=''/>");
+ 	operCells.push("<input type='text' id='SUB_ID' size='18'  readonly value=''/>");
+ 	operCells.push("<input type='checkbox' id=SUB_ID'  value='' checked/>");
+ 	operDyno = new DynamicTable("operstatus",operCells);
+
+initLoadCells = []
+    initLoadCells.push("<input type='text' id='SUB_ID' size='30' value='' placeholder='Id' />");
+ 	initLoadCells.push("<a href=\"javascript:deleteInitial('ROW_ID');\">Del<\/a><\/td>");
+    initLoadsDyno = new DynamicTable("addinititalloads",initLoadCells);
+    
+	lastTime = 0;
+	
+	
+	<!--#include virtual="SSI/logger.ssi" -->
+	
+	pane = 'status';		// current pane, starts in status
+	
+	userName = null;    // no user yet
+	
+	camps = null;
+	running = null;
+	
+	if (typeof(rtb4free_demo) != 'undefined') {
+		$('#username').val("demo");
+		doModal(BootstrapDialog.TYPE_INFO,"Info","You are logging in as 'demo', just press 'Sign In' to go to\nproceed to the campaign admin page");
+ 	}
+    dataRecorder = [];  
+    pinger = null;
+    
+    cpuData = [];
+    memData = [];
+    qpsData = [];
+    abtData = [];
+    
+    first = true;
+    
+    exchanges = [];
+    
+ 	// O = operstatus, Z = Configuration, B = Blacklist, E = Exchanges, C = Campaigns
+    WHATTOGET = "O";
+    
+    /** Start off disabled */
+	$('#savechanges').addClass('disabled')
+ </script>
+
+</html>

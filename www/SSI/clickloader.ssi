@@ -1,0 +1,2 @@
+loc = document.location.hostname + ":7379"
+new ZeroMQCallback("5573","clicks",loc,mapper)

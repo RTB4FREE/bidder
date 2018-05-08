@@ -1,0 +1,799 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8">
+<!-- when using the jsoneditor mode "code", it's important to specify charset utf-8 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description"
+	content="A test page for sending RTB requests to the Bidding engine.">
+<meta name="keywords"
+	content="RTB,OpenRTB,JAVA,Advertising,real-time,exchange,video,vast,display,simulation,bid,response,Native ad">
+<meta name="author" content="RTB4FREE">
+<title>Bidder3 Bid Tester</title>
+<!--#include virtual="SSI/brand_icon.ssi" -->
+<link
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+	rel="stylesheet">
+<link
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css"
+	rel="stylesheet">
+<link href="css/bootstrap-dialog.css" rel="stylesheet">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script src="js/vkbeautify.0.99.00.beta.js"></script>
+<script src="js/rtb4free.js"></script>
+
+<script
+	src="https://cdn.jsdelivr.net/vast-player/0.2/vast-player.min.js"></script>
+
+<link href="css/bootstrap-dialog.css" rel="stylesheet">
+<script src="js/bootstrap-dialog.js"></script>
+
+<link href="jsoneditor/dist/jsoneditor.min.css" rel="stylesheet"
+	type="text/css">
+<script src="jsoneditor/dist/jsoneditor.min.js"></script>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-5532985-4', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+<script>
+
+    String.prototype.replaceAll = function(search, replacement) {
+        var target = this;
+        return target.split(search).join(replacement);
+    };
+
+    function dockerize(text) {
+        text = text.replaceAll("localhost",playground);
+        return text
+    }
+         var date = new Date();  
+         
+         var bannerBid = {
+         id: "35c22289-06e2-48e9-a0cd-94aeb79fab43",
+         at: 2,
+         imp: [
+             {
+                 id: "35c22289-06e2-48e9-a0cd-94aeb79fab43-1",
+                 instl: 0,
+                 banner: {
+                     h: 50,
+                     w: 320,
+                 	"mimes": [
+        				"image/gif",
+        				"image/jpeg",
+        				"image/png",
+        				"text/javascript"
+      				],
+                     pos: 0
+                 },
+                 ext: {
+                     "nex_screen": 0
+                 }
+             }
+         ],
+         site: {
+             id: "99201",
+             name: "BidderTestMobileWEB",
+             domain: "junk1.com",
+             cat: [
+                 "IAB1", "IAB2"
+             ],
+             keywords: "radiation",
+             page: "http://www.nexage.com",
+             ref: "http://www.iab.net",
+             search: "radiation",
+             publisher: {
+                 id: "98401",
+                 name: "testme"
+             },
+             ext: {
+                 "nex_coppa": 0
+             }
+         },
+         device: {
+             didsha1: "132079238ec783b0b89dff308e1f9bdd08576273",
+             dpidsha1: "f22711a823044bb9ce7ace097955de0286eb0182",
+             ip: "166.137.138.18",
+             carrier: "ATT",
+             ua: "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_2_1 like Mac OS X; el-gr) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8C148 Safari/6533.18.5",
+             make: "Apple",
+             model: "iPhone",
+             osv: "3.1.2",
+             connectiontype: 3,
+             devicetype: 1,
+             geo: {
+                 lat: 42.378,
+                 lon: -71.227,
+                 country: "USA"
+             }
+         },
+         user: {
+             id: "ASDFJKL",
+             yob: 1961,
+             gender: "F",
+             keywords: "sports",
+             geo: {
+                 country: "USA",
+                 city: "Waltham",
+                 zip: "02451",
+                 region: "MA",
+                 type: 3
+             },
+             ext: {
+                 nex_eth: "4",
+                 nex_marital: "M",
+                 nex_kids: "N",
+                 nex_hhi: 75000,
+                 nex_dma: "Boston"
+             }
+         },
+         ext: {
+     		coppa: 0,
+     		udi: {
+     			googleadid: "5e2efab6-7721-4cfe-b542-97084d5aa62f",
+     			googlednt: 0,
+     			atuid: "a90377ab-190b-1036-f424-ac10fdb8ffef"
+     		},
+     		operaminibrowser: 0,
+     		carriername: "Verizon Wireless"
+     	}
+      };
+         
+         var videoBid = {
+         id: "72c22289-06e2-48e9-a0cd-94aeb79fab43",
+         at: 2,
+         imp: [
+             {
+                 id: "72c22289-06e2-48e9-a0cd-94aeb79fab43-1",
+                 instl: 0,
+                 video: {
+                     h: 200,
+                     w: 400,
+                     linearity: 1,
+                	 minduration: 5,
+                	 maxduration: 30,
+                	 protocol:2,
+                	 mimes: [
+ 						"video/x-flv",
+ 						"video/mp4",
+ 						"application/x-shockwave-flash",
+ 						"application/javascript"
+ 					 ],
+                     pos: 0
+                 },
+                 ext: {
+                     "nex_screen": 0
+                 }
+             }
+         ],
+         site: {
+             id: "99201",
+             name: "BidderTestMobileWEB",
+             domain: "junk1.com",
+             cat: [
+                 "IAB1", "IAB2"
+             ],
+             keywords: "radiation",
+             page: "http://www.nexage.com",
+             ref: "http://www.iab.net",
+             search: "radiation",
+             publisher: {
+                 id: "98401",
+                 name: "testme"
+             },
+             ext: {
+                 "nex_coppa": 0
+             }
+         },
+         device: {
+             didsha1: "132079238ec783b0b89dff308e1f9bdd08576273",
+             dpidsha1: "f22711a823044bb9ce7ace097955de0286eb0182",
+             ip: "166.137.138.18",
+             carrier: "ATT",
+             ua: "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_2_1 like Mac OS X; el-gr) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8C148 Safari/6533.18.5",
+             make: "Apple",
+             model: "iPhone",
+             osv: "3.1.2",
+             connectiontype: 3,
+             devicetype: 1,
+             geo: {
+                 lat: 42.378,
+                 lon: -71.227,
+                 country: "USA"
+             }
+         },
+         user: {
+             id: "ASDFJKL",
+             yob: 1961,
+             gender: "F",
+             keywords: "sports",
+             geo: {
+                 country: "USA",
+                 city: "Waltham",
+                 zip: "02451",
+                 region: "MA",
+                 type: 3
+             },
+             ext: {
+                 nex_eth: "4",
+                 nex_marital: "M",
+                 nex_kids: "N",
+                 nex_hhi: 75000,
+                 nex_dma: "Boston"
+             }
+         }
+         };
+         
+         /////////////////
+		appWallImpression = {
+    layout: 2,
+    assets: [
+        {
+            id: 1,
+            required: 1,
+            title: {
+                len: 30
+            }
+        },
+        {
+            id: 2,
+            required: 0,
+            data: {
+                type: 3,
+                len: 5
+            }
+        },
+        {
+            id: 3,
+            required: 1,
+            img: {
+                type: 1,
+                w: 64,
+                h: 64,
+                mimes: [
+                    "image/png"
+                ]
+            }
+        },
+        {
+            id: 4,
+            required: 0,
+            data: {
+                type: 2,
+                len: 10
+            }
+        }
+    ]
+};
+///////////////////
+         
+        var adm = null;
+        var bid = bannerBid;
+         
+		var tm = null;
+		var times = 0;
+
+		function doTimes()
+		{
+    		var d = new Date();
+    		times++;
+    		if (times == 2) {
+        		return (d.getTime() - tm)
+        		times = 0;
+        	}
+    		else
+    		{
+       			tm = d.getTime();
+        		return 0;
+        	}
+  		}
+
+
+         playground = document.location.host
+
+         function sendTest() {
+         
+         CRUD = nurl;
+         document.getElementById("nurl").innerHTML = "";
+         
+
+         document.getElementById("image").innerHTML = "";
+         document.getElementById("click-info").value = "";
+         
+         code = document.getElementById("code").value;
+         bid = editor.get();
+         data = JSON.stringify(bid,null,2);
+         document.getElementById("bid").innerHTML = data;
+         document.getElementById("response").value = "";
+         
+         var exchange = document.getElementById('urlspec').value + document.getElementById('exchange_name').value;
+         exchange = dockerize(exchange)
+
+         doTimes();
+         
+         $.ajax({
+         type: 'POST', 
+         url: exchange,
+         data: data,
+         success: function(data, textStatus, request){
+           time = doTimes();
+         
+           if (request.status == 204) {
+           	text = "";
+           	xreason = "No Bid"
+           } else {
+           	text = request.responseText;
+           	text = dockerize(text);
+
+           	data = JSON.parse(text);
+           	text = JSON.stringify(data,null,2);
+           
+           	nurl = data.seatbid[0].bid[0].nurl;
+          	nurl = unescape(nurl); 	
+          	
+          	nurl = nurl.replace("${AUCTION_PRICE}","5.0");
+          	nurl = nurl.replace("${AUCTION_PRICE}","5.0");
+          	nurl = nurl.replace("${AUCTION_PRICE}","5.0");
+          	
+          	adm = data.seatbid[0].bid[0].adm
+          	
+          	
+          	vals  = nurl.split("http:");
+          	imageUrl = "http:"+vals[vals.length-1];
+          	parts = imageUrl.split("?");url=
+             
+             nurl = encodeURI(nurl);
+             
+             nurl = dockerize(nurl);
+           
+             CRUD = nurl;
+             output = "<button type='button' class='btn btn-warning' onclick='loadImage()'>Send Win</button>&nbsp;" + nurl;
+           
+           	document.getElementById("nurl").innerHTML = output;
+           	xreason = request.getResponseHeader('X-REASON');
+           }
+           xtime = request.getResponseHeader('X-TIME');
+           if (xtime == null)
+        	   xtime = "0"
+        	   
+           xinstance = request.getResponseHeader('X-INSTANCE');
+           report = "<h3>X-TIME: " + xtime + ", RTT: " + time;
+           if (xreason != null) {
+           	 report += ", *** NO BID *** REASON: " + xreason + "</h3>";
+           }
+           report += "</h3>";
+           document.getElementById("analyze").innerHTML = report;
+           document.getElementById("response").value = text;
+           
+           inst = "<h3>X-INSTANCE: " + xinstance + "</h3>";
+           document.getElementById("xinstance").innerHTML = inst;
+           
+           
+         },
+         error: function (request, textStatus, errorThrown) {
+        	 doModal(BootstrapDialog.TYPE_DANGER,"Error",request.responseText);
+         }});
+         
+         }
+         
+      
+         
+         function loadImage() {
+        	 if (CRUD == null) {
+        	 	doModal(BootstrapDialog.TYPE_DANGER,"Error","There was no bid from the bidder");
+        	 	return;
+        	 }
+         var nurl = CRUD;
+         nurl = nurl.replace("{AUCTION_PRICE}","5.0");
+   		 nurl = nurl.replace("{AUCTION_PRICE}","5.0");
+   		 nurl = nurl.replace("{AUCTION_PRICE}","5.0");
+         
+         
+         $.ajax({
+         type: 'POST',
+         url:nurl,
+         data: "",
+         success: function(data, textStatus, request){
+         	text = request.responseText;
+         	text = dockerize(text);
+         	
+         	if (text.length < 10) {
+         	  text = adm;
+         	}
+         	
+         	text = text.replace('${AUCTION_PRICE}','5.0');        // simulate exchange macro substitution
+         	text = text.replace('${AUCTION_PRICE}','5.0');
+         	text = text.replace('${AUCTION_PRICE}','5.0');
+         	
+         	text = text.replace('%%WINNING_PRICE%%','5.0');        // simulate exchange macro substitution for Ad Exchange
+
+         	
+         	if (text.includes("<script")) {
+         		//document.getElementById("image").innerHTML = "Hello";
+         		//text = "<script>alert('hello!');<\/script>";
+         		//document.getElementById("click-info").value = text + "\n\nNote: JS did not return"
+         		
+         		//$('#image').replaceWith(text);      DOES NOT WORK
+         		
+         		//document.write(text);
+
+         		//document.getElementById("click-info").value = text + "\n\nNote: JS returned OK"
+         		//return;
+         		
+         	}
+         	else {
+         		try {
+         			text = decodeURIComponent(text);
+         		} catch (e) {
+         			
+         		}
+         	}
+         	   	
+         	
+         	x = document.getElementById("click-info");
+         	if (typeof bid.imp[0].video == 'undefined') {
+         		var check = text.indexOf("</iframe>");
+         		if (check != -1) {
+         			var buf = text.substring(0,check+9);
+         			document.getElementById("image").innerHTML = buf;
+         		} else
+         			check = text.indexOf("<ad");
+         			if (check == -1) {
+         				document.getElementById("image").innerHTML = text;   
+         			} else {
+         				check = text.indexOf("<clickUrl>");
+         				var check1 = text.indexOf("</clickUrl>");
+         				var theClickUrl = text.substring(check+10,check1);
+         				check = text.indexOf("<imgUrl>");
+         				check1 = text.indexOf("</imgUrl>");
+         				var theImageUrl = text.substring(check+8,check1);
+         				var ref = "<a href='" + theClickUrl + "'><img src='"+ theImageUrl + "'></a>";
+         				document.getElementById("image").innerHTML = ref;
+         				
+         				/**
+         				  * Send the pixel beacon
+         				  */
+         				check = text.indexOf("<beacon>");
+         				check1 = text.indexOf("</beacon>");
+         				var url = text.substring(check+8,check1);
+         			}
+         	}
+         	else {
+       		
+         		var player = new window.VASTPlayer(document.getElementById('container'));
+         		 
+         		player.once('AdStopped', function() {
+                    console.log('Ad finished playback!');
+                });
+ 
+         		//  'https://platform-staging.reelcontent.com/api/public/vast/2.0/tag?campaign=cam-e951792a909f17'
+                player.load(
+                    text
+                ).then(function startAd() {
+                    return player.startAd();
+                }).catch(function(reason) {
+                	alert("Can't play: " + reason);
+                    setTimeout(function() { throw reason; }, 0);
+                });
+         		
+         	}
+         	      
+   			text = vkbeautify.xml(text);
+   			x.value = text;   					// inner text
+           
+           
+
+         },
+         error: function (request, textStatus, errorThrown) {
+        	 doModal(BootstrapDialog.TYPE_DANGER,"Error",request.responseText);
+         }});
+         
+         ///////////////////
+         }
+         
+      </script>
+<style type="text/css">
+table.fixed {
+	table-layout: fixed;
+}
+
+table.fixed td {
+	overflow: hidden; html , body { font-family : verdana, sans-serif;
+	margin: 0;
+	padding: 5px;
+}
+</style>
+</head>
+<body>
+<body>
+	<nav class="navbar navbar-fixed-top navbar-inverse">
+		<div class="container">
+			<div class="navbar-header">
+				<button class="navbar-toggle collapsed" data-target="#navbar"
+					data-toggle="collapse" type="button">
+					<span class="sr-only">Toggle navigation</span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#"><!--#include virtual="SSI/brand_name.ssi" --></a>
+			</div>
+
+			<!-- /.nav-collapse -->
+		</div>
+		<!-- /.container -->
+	</nav>
+	<!-- /.navbar -->
+	<br>
+	<br>
+	<br>
+	<br>
+
+
+
+	<div class="container">
+
+		<h2>
+			<!--#include virtual="SSI/brand_name.ssi" -->
+			Bid Tester
+			</h1>
+			<p>
+				This page provides an easy way to send test bids to the running
+				<!--#include virtual="SSI/brand_name.ssi" -->
+				bidder.<br /> You can send a bid to the built-in
+				campaign, or, you can create your own campaign and ask<br /> the
+				<!--#include virtual="SSI/brand_name.ssi" -->
+				bidding engine to consider only your campaign in making a bid.
+			</p>
+			<p>
+				The
+				<!--#include virtual="SSI/brand_name.ssi" -->
+				supports display, video ads and native content. Below, choose what
+				kind of bid request you would like to send the
+				<!--#include virtual="SSI/brand_name.ssi" -->
+				bidding engine
+			</p>
+			<h3>
+				Exchange: <select class="selectpicker" id="exchange_name">
+					<option>admedia</option>
+					<option>adprudence</option>
+					<option>appnexus</option>
+					<option>adventurefeeds</option>
+					<option>atomx</option>
+					<option>axonix</option>
+					<option>c1x</option>
+					<option>c1xus</option>
+					<option>cappture</option>
+					<option>citenko</option>
+					<option>epomx</option>
+					<option>fyber</option>
+					<option>gotham</option>
+					<option>google</option>
+					<option>index</option>
+					<option>intango</option>
+					<option>kadam</option>
+					<option>medianexusnetwork</option>
+					<option selected>nexage</option>
+					<option>openx</option>
+					<option>pokkt</option>
+					<option>pubmatic</option>
+					<option>republer</option>
+					<option>smaato</option>
+					<option>smaato-builtin</option>
+					<option>smartyads</option>
+					<option>smartadserver</option>
+					<option>spotx</option>
+					<option>ssphwy</option>
+					<option>stroer</option>
+					<option>taggify</option>
+					<option>tappx</option>
+					<option>vdopia</option>
+					<option>vertamedia</option>
+					<option>waardx</option>
+					<option>wideorbit</option>
+				</select>
+				<input type="text" id="urlspec" class="form-control" placeholder="URL Specification" value="http://$BID:8080/rtb/bids/">
+				</form>
+			</h3>
+			<br />
+
+			<h3>
+				Bid Type
+				<button type="button" class="btn btn-info" onclick='doBanner()'>Display</button>
+				<button type="button" class="btn btn-info" onclick='doAppWall()'>Native
+					(App Wall)</button>
+				<button type="button" class="btn btn-info" onclick='doVideo()'>Video</button>
+			</h3>
+
+
+			<div id='bidtype'>
+				<h3>Sample Bid Request: Banner</h3>
+			</div>
+			<div id="code" style="width: 800px; height: 400px;"></div>
+
+			<h3>
+				<button type="button" class="btn btn-warning" onclick='sendTest()'>Send
+					Bid Request</button>
+			</h3>
+			<hr />
+			<div id="analyze">
+				<h3>X-TIME: 0, RTT: 0</h3>
+			</div>
+			<div id="xinstance">
+				<h3>X-INSTANCE:</h3>
+			</div>
+
+			<h3>NURL:</h3>
+			<div id="nurl"></div>
+			<div id="container"></div>
+			<table style="" border="1">
+				<col width="600px" />
+				<col width="600" />
+				<tr>
+					<td height="50">
+						<div id='outer-image'>
+							<div id="image">Click Through Image</div>
+						</div>
+					</td>
+					<td><textarea id="click-info" textarea class="form-control"
+							rows="10" readonly></textarea></td>
+				</tr>
+			</table>
+			<hr />
+			<table>
+				<tr>
+					<td><pre>
+      <textarea rows="20" cols="75" id="bid" readonly>
+      </textarea>
+   </pre></td>
+					<td><pre>
+      <textarea rows="20" cols="75" id="response" readonly>
+      </textarea>
+   </pre></td>
+				</tr>
+			</table>
+
+
+
+			<footer>
+				<p>
+				<p>&copy; Class 1 Exchange 2017<br/>Email: Ben@c1exchange.com, Peter@c1exchange.com</p>
+				</p>
+			</footer>
+	</div>
+	</div>
+	</div>
+
+	<script>
+      
+      
+      
+vastData = "" +
+  "<video id='vid2' class='video-js vjs-default-skin' autoplay controls preload='auto'" +
+  "      poster='http://video-js.zencoder.com/oceans-clip.png'" +
+  "      data-setup='{}'" +
+  "      width='300'" +
+  "      height='300'" +
+  "     >" +
+  "    <source src='http://video-js.zencoder.com/oceans-clip.mp4' type='video/mp4'>" +
+  "    <source src='http://video-js.zencoder.com/oceans-clip.webm' type='video/webm'>" +
+  "    <source src='http://video-js.zencoder.com/oceans-clip.ogv' type='video/ogg'>" +
+  "    <p>Video Playback Not Supported</p>" +
+  "  </video>"; 
+         
+      
+         
+         function executeDyno() {
+             bid = editor.get();
+             console.log(JSON.stringify(bid, null, 2));
+         }
+         
+         function bannerOrVideo() {
+         	if (videoMode == true) {
+         		bid = cloneObject(videoBid);
+         		bid.id = guid();
+         		bid.imp[0].id = bid.id;
+         		document.getElementById('bidtype').innerHTML = "<h3>Sample Bid Request: Video</h3>";
+         	} else if (appWall == false)  {
+         		bid = cloneObject(bannerBid);
+         		bid.id = bid.imp[0].id = guid();
+         		document.getElementById('bidtype').innerHTML = "<h3>Sample Bid Request: Banner</h3>";
+         	} else {
+         		bid =cloneObject(bannerBid);
+         		bid.id = bid.imp[0].id = guid();
+         		imp  = {
+         			id: bid.id,
+      				instl: 0,
+      				native: appWallImpression,
+      				ext: {
+        				nex_screen: 0
+        			}
+     			};
+     			bid.imp.pop();
+     			bid.imp.push(imp);
+     			document.getElementById('bidtype').innerHTML = "<h3>Sample Bid Request: Native (app-wall)</h3>";
+         	}
+         	editor.set(bid);
+         }
+         
+         function doAppWall() {
+         	videoMode = false;
+         	appWall = true;
+         	bannerOrVideo();
+         }
+         
+         function doVideo() {
+         	videoMode = true;
+         	appWall = false;
+         	bannerOrVideo();
+         }
+         
+         function doBanner() {
+         	videoMode = false;
+         	appWall = false;
+         	bannerOrVideo();
+         }
+         
+        
+         
+         var videoMode = false;
+         var appWall = false;
+       
+       
+       /**
+        * Make a clone of an object. Used to make clones of bid request objects
+        */
+       function cloneObject(obj) {
+    		if (obj === null || typeof obj !== 'object') {
+        		return obj;
+    		}
+ 
+    		var temp = obj.constructor(); // give temp the original obj's constructor
+    		for (var key in obj) {
+        		temp[key] = cloneObject(obj[key]);
+    		}
+ 
+    		return temp;
+		}
+		
+		/**
+		  * Make a new bid id
+		  */
+		function guid() {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+  }
+  return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+    s4() + '-' + s4() + s4() + s4();
+}
+
+CRUD = null;
+      </script>
+
+	<script>
+        // create the editor
+        var container = document.getElementById("code");
+        var options = {mode:'code'};
+        var editor = new JSONEditor(container, options);
+        editor.set(bannerBid);
+
+        // get json
+        var json = editor.get();
+    </script>
+	</div>
+</body>
+</html>

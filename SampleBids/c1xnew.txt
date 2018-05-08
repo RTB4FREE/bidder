@@ -1,0 +1,99 @@
+{
+    "imp": [
+      {
+        "ext": {
+          "nex_screen": 0
+        },
+        "pmp": {
+          "deals": [
+            {
+              "wadomain": [
+                "c1exchange.com"
+              ],
+              "bidfloor": 0.2,
+              "id": "fmtdeal"
+            }
+          ],
+          "private_auction": 1
+        },
+        "banner": {
+          "pos": 0,
+          "w": 300,
+          "h": 250,
+          "mimes": [
+            "image/gif",
+            "image/jpeg",
+            "image/png",
+            "text/javascript"
+          ]
+        },
+        "id": "2d567fb4-27ff-5d2c-7f65-bcaca54c262c",
+        "instl": 0
+      }
+    ],
+    "site": {
+      "ext": {
+        "nex_coppa": 0
+      },
+      "ref": "http://www.iab.net",
+      "search": "radiation",
+      "keywords": "radiation",
+      "cat": null,
+      "domain": "junck.com",
+      "name": "BidderTestMobileWEB",
+      "publisher": {
+        "name": "testme",
+        "id": ""
+      },
+      "id": "",
+      "page": "http://www.nexage.com"
+    },
+    "@timestamp": "2017-10-20T11:04:23.857Z",
+    "at": 1,
+    "beat": {
+      "hostname": "263b5d823319",
+      "name": "263b5d823319",
+      "version": "5.5.2"
+    },
+    "@version": "1",
+    "host": "263b5d823319",
+    "id": "FMT2-BidGovernor-Test_13",
+    "device": {
+      "geo": {
+        "country": "USA",
+        "lon": -71.227,
+        "location": "42.378,-71.227",
+        "lat": 42.378
+      },
+      "carrier": "ATT",
+      "osv": "3.1.2",
+      "didsha1": "132079238ec783b0b89dff308e1f9bdd08576273",
+      "ip": "166.137.138.18",
+      "model": "iPhone",
+      "ua": "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_2_1 like Mac OS X; el-gr) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8C148 Safari/6533.18.5",
+      "connectiontype": 3,
+      "make": "Apple",
+      "devicetype": 2,
+      "dpidsha1": "f22711a823044bb9ce7ace097955de0286eb0182"
+    },
+    "user": {
+      "geo": {
+        "zip": "02451",
+        "country": "USA",
+        "city": "Waltham",
+        "type": 3,
+        "region": "MA"
+      },
+      "ext": {
+        "nex_marital": "M",
+        "nex_kids": "N",
+        "nex_dma": "Boston",
+        "nex_eth": "4",
+        "nex_hhi": 75000
+      },
+      "gender": "F",
+      "keywords": "sports",
+      "id": "ASDFJKL",
+      "yob": 1961
+    }
+  }

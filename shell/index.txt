@@ -1,0 +1,68 @@
+{
+	"imp": [{
+		"banner": {
+			"pos": 1,
+			"topframe": 0,
+			"w": 300,
+			"expdir": [
+				1,
+				2,
+				3,
+				4
+			],
+			"h": 250
+		},
+		"id": "1",
+		"secure": 1,
+		"instl": 0
+	}],
+	"tags": [
+		"beats_input_raw_event"
+	],
+	"site": {
+		"domain": "washingtonpost.com",
+		"cat": [
+			"IAB13-7"
+		],
+		"publisher": {
+			"id": "184947"
+		},
+		"page": "https://blogs.wsj.com/puzzle/2017/08/18/sleep-over-saturday-crossword-august-19",
+		"id": "195444",
+		"content": {
+			"keywords": "2"
+		}
+	},
+	"@timestamp": "2017-08-19T01:05:47.889Z",
+	"beat": {
+		"hostname": "c1x-bidder2",
+		"name": "c1x-bidder2",
+		"version": "5.5.1"
+	},
+	"bcat": [
+		"IAB7-41",
+		"IAB22-1",
+		"IAB23",
+		"IAB9-30",
+		"IAB9-7",
+		"IAB14-1",
+		"IAB25-2"
+	],
+	"id": "747CEAC3220563C4",
+	"device": {
+		"geo": {
+			"zip": "21228",
+			"country": "USA",
+			"city": "Catonsville",
+			"metro": "512",
+			"region": "US-MD"
+		},
+		"osv": "10.3.3",
+		"os": "iOS",
+		"ip": "71.244.212.0",
+		"model": "ipad",
+		"ua": "Mozilla/5.0 (iPad; CPU OS 10_3_3 like Mac OS X) AppleWebKit/603.3.8 (KHTML, like Gecko) Version/10.0 Mobile/14G60 Safari/602.1",
+		"make": "apple",
+		"devicetype": 5
+	}
+}

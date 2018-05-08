@@ -1,0 +1,158 @@
+ {
+ 	"site": {
+ 		"mobile": 1,
+ 		"domain": "junk1.com",
+ 		"page": "https://www.yummly.com/recipe/Perfect-Pecan-Pie-517679?prm-v1&utm_medium=email&utm_source=seasonal&utm_campaign=A_Bakers_Dozen",
+ 		"publisher": {
+ 			"id": "537137225"
+ 		},
+ 		"id": "537268901",
+ 		"cat": [
+ 			"IAB8"
+ 		]
+ 	},
+ 	"user": {
+ 		"id": "1884eab3-bcfc-0388-203a-1cef85c2de93"
+ 	},
+ 	"device": {
+ 		"make": "Apple",
+ 		"geo": {
+ 			"lon": -104.715,
+ 			"location": "38.854,-104.715",
+ 			"utcoffset": 360,
+ 			"zip": "80915",
+ 			"city": "colorado springs",
+ 			"ext": {
+ 				"continent": "north america",
+ 				"dma": 752
+ 			},
+ 			"type": 2,
+ 			"region": "CO",
+ 			"country": "USA",
+ 			"lat": 38.854
+ 		},
+ 		"language": "en",
+ 		"ip": "75.163.165.180",
+ 		"os": "iOS",
+ 		"dnt": 0,
+ 		"model": "iPhone",
+ 		"osv": "11",
+ 		"ext": {
+ 			"browser": "Mobile Safari",
+ 			"language": [
+ 				"en"
+ 			]
+ 		},
+ 		"h": 667,
+ 		"w": 375,
+ 		"devicetype": 1,
+ 		"ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 11_2_6 like Mac OS X) AppleWebKit/604.5.6 (KHTML, like Gecko) Version/11.0 Mobile/15D100 Safari/604.1"
+ 	},
+ 	"id": "123",
+ 	"Xid": "000417da-d6cb-4c68-b8e8-8499fb82f62a",
+ 	"regs": {
+ 		"ext": {
+ 			"sb568": 0
+ 		},
+ 		"coppa": 0
+ 	},
+ 	"topic": "requests",
+ 	"bcat": [
+ 		"10",
+ 		"12",
+ 		"20",
+ 		"26",
+ 		"34",
+ 		"IAB11-2",
+ 		"IAB11-3",
+ 		"IAB11-4",
+ 		"IAB14-1",
+ 		"IAB15-5",
+ 		"IAB17-18",
+ 		"IAB22-1",
+ 		"IAB23",
+ 		"IAB25",
+ 		"IAB7-39",
+ 		"IAB7-44",
+ 		"IAB7-5",
+ 		"IAB9-25",
+ 		"IAB9-30",
+ 		"IAB9-5",
+ 		"IAB9-7",
+ 		"IAB9-9",
+ 		"OX-10",
+ 		"OX-12",
+ 		"OX-20",
+ 		"OX-26",
+ 		"OX-34"
+ 	],
+ 	"consumer_group": "logstash1",
+ 	"type": "requests",
+ 	"document_id": "000417da-d6cb-4c68-b8e8-8499fb82f62a",
+ 	"at": 1,
+ 	"source": {
+ 		"fd": 1,
+ 		"pchain": "6a698e2ec38604c6:537137225"
+ 	},
+ 	"imp": [{
+ 		"exp": 300,
+ 		"secure": 1,
+ 		"id": "1",
+ 		"instl": 0,
+ 		"bidfloorcur": "USD",
+ 		"bidfloor": 0.25,
+ 		"pmp": {
+ 			"deals": [{
+ 				"bidfloor": 2.95,
+ 				"at": 2,
+ 				"id": "OX-yum-ZOfr38"
+ 			}],
+ 			"private_auction": 1
+ 		},
+ 		"banner": {
+ 			"ext": {
+ 				"matching_ad_id": [{
+ 					"creative_id": 539227797,
+ 					"ad_width": 300,
+ 					"campaign_id": 539226826,
+ 					"ad_height": 250,
+ 					"deal": [{
+ 						"deal_pricing_type": 2,
+ 						"deal_exclusivity": 0,
+ 						"deal_cpm_micros": 2950000,
+ 						"deal_id": "OX-yum-ZOfr38"
+ 					}],
+ 					"placement_id": 539227796
+ 				}]
+ 			},
+ 			"h": 250,
+ 			"battr": [
+ 				1,
+ 				2,
+ 				6,
+ 				7,
+ 				9,
+ 				10,
+ 				11,
+ 				14,
+ 				17
+ 			],
+ 			"w": 300,
+ 			"format": [{
+ 				"w": 300,
+ 				"h": 250
+ 			}]
+ 		}
+ 	}],
+ 	"@timestamp": "2018-03-15T18:48:31.029Z",
+ 	"cur": [
+ 		"USD"
+ 	],
+ 	"test": 0,
+ 	"ext": {
+ 		"synthkey": "1884eab3-bcfc-0388-203a-1cef85c2de93:75.163.165.180:3924581769:null:null",
+ 		"timestamp": 1521139711029,
+ 		"exchange": "openx",
+ 		"pchain": "6a698e2ec38604c6:537137225"
+ 	}
+ }

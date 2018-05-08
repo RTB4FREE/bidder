@@ -1,0 +1,29 @@
+package com.jacamars.dsp.rtb.commands;
+
+import com.jacamars.dsp.rtb.bidder.Controller;
+
+/**
+ * A class that is used to send the start bidding command to the bidder.
+ * @author Ben M. Faul
+ *
+ */
+
+public class StartBidder extends BasicCommand {
+	public StartBidder() {
+		super();
+		cmd = Controller.START_BIDDER;
+		msg = "Start Bidder issued";
+		name = "StartBidder";
+	}
+	
+	/**
+	 * Start the bidder command.
+	 * @param s String. The bidder to start.
+	 */
+	public StartBidder(String s) {
+		super(s);
+		cmd = Controller.START_BIDDER;
+		msg = "Start Bidder Issued";
+		name = "StartBidder";
+	}
+}

@@ -1,0 +1,2 @@
+    loc = document.location.hostname + ":7379"
+    logger = new Logger('logger','5574','logs',loc);

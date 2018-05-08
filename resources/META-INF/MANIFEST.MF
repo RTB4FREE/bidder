@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Build-Jdk: 1.8.0_151
+Built-By: benmfaul
+Premain-Class: com.jacamars.dsp.rtb.tools.ObjectSizeFetcher

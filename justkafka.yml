@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  zookeeper:
+    image: "zookeeper"
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: "ches/kafka"
+    environment:
+      ZOOKEEPER_IP: "zookeeper"
+    ports:
+      - "9092:9092"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
