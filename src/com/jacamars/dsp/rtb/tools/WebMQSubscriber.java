@@ -36,7 +36,7 @@ public class WebMQSubscriber {
                     String contents = mapper.writeValueAsString(data);
                     response.getWriter().println(contents);
                     response.flushBuffer();
-                } catch (IOException e) {
+                } catch (Exception e) {
                     // The other side closed, we are outta here!
                     chan.shutdown();
                     running = false;
