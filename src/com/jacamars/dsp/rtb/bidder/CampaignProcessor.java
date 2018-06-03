@@ -99,9 +99,8 @@ public class CampaignProcessor implements Runnable {
 		try {
 			boolean printNoBidReason = Configuration.getInstance().printNoBidReason;
 			int logLevel = 5;
-			StringBuilder err = null;
+			StringBuilder err = new StringBuilder();
 			if (printNoBidReason || br.id.equals("123")) {
-				err = new StringBuilder();
 				if (br.id.equals("123")) {
 					printNoBidReason = true;
 				}
@@ -193,6 +192,7 @@ public class CampaignProcessor implements Runnable {
 						break;
 
 				} else {
+					probe.process(br.getExchange(),camp.adId,"Global",err.toString());
 					if (printNoBidReason) {
 						xerr.append(camp.adId);
 						xerr.append("/");
