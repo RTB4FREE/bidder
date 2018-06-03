@@ -556,8 +556,16 @@ public class Configuration {
 		}
 		
 		if (m.get("systemMacros")!=null) {
-			systemMacros = (Map)m.get("systemMacros");
+			systemMacros = (Map<String,String>)m.get("systemMacros");
+
+            for (String name : systemMacros.keySet()) {
+                String what = systemMacros.get(name);
+                what = substitute(what);
+                systemMacros.put(name,what);
+                MacroProcessing.addMacro(name);
+            }
 		}
+
 
 		password = (String) m.get("password");
 
@@ -713,6 +721,14 @@ public class Configuration {
 		    deadmanSwitch = new DeadmanSwitch(redisson,deadmanKey);
 		    deadmanSwitch.start();
         }
+		
+		if (m.get("trace") != null) {
+		    String strace = (String)m.get("trace");
+		    if (strace.equalsIgnoreCase("true"))
+		        RTBServer.trace = true;
+		    else
+		        RTBServer.trace = false;
+        }
 
 		campaignsList.clear();
 		overrideList.clear();
@@ -828,6 +844,10 @@ public class Configuration {
 
 		while(address.contains("$IPADDRESS"))
 			address = GetIpAddressFromInterface(address);
+		
+		while(address.contains("$TRACKER"))
+	        address = GetEnvironmentVariable(address,"$TRACKER","localhost:8080");
+		  
 		return address;
 	}
 
@@ -1435,7 +1455,7 @@ public class Configuration {
 		Iterator<Campaign> it = campaignsList.iterator();
 
 		for (Campaign c : campaignsList) {
-            if (c.adId.equals(name)) {
+            if (c != null && c.adId.equals(name)) {
                 campaignsList.remove(c);
                 overrideList.remove(c);
                 recompile();
@@ -1455,7 +1475,7 @@ public class Configuration {
 	 */
 	public boolean setWeights(String name, String weights) throws Exception {
 		for (Campaign c : campaignsList) {
-			if (c.adId.equals(name)) {
+			if (c != null && c.adId.equals(name)) {
 				c.setWeights(weights);
 				return true;
 			}
@@ -1472,7 +1492,7 @@ public class Configuration {
 	 */
 	public ProportionalEntry getWeights(String name) throws Exception {
         for (Campaign c : campaignsList) {
-            if (c.adId.equals(name)) {
+            if (c != null && c.adId.equals(name)) {
                 if (c.weights == null) {
                     return null;
                 }
