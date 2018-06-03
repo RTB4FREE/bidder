@@ -12,6 +12,7 @@
     "indexPage": "$INDEXPAGE",
     "concurrency" : "3",
     "threads": "2000",
+    "trace": "$TRACE",
     "stopped" : false,
     "deadmanswitch": "$ACCOUNTING",
     "ttl" : 300,

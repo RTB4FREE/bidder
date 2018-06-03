@@ -549,6 +549,15 @@ public class Configuration {
 		    if (deadmanKey.equalsIgnoreCase("NONE"))
 		    	deadmanKey = null;
         }
+		
+		 if (m.get("trace") != null) {
+			 String strace = (String)m.get("trace");
+			 if (strace.equalsIgnoreCase("true"))
+			     RTBServer.trace = true;
+			 else
+			     RTBServer.trace = false;
+
+	    }
 
 		if (m.get("concurrency") != null) {
 			String mstr = (String)m.get("concurrency");
@@ -848,6 +857,8 @@ public class Configuration {
 		while(address.contains("$TRACKER"))
 	        address = GetEnvironmentVariable(address,"$TRACKER","localhost:8080");
 		  
+        address = GetEnvironmentVariable(address,"$TRACE","false");
+        
 		return address;
 	}
 
