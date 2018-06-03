@@ -44,6 +44,7 @@ import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
+import com.jacamars.dsp.rtb.tools.ChattyErrors;
 import com.jacamars.dsp.rtb.blocks.LookingGlass;
 import com.jacamars.dsp.rtb.commands.Echo;
 import com.jacamars.dsp.rtb.common.Campaign;
@@ -275,6 +276,9 @@ public class RTBServer implements Runnable {
      * Bid target to exchange class map
      */
     public static Map<String, BidRequest> exchanges = new HashMap();
+    
+    /** Trace stuff coming in to the bidder */
+    public static volatile boolean trace = false;
 
     /**
      * This is the entry point for the RTB server.
@@ -1042,7 +1046,8 @@ class Handler extends AbstractHandler {
          * catch (Exception e) { } }
          */
 
-        // System.out.println("------------>" + target);
+        if (RTBServer.trace)
+            logger.info("Trace: {}",target);
         /**
          * This set of if's handle the bid request transactions.
          */
@@ -1136,7 +1141,7 @@ class Handler extends AbstractHandler {
                         response.setContentType(br.returnContentType());
                         baseRequest.setHandled(true);
                         br.writeNoBid(response, time);
-                        logger.warn("Server throttled, low on threads");
+                        ChattyErrors.printWarningEveryMinute(logger,"Server throttled, low on threads");
                         Controller.getInstance().sendRequest(br, false);
                         return;
                     }
@@ -1777,6 +1782,10 @@ class AdminHandler extends Handler {
         try {
             if (request.getHeader("Content-Encoding") != null && request.getHeader("Content-Encoding").equals("gzip"))
                 isGzip = true;
+            
+
+            if (RTBServer.trace)
+                logger.info("Trace: {}",target);
 
             if (target.contains("pinger")) {
                 response.setStatus(200);

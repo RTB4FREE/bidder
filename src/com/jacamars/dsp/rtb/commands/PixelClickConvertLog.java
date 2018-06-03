@@ -8,7 +8,6 @@ import com.jacamars.dsp.rtb.exchanges.openx.OpenXWinObject;
 import com.jacamars.dsp.rtb.pojo.BidRequest;
 import com.jacamars.dsp.rtb.pojo.WinObject;
 import com.jacamars.dsp.rtb.tools.DbTools;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,10 +85,16 @@ public class PixelClickConvertLog {
      * Process a click
      */
     void doClick() {
+        parseElements();
+        type = CLICK;
+        timestamp = System.currentTimeMillis();
+    }
+
+    void parseElements() {
         String str = payload.replaceAll("&","/");
         int i = str.indexOf("url=");
         if (i != -1) {
-           str = str.substring(0,i);
+            str = str.substring(0,i);
         }
         String[] parts = str.split("/");
 
@@ -203,8 +208,6 @@ public class PixelClickConvertLog {
                 }
             }
         }
-        type = CLICK;
-        timestamp = System.currentTimeMillis();
     }
 
     /**
@@ -214,6 +217,8 @@ public class PixelClickConvertLog {
 
         if (exchange == null)
             return;
+
+        parseElements();
 
         /**
          * Huge hack. C1X SSP does not do win url's you have to piggy back the the win from the pixel

@@ -1,8 +1,5 @@
 package com.jacamars.dsp.rtb.pojo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jacamars.dsp.rtb.bidder.Controller;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.common.Configuration;
@@ -11,8 +8,9 @@ import com.jacamars.dsp.rtb.exchanges.adx.AdxWinObject;
 import com.jacamars.dsp.rtb.exchanges.google.GoogleWinObject;
 import com.jacamars.dsp.rtb.exchanges.google.OpenRTB;
 import com.jacamars.dsp.rtb.exchanges.openx.OpenX;
-import com.jacamars.dsp.rtb.rate.Limiter;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,7 +97,6 @@ public class WinObject {
 	 */
 	@JsonIgnore
 	public static String getJson(String target) throws Exception {
-		boolean debug = false;
 		String image = null;
 		String adm = StringUtils.EMPTY;
 		String cost = StringUtils.EMPTY;
@@ -134,9 +131,6 @@ public class WinObject {
 		}
 		// watch out for special characters encoded in the hash.
 		hash = URLDecoder.decode(hash, "UTF-8");
-		
-		if (hash.equals("123")) 
-			debug = true;
 
 		try {
 			if (image != null)
@@ -153,14 +147,6 @@ public class WinObject {
 			if (bid != null) {
 				adm = (String) bid.get("ADM");
 				cost = (String) bid.get("PRICE");
-				if (debug) {
-					logger.info("Query of {} retuned cost: {}, adm: {}", cost,adm);
-				}
-			} else {
-				if (debug) {
-					logger.info("Query of hash {} returned null",hash);
-					adm = "not found";
-				}
 			}
 		} catch (Exception error) {
 			logger.error("CANT RETRIEVE BID DATA, AEROSPIKE ERROR: {}", error);
@@ -270,8 +256,6 @@ public class WinObject {
 		try {
 			double value = Double.parseDouble(price);
 			RTBServer.adspend += value;
-
-			Limiter.getInstance().addSpend(adId, value);
 		} catch (Exception error) {
 			logger.error("Error: exchange {} did not pass a proper {AUCTION_PRICE} substitution on the WIN, win price is undeterimed: {}, hash = {}", pubId,price, hash);
 		}

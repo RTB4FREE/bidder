@@ -1,6 +1,7 @@
 package com.jacamars.dsp.rtb.tools;
 
 import java.net.URLDecoder;
+
 import java.net.URLEncoder;
 import java.util.HashSet;
 import java.util.List;
@@ -12,7 +13,6 @@ import com.jacamars.dsp.rtb.common.Creative;
 import com.jacamars.dsp.rtb.common.URIEncoder;
 import com.jacamars.dsp.rtb.pojo.BidRequest;
 import com.jacamars.dsp.rtb.pojo.Impression;
-
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -271,6 +271,10 @@ public class MacroProcessing {
         macroList.add("{tid_enc}");
         macroList.add("%7Btid%7D");
 
+    }
+
+    public static void addMacro(String mac) {
+        macroList.add(mac);
     }
 
     /**
@@ -778,7 +782,7 @@ public class MacroProcessing {
                     value = TidKey.get(br,adid,creat);
                     replaceAll(sb, item, value);
                     break;
-                    
+
                 default:
                     value = Configuration.getInstance().getMacroDefinition(item);
                     if (value != null)

@@ -1,13 +1,11 @@
 package com.jacamars.dsp.rtb.exchanges.appnexus;
 
 import java.io.InputStream;
+
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.MissingNode;
 import com.jacamars.dsp.rtb.bidder.Controller;
 import com.jacamars.dsp.rtb.bidder.SelectedCreative;
 import com.jacamars.dsp.rtb.common.Campaign;
@@ -15,6 +13,9 @@ import com.jacamars.dsp.rtb.common.Creative;
 import com.jacamars.dsp.rtb.pojo.BidRequest;
 import com.jacamars.dsp.rtb.pojo.BidResponse;
 import com.jacamars.dsp.rtb.pojo.Impression;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.MissingNode;
 
 /**
  * A class to handle Appnexus ad exchange
@@ -266,7 +267,7 @@ public class Appnexus extends BidRequest {
 		// Check for seat id
 		//
 		Object obj = interrogate("wseat");
-		if (obj instanceof MissingNode) {
+		if (obj == null || obj instanceof MissingNode) {
 			if (sb != null) {
 				sb.append("appnexus seat missing");
 				return false;
