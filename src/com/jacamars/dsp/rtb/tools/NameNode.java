@@ -135,7 +135,7 @@ public class NameNode implements Runnable {
                             }
                         }
                     }
-                    biddersList.remove(dels);
+                    biddersList.removeAll(dels);
                     redis.addListExpire(BIDDERSPOOL, biddersList, 300);
                 }
 			} catch (Exception e) {
