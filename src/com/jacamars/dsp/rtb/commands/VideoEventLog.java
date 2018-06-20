@@ -66,6 +66,7 @@ public class VideoEventLog {
         this.payload = payload;
         timestamp = System.currentTimeMillis();
         vastevent = "undefined";
+        payload = payload.replaceAll("&", "/");
         String [] parts = payload.split("/");;
         for (int i=0;i<parts.length;i++) {
             String what = parts[i];
@@ -95,6 +96,7 @@ public class VideoEventLog {
                         bidid = t2[1];
                         break;
                     case "domain":
+                    case "site_domain":
                         domain = t2[1];
                         break;
                     case "exchange":

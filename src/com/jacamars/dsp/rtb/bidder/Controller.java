@@ -1116,7 +1116,7 @@ public enum Controller {
      */
     public void publishVideoEvent(HttpServletRequest request, String uid) {
         if (videoeventsQueue != null) {
-            String queryString = request.getRequestURL().toString();
+            String queryString = request.getQueryString();
             VideoEventLog log = new VideoEventLog(queryString);
             log.uid = uid;
             if (log.debug)
@@ -1461,7 +1461,8 @@ class CommandLoop implements com.jacamars.dsp.rtb.jmq.MessageListener<Object> {
                     try {
                         String list = "";
                         for (Campaign c : Configuration.getInstance().getCampaignsListReal()) {
-                            list += c.adId + " ";
+                            if (c != null) 
+                            	list += c.adId + " ";
                         }
                         BasicCommand cmd = new ListCampaignsResponse(item.from, Configuration.instanceName, list);
                         cmd.from = Configuration.instanceName;
