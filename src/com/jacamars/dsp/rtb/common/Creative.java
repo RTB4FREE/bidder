@@ -566,6 +566,22 @@ public class Creative {
 			}
 			return null;
 		}
+		
+		/**
+		 * If there was no deal, then make sure the bid floor is not blown
+		 */
+		if (dealId == null) {
+			if(imp.bidFloor != null && xprice < imp.bidFloor) {
+				if (errorString != null) {
+					errorString.append("Price of creative: ");
+					errorString.append(xprice);
+					errorString.append(" < bidfloor: ");
+					errorString.append(imp.bidFloor);
+				}
+				probe.process(br.getExchange(), adId, impid, Probe.BID_FLOOR);
+				return null;
+			}
+		}
 
 		return new SelectedCreative(this, dealId, xprice, impid);
 	}

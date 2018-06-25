@@ -387,7 +387,7 @@ public class MacroProcessing {
                 case "{creative_ad_width}":
                 case "{creative_ad_width_enc}":
                 case "%7Bcreative_ad_width%7D":
-                    value = encodeIfRequested(item, value);
+                    value = encodeIfRequested(item, creat.strW);
                     replaceAll(sb, item, value);
                     break;
 
