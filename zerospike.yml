@@ -17,7 +17,7 @@ services:
     restart: always
 
   zerospike:
-    image: "64.94.191.15:5000/zerospike"
+    image: "jacamars/zerospike"
     environment:
       BROKERLIST: "kafka:9092"
       THREADS: "2"
