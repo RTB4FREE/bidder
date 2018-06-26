@@ -91,7 +91,7 @@ public class RTopic implements EventIF {
 	@Override
 	public void handleMessage(String id, String msg) {
 		try {
-			if (msg.contains("com.c1x.bidder3.rtb.jmq.Ping"))
+			if (msg.contains("rtb.jmq.Ping"))
 				return;
 
 			Object[] x = Tools.deSerialize(mapper, msg);
@@ -119,7 +119,7 @@ public class RTopic implements EventIF {
                 } else {
 				    //System.out.println("No listener for: " + name);
                     if (name.contains("rtb.commands")) {
-                        o = m.get("com.c1x.bidder3.rtb.commands.BasicCommand");
+                        o = m.get("com.jacamar.dsp.rtb.commands.BasicCommand");
                         it = set.iterator();
                         if (it.hasNext()) {
                             name = it.next();
