@@ -189,7 +189,7 @@ public class CampaignSelector {
 
         if (Configuration.getInstance().printNoBidReason) {
             for (int i = 0; i < candidates.size(); i++) {
-                SelectedCreative cr = select.get(i);
+                SelectedCreative cr = candidates.get(i);
                 logger.info("Selected winner {}/{}", cr.campaign.adId, cr.creative.impid);
             }
         }
