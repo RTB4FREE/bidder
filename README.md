@@ -382,11 +382,11 @@ If you want to modify the code.
 4. Make the docker images locally:
 
    $docker build -t jacamars/zerospike -f Docker.zerospike .
-   $docker build -t jacamars/bidder -f Docker.bidder .
+   $docker build -t jacamars/rtb4free:v1 -f Docker.bidder .
 
 5. If you need to push to your repo (change jacamars to your repo):
 
-   $docker push jacamars/bidder
+   $docker push jacamars/rtb4free:v1
    $docker push jacamars/zerospike
 
 
