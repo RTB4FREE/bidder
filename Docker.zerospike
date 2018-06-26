@@ -18,15 +18,8 @@ COPY target/*with-dependencies.jar /target
 COPY wait-for-it.sh /
 COPY tools/* /
 COPY data/ /data
-COPY shell/ /shell
 COPY www /www
 COPY log4j.properties /
-COPY SampleBids /SampleBids
-
-COPY database.json /
-COPY blacklist.json /
-
-COPY Campaigns/docker.json Campaigns/payday.json
 
 EXPOSE 6000 6001 6002 7001
 
