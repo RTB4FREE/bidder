@@ -447,8 +447,10 @@ public class MacroProcessing {
                 case "{app_name}":
                 case "{app_name_enc}":
                 case "%7app_name%7D":
-                    value = URLEncoder.encode(br.siteName, "UTF-8");
-                    replaceAll(sb, item, value);
+                	if (br.siteName != null) {
+                		value = URLEncoder.encode(br.siteName, "UTF-8");
+                		replaceAll(sb, item, value);
+                	}
                     break;
 
                 case "{site_id}":
