@@ -778,6 +778,46 @@ public class Configuration {
 		if (winUrl.contains("localhost")) {
 			logger.warn("*** WIN URL IS SET TO LOCALHOST, NO REMOTE ACCESS WILL WORK FOR WINS ***");
 		}
+		
+		printEnvironment();
+	}
+	
+	void printEnvironment() throws Exception {
+
+		String[] args = new String[]{"FREQGOV","HOSTNAME","BROKERLIST","PUBSUB","WIN","PIXEL","VIDEO","BID","EXTERNAL",
+				"PUBPORT","SUBPORT","INITPORT","TRACE","THREADS","CONCURRENCY","ADMINPORT","REQUESTSTRATEGY","ACCOUNTING",
+				"THROTTLE","IPADRESS","TRACKER","BROKERLIST"
+		};
+
+		String[] macros = {"pixel_tracker","redirect_tracker","postback_tracker","event_tracker","pixel-tracking-url",
+				"winurl","redirect-url","vasturl","eventurl","postbackurl"
+		};
+
+		Map<String, String> env = System.getenv();
+		logger.info("************* ENVIROMENT VARIABLES SET ******************");
+		for (String envName : env.keySet()) {
+			logger.info("ENVIRONMENT: " + envName + "\t" + env.get(envName));
+		}
+		logger.info("*********************************************************");
+
+		logger.info("***************** SUBSTITUTIONS **************************");
+		for (String s : args) {
+			String addr = s + ":\t$" + s;
+			String address = substitute(addr);
+			logger.info(address);
+		}
+		logger.info("*********************************************************");
+
+		logger.info("******************* MACRO TESTS **************************");
+
+		logger.info("{redirect_url} = " + redirectUrl);
+		logger.info("{event_url} = " + eventUrl);
+		logger.info("{vast_url} = " + vastUrl);
+		logger.info("{postback_url} = " + postbackUrl);
+		logger.info("{win_url} = " + winUrl);
+
+		logger.info("**********************************************************");
+
 	}
 
 	public static String getHostFrom(String address) {
@@ -802,7 +842,7 @@ public class Configuration {
 	}
 
 	/**
-	 * Substutute the macros and environment variables found in the the string.
+	 * Substitute the macros and environment variables found in the the string.
 	 * @param address String. The address being queries/
 	 * @return String. All found environment vars will be substituted.
 	 * @throws Exception on parsing errors.
