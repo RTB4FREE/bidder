@@ -39,13 +39,13 @@ services:
       BROKERLIST: "kafka:9092"
       PUBSUB: "zerospike"
       EXTERNAL: "http://localhost"
-      ADMINPORT: "0"
+      ADMINPORT: "8155"
       ACCOUNTING: "NONE"
       FREQGOV: "false"
       INDEXPAGE: "/index.html"
     ports:
-      - "80:8080"
-    #  - "8155:8155"
+      - "8080:8080"
+      - "8155:8155"
     #  - "7379:7379"
     #  - "7000:7000"
     restart: always

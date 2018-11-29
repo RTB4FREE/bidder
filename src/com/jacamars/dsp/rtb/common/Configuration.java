@@ -598,7 +598,7 @@ public class Configuration {
 			RTBServer.strategy = STRATEGY_MAX_CONNECTIONS;
 
 		if (m.get("nobid-reason")!=null)
-		    printNoBidReason = (Boolean) verbosity.get("nobid-reason");
+		    printNoBidReason = Boolean.parseBoolean((String)verbosity.get("nobid-reason"));
 
 		template = (Map) m.get("template");
 		if (template == null) {
@@ -731,14 +731,6 @@ public class Configuration {
 		    deadmanSwitch.start();
         }
 		
-		if (m.get("trace") != null) {
-		    String strace = (String)m.get("trace");
-		    if (strace.equalsIgnoreCase("true"))
-		        RTBServer.trace = true;
-		    else
-		        RTBServer.trace = false;
-        }
-
 		campaignsList.clear();
 		overrideList.clear();
 
@@ -786,7 +778,7 @@ public class Configuration {
 
 		String[] args = new String[]{"FREQGOV","HOSTNAME","BROKERLIST","PUBSUB","WIN","PIXEL","VIDEO","BID","EXTERNAL",
 				"PUBPORT","SUBPORT","INITPORT","TRACE","THREADS","CONCURRENCY","ADMINPORT","REQUESTSTRATEGY","ACCOUNTING",
-				"THROTTLE","IPADRESS","TRACKER","BROKERLIST"
+				"THROTTLE","IPADRESS","TRACKER","BROKERLIST","NOBIDREASON"
 		};
 
 		String[] macros = {"pixel_tracker","redirect_tracker","postback_tracker","event_tracker","pixel-tracking-url",
@@ -890,6 +882,8 @@ public class Configuration {
 			address = GetEnvironmentVariable(address,"$INDEXPAGE","/index.html");
 		while(address.contains("$THROTTLE"))
 			address = GetEnvironmentVariable(address,"$THROTTLE","100");
+		while(address.contains("$NOBIDREASON"))
+			address = GetEnvironmentVariable(address,"$NOBIDREASON","false");
 
 		while(address.contains("$IPADDRESS"))
 			address = GetIpAddressFromInterface(address);
@@ -1673,6 +1667,7 @@ public class Configuration {
         if (c == null)
             return;
 
+   
         handyMap.addCampaign(c);
 
         c.encodeCreatives();
@@ -1687,7 +1682,12 @@ public class Configuration {
                 }
             }
         }
-
+        
+        if (RTBServer.trace) {
+        	logger.info("***************** CAMPAIGN ********************");
+        	logger.info(c.toJson());
+        }
+        
     }
 
     /**

@@ -12,6 +12,7 @@
     "concurrency" : "1",
     "NOdeadmanswitch":"accountingsystem",
     "threads": "128",
+    "trace": "$TRACE",
     "stopped" : false,
     "ttl" : 300,
     "pixel-tracking-url" : "$EXTERNAL/pixel",
@@ -21,12 +22,12 @@
     "vasturl" : "$EXTERNAL/vast",
     "eventurl" : "$EXTERNAL/track",
     "postbackurl" : "$EXTERNAL/postback",
-    "adminPort" : "0",
+    "adminPort" : "$ADMINPORT",
     "adminSSL" : false,
     "password" : "startrekisbetterthanstarwars",
     "verbosity" : {
       "level" : -3,
-      "nobid-reason" : false
+      "nobid-reason" : "$NOBIDREASON"
     },
     "geotags" : {
       "states" : "",

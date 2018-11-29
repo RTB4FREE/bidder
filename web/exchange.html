@@ -56,6 +56,9 @@
     };
 
     function dockerize(text) {
+    	if (playground.indexOf("localhost")>-1)
+    		return text;
+    	
         text = text.replaceAll("localhost",playground);
         return text
     }
@@ -73,7 +76,7 @@
                      w: 320,
                  	"mimes": [
         				"image/gif",
-        				"image/jpeg",
+        				"image/jpg",
         				"image/png",
         				"text/javascript"
       				],
@@ -303,7 +306,7 @@
 
 
          playground = document.location.host
-
+         
          function sendTest() {
          
          CRUD = nurl;
@@ -364,6 +367,7 @@
            
            	document.getElementById("nurl").innerHTML = output;
            	xreason = request.getResponseHeader('X-REASON');
+
            }
            xtime = request.getResponseHeader('X-TIME');
            if (xtime == null)
@@ -387,6 +391,7 @@
         	 doModal(BootstrapDialog.TYPE_DANGER,"Error",request.responseText);
          }});
          
+         location.hash = "#sendwin";
          }
          
       
@@ -615,19 +620,20 @@ table.fixed td {
 				<button type="button" class="btn btn-info" onclick='doAppWall()'>Native
 					(App Wall)</button>
 				<button type="button" class="btn btn-info" onclick='doVideo()'>Video</button>
+				<button type="button" class="btn btn-warning" onclick='sendTest()'>Send Bid Request</button>
 			</h3>
 
 
 			<div id='bidtype'>
 				<h3>Sample Bid Request: Banner</h3>
 			</div>
+			
 			<div id="code" style="width: 800px; height: 400px;"></div>
 
-			<h3>
-				<button type="button" class="btn btn-warning" onclick='sendTest()'>Send
-					Bid Request</button>
-			</h3>
-			<hr />
+			<a name="sendwin" id="sendwin"></a>
+			<br/>
+			<br/>
+			
 			<div id="analyze">
 				<h3>X-TIME: 0, RTT: 0</h3>
 			</div>
@@ -641,6 +647,14 @@ table.fixed td {
 			<table style="" border="1">
 				<col width="600px" />
 				<col width="600" />
+								<tr>
+				<td align="center" bgcolor="#FFB6C1" height="40">
+				    Image
+				</td>
+				<td align="center" bgcolor="#00FF7F" height="40">
+					Markup HTM:
+				</td>
+				</tr>
 				<tr>
 					<td height="50">
 						<div id='outer-image'>
@@ -652,14 +666,23 @@ table.fixed td {
 				</tr>
 			</table>
 			<hr />
+			<h3>RTB Protocol</h3>
 			<table>
 				<tr>
-					<td><pre>
-      <textarea rows="20" cols="75" id="bid" readonly>
+				<td align="center" bgcolor="#FFB6C1" height="40">
+				    Request
+				</td>
+				<td align="center" bgcolor="#00FF7F" height="40">
+					Response
+				</td>
+				</tr>
+				<tr>
+					<td align="left"><pre>
+<textarea rows="20" cols="75" id="bid" readonly>
       </textarea>
    </pre></td>
-					<td><pre>
-      <textarea rows="20" cols="75" id="response" readonly>
+					<td align="left"><pre>
+<textarea rows="20" cols="75" id="response" readonly>
       </textarea>
    </pre></td>
 				</tr>

@@ -442,6 +442,9 @@ public class RTBServer implements Runnable {
 
     public static void panicStop() {
         try {
+        	for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+        	    logger.warn("{}",ste);
+        	}
             Controller.getInstance().sendShutdown();
             Thread.sleep(100);
             logger.info("PanicStop", "Bidder is shutting down *** NOW ****");
@@ -1777,7 +1780,7 @@ class AdminHandler extends Handler {
         long time = System.currentTimeMillis();
         boolean isGzip = false;
 
-        response.setHeader("X-INSTANCE", config.instanceName);
+        response.setHeader("X-INSTANCE", config.instanceName);      
 
         try {
             if (request.getHeader("Content-Encoding") != null && request.getHeader("Content-Encoding").equals("gzip"))
