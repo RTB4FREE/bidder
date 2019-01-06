@@ -5,12 +5,6 @@
 	<name>RTB4FREE</name>
 	<description>RTB 2.5 DSP</description>
 
-	<properties>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.compiler.source>1.8</maven.compiler.source>
-    </properties>
-
-
 	<dependencies>
 
 		<dependency>
@@ -222,13 +216,19 @@
         </dependency>
         
         <!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api-parent -->
+		<!-- https://mvnrepository.com/artifact/com.sun.xml.bind/jaxb-impl -->
 <dependency>
-    <groupId>javax.xml.bind</groupId>
-    <artifactId>jaxb-api-parent</artifactId>
-    <version>2.4.0-b180830.0359</version>
-    <type>pom</type>
+    <groupId>com.sun.xml.bind</groupId>
+    <artifactId>jaxb-impl</artifactId>
+    <version>2.4.0-b180830.0438</version>
 </dependency>
-        
+
+        <dependency>
+    		<groupId>org.glassfish.jaxb</groupId>
+    		<artifactId>jaxb-runtime</artifactId>
+    		<version>2.3.1</version>
+    		<scope>runtime</scope>
+		</dependency>
 
     </dependencies>
 
@@ -255,7 +255,6 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
