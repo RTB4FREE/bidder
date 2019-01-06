@@ -120,6 +120,11 @@
     "id" : "intango-id",
     "bid" : "/rtb/bids/intango=com.jacamars.dsp.rtb.exchanges.Generic"
   }, {
+    "name" : "openssp",
+    "id" : "openssp-id",
+    "bid" : "/rtb/bids/openssp=com.jacamars.dsp.rtb.exchanges.Generic"
+  },
+  {
     "name" : "vdopia",
     "id" : "vdopia-id",
     "bid" : "/rtb/bids/vdopia=com.jacamars.dsp.rtb.exchanges.Generic"
