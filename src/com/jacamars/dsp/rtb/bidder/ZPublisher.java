@@ -474,6 +474,7 @@ public class ZPublisher implements Runnable, Callback {
                         ping.cancelPing();
                     logger.publish(msg);
                 }
+                Thread.sleep(1);
             } catch (Exception e) {
                 e.printStackTrace();
                 // return;
