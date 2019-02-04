@@ -1,5 +1,10 @@
-Bidder
+OpenRTB Bidder
 =====================
+This is a JAVA 1.8 based openRTB bidding system.
+
+
+DOCKER BASED RTB BIdder
+=======================
 
 These are the Docker instructions for working with Bidder, Crosstalk, Zerospike, Kafka and Zookeeper.
 
@@ -463,53 +468,6 @@ If you use your own shell environment variables and don't provide a value, then 
    
    Note, all substitutions are strings.
    
-HANDY DOCKER ACTIVITIES
-=====================================
-
-Running Containers
---------------------------------------
-
-    $docker ps
-
-Attach to a Container
----------------------------------------
-Do a docker ps and then use the container-id or name:
-
-    $docker exec -it <id-or-name> /bin/bash
-
-Attach to the log
----------------------------------------
-Do a docker ps and then use the container-id or name:
-
-    $docker logs -f <id-or-name>
-
-Delete an image
-----------------------------------------
-Do a docker ls firsr
-
-    $docker image ls
-
-Find the container id
-
-    $docker image rm <image-id> --force
-
-Correct Checksum Error
------------------------------------------
-If docker-compose complains about a checksum after you delete a container do this:
-
-    $docker-compose rm
-
-Connect Intellij Debugger to Bidder, Crosstalk or Zerospike
------------------------------------------
-
-Bidder:
-In the service for the bidder in docker-compose.yml, use ./rtb4free-jmx instead of ./rtbf4free Then in your Intellij system, create a remote debug and connect using port 9000.
-
-Zerospike
-In the service for the zerospike in docker-compose.yml, use ./zerospike-jmx instead of ./zerospike Then in your Intellij system, create a remote debug and connect using port 9000.
-
-Crosstalk:
-In the service for the crosstalk in docker-compose.yml, use ./crosstalk-jmx instead of ./crosstalk Then in your Intellij system, create a remote debug and connect using port 9000.
 
 THEORY OF OPERATION
 =====================================
@@ -568,6 +526,12 @@ associate the loading of the page in the web browser with the winning bid and th
 User Clicks the Ad
 ------------------
 When the user clicks on the ad, the referrer URL is fired and this is also handled by the handler. The handler then uses the URI encoding to transmit the information to a ZeroMQ channel, usually called 'clicks', for further processing and accounting downstream.
+
+Budgeting
+------------------
+The bidder is designed for maximum bidding. It does not handle budgeting. Instead, the companion program Crosstalk handles
+the budgeting in coordination with the Campaign Manager. The Campaign manager will allow you to specify hourly, daily and total
+budgeting by campaign.
 
 USING THE SIMULATOR WEB PAGE
 ============================
