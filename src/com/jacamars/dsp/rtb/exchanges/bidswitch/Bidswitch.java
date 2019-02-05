@@ -13,7 +13,7 @@ import com.jacamars.dsp.rtb.pojo.Impression;
 
 public class Bidswitch extends BidRequest {
 
-	public static final String BIDSWITCH = "BIDSWITCH";
+	public static final String BIDSWITCH = "bidswitch";
 	
 	public Bidswitch() {
 		super();
@@ -65,8 +65,8 @@ public class Bidswitch extends BidRequest {
 	
 	@Override
 	public boolean parseSpecial() {
+		setExchange(BIDSWITCH);
 		return true;
 	}
-	
 
 }

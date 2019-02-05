@@ -50,6 +50,9 @@ public class FixedNodeDoSize extends Node {
                         creative.strH = Integer.toString(f.h);
                     } else {
                         falseCount.incrementAndGet();
+                        if (errorString != null) {
+                            errorString.append(Probe.FORMAT_NOMATCH);
+                        }
                         return false;
                     }
                 }

@@ -53,6 +53,7 @@
         "nexage" : "<a href='{redirect_url}/exchange={pub}/ad_id={ad_id}/creative_id={creative_id}/price=${AUCTION_PRICE}/lat={lat}/lon={lon}/bid_id={bid_id}?url={creative_forward_url}'><img src='{creative_image_url}' height='{creative_ad_height}' width='{creative_ad_width}'></a><img src='{pixel_url}/exchange={pub}/ad_id={ad_id}/creative_id={creative_id}/{bid_id}/price=${AUCTION_PRICE}/lat={lat}/lon={lon}/bid_id={bid_id}' height='1' width='1'>",
         "smartyads" : "{creative_forward_url}",
         "atomx" : "{creative_forward_url}",
+        "bidswitch" : "{creative_forward_url}",
         "adventurefeeds" : "{creative_forward_url}",
         "gotham" : "{creative_forward_url}",
         "epomx" : "{creative_forward_url}",
@@ -240,6 +241,10 @@
     "name" : "admedia",
     "id" : "admedia-id",
     "bid" : "/rtb/bids/admedia=com.jacamars.dsp.rtb.exchanges.Generic&!usesEncodedAdm"
+  }, {
+    "name" : "bidswitch",
+    "id" : "4",
+    "bid" : "/rtb/bids/bidswitch=com.jacamars.dsp.rtb.exchanges.bidswitch.Bidswitch&!usesEncodedAdm"
   }],
   "NOs3" : {
     "access_key_id" : "$S3ACCESSKEY",
