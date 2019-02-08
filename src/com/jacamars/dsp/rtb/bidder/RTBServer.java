@@ -140,6 +140,8 @@ public class RTBServer implements Runnable {
     // wide open at
     // 100, closed
     // at 0
+    
+    public static volatile boolean GDPR_MODE = false;
 
     /**
      * Indicates of the server is not accepting bids
@@ -1115,6 +1117,8 @@ class Handler extends AbstractHandler {
 
                     br = x.copy(body);
                     br.incrementRequests();
+                    if (RTBServer.GDPR_MODE)
+                    	br.enforceGDPR();
 
                     id = br.getId();
 

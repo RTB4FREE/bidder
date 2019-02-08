@@ -379,7 +379,7 @@ public class Configuration {
 			instanceName = shard + ":" + useName;
 
 		/**
-		 * Set up tem p files
+		 * Set up temp files
 		 */
 		Files.createDirectories(Paths.get("www/temp")); // create the temp
 														// directory in www so
@@ -484,6 +484,14 @@ public class Configuration {
 			instanceBidRequest(x);
 		}
 
+		/**
+		 * Set GDPR mode
+		 */
+		String gdpr = (String)m.get("GDPR_MODE");
+		if (gdpr != null && gdpr.length()>0) {
+			RTBServer.GDPR_MODE = Boolean.parseBoolean(gdpr);
+		}
+		
 		/**
 		 * Create forensiq
 		 */
@@ -809,6 +817,7 @@ public class Configuration {
 		logger.info("{win_url} = " + winUrl);
 
 		logger.info("**********************************************************");
+		logger.info("GDPR Mode = " + RTBServer.GDPR_MODE);
 
 	}
 
@@ -844,6 +853,9 @@ public class Configuration {
 		while(address.contains("$FREQGOV"))
 			address = GetEnvironmentVariable(address,"$FREQGOV", "true");
 
+		while(address.contains("$GDPR_MODE"))
+			address = GetEnvironmentVariable(address,"$GDPR_MODE", "false");
+		
 		while(address.contains("$HOSTNAME"))
 			address = GetEnvironmentVariable(address,"$HOSTNAME",Configuration.instanceName);
 		while(address.contains("$BROKERLIST"))

@@ -1,4 +1,5 @@
 {
+  "GDPR_MODE": "$GDPR_MODE",
   "NOfraud" : {
     "type" : "forensiq",
     "threshhold" : 0,

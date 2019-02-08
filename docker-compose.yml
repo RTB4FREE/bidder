@@ -44,6 +44,7 @@ services:
   bidder:
     image: "jacamars/rtb4free:v1"
     environment:
+      GDPR_MODE: "FALSE"
       BROKERLIST: "kafka:9092"
       PUBSUB: "zerospike"
       EXTERNAL: "http://localhost:8080"
