@@ -4,12 +4,15 @@ import java.io.InputStream;
 import java.util.List;
 
 import com.jacamars.dsp.rtb.bidder.SelectedCreative;
+import com.jacamars.dsp.rtb.common.Campaign;
+import com.jacamars.dsp.rtb.common.Creative;
 import com.jacamars.dsp.rtb.exchanges.google.GoogleBidRequest;
 import com.jacamars.dsp.rtb.pojo.BidRequest;
+import com.jacamars.dsp.rtb.pojo.BidResponse;
 import com.jacamars.dsp.rtb.pojo.Impression;
 
 // https://protocol.bidswitch.com/standards/standards.html
-// Bidswitch 5.3
+// Bidswitch 5.3anObject
 
 public class Bidswitch extends BidRequest {
 
@@ -68,5 +71,18 @@ public class Bidswitch extends BidRequest {
 		setExchange(BIDSWITCH);
 		return true;
 	}
+	
+	@Override
+	public BidResponse buildNewBidResponse(Impression imp, Campaign camp, Creative creat, double price, String dealId,
+			int xtime) throws Exception {
+		return new BidswitchBidResponse(this, imp, camp, creat, price, dealId, xtime);
+	}
+
+	@Override
+	public BidResponse buildNewBidResponse(List<SelectedCreative> list, int xtime) throws Exception {
+		return new BidResponse(this, list, xtime);
+	}
+
+	
 
 }
