@@ -262,10 +262,6 @@
     "name" : "@CIDR",
     "type" : "CidrMap"
   }, {
-    "filename" : "data/adxgeo.csv",
-    "name" : "@ADXGEO",
-    "type" : "com.jacamars.dsp.rtb.exchanges.adx.AdxGeoCodes"
-  }, {
     "filename" : "data/zip_codes_states.csv",
     "name" : "@ZIPCODES",
     "type" : "com.jacamars.dsp.rtb.tools.LookingGlass"
