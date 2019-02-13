@@ -100,6 +100,8 @@ public class TestBidswitch  {
 				fail("Can't connect to test host: " + Config.testHost);
 			}
 			
+			System.out.println(s);
+			
 			assertNotNull(s);
 			int code = http.getResponseCode();
 			assertEquals(code,200);

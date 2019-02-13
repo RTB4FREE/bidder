@@ -7,7 +7,7 @@
 		"id": "130070665",
 		"paid": 0,
 		"privacypolicy": 1,
-		"name": "MetroZone_Events Near You_MetroPCS_Events Near You_320x50_In APP_Android_Android_XXLARGE_320x50_IAB1",
+		"name": "WMUR - Android - Core News App",
 		"publisher": {
 			"id": "1100015422",
 			"name": "Mobile Posse, Inc."
