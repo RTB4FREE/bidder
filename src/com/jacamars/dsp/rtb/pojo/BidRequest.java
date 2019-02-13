@@ -498,6 +498,7 @@ public class BidRequest {
 				if (siteDomain.indexOf("/") != -1) {
 					siteDomain = siteDomain.substring(0, siteDomain.indexOf("/"));
 				}
+				siteDomain = URIEncoder.myUri(siteDomain);
 			}
 
 			////////////////// Fill in pageurl info ////////////////
