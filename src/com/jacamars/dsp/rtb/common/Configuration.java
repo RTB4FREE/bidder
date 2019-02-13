@@ -850,6 +850,16 @@ public class Configuration {
 	 */
 	public static String substitute(String address) throws Exception {
 
+		while(address.contains("$S3REGION"))
+			address = GetEnvironmentVariable(address,"$S3REGION");
+		while(address.contains("$S3BUCKET"))
+			address = GetEnvironmentVariable(address,"$S3BUCKET");
+		while(address.contains("$S3ACCESSKEY"))
+			address = GetEnvironmentVariable(address,"$S3ACCESSKEY");
+		while(address.contains("$S3SECRETKEY"))
+			address = GetEnvironmentVariable(address,"$S3SECRETKEY");
+
+		
 		while(address.contains("$FREQGOV"))
 			address = GetEnvironmentVariable(address,"$FREQGOV", "true");
 
