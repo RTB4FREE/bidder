@@ -83,6 +83,28 @@ public class Bidswitch extends BidRequest {
 		return new BidResponse(this, list, xtime);
 	}
 
+	/**
+	 * Makes sure the Bidswitch keys 'advertiser_name' and 'agency_name' are available on the creative
+	 * @param creat Creative. The creative in question.
+	 * @param errorString StringBuilder. The error handling string. Add your error here if not null.
+	 * @returns boolean. Returns true if the Exchange and creative are compatible.
+	 */
+	@Override
+	public boolean checkNonStandard(Creative creat, StringBuilder errorString) {
+		if (creat.extensions == null || 
+				creat.extensions.get("advertiser_name") == null || 
+				creat.extensions.get("agency_name") == null) {
+			
+			if (errorString != null) {
+				errorString.append(creat.impid);
+				errorString.append(" ");
+				errorString.append("Missing extenstions for Bidswitch");
+			}
+			
+			return false;
+		}
+		return true;
+	}
 	
 
 }

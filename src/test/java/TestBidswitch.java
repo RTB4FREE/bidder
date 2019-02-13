@@ -65,7 +65,7 @@ public class TestBidswitch  {
 		   */
 		  HttpPostGet http = new HttpPostGet();
 			String bid = Charset.defaultCharset()
-					.decode(ByteBuffer.wrap(Files.readAllBytes(Paths.get("./SampleBids/Bidswitch/App.txt")))).toString();
+					.decode(ByteBuffer.wrap(Files.readAllBytes(Paths.get("./SampleBids/Bidswitch/AppNoDomain.txt")))).toString();
 			String s = null;
 			long time = 0;
 
@@ -81,6 +81,30 @@ public class TestBidswitch  {
 			System.out.println(s);
 			assertNotNull(s);
 			assertTrue(http.getResponseCode()==200);
+			
+			Map m = mapper.readValue(s,Map.class);
+			String id = (String)m.get("id");
+			assertTrue(id.equals("123"));
+			assertNotNull(m.get("ext"));
+			Map<String,String> mx = (Map)m.get("ext");
+			assertNotNull(mx.get("protocol"));
+			assertTrue(mx.get("protocol").equals("5.3"));
+			
+			List<Map> seatbids = (List)m.get("seatbids");
+			assertNotNull(seatbids);
+			assertTrue(seatbids.size()==1);
+			Map seatbid = seatbids.get(0);
+			String str = (String)seatbid.get("seat");
+			assertNotNull(str);
+			assertTrue(str.equals("4"));
+			
+			List<Map> bids = (List)seatbid.get("bids");
+			assertNotNull(bids);
+			assertTrue(bids.size()==1);
+			Map xbid = (Map)bids.get(0);
+			
+			str = (String)xbid.get("nurl");
+			assertFalse(str.contains(" "));
 			
 			/**
 			 * This one will return a Banner ad.
@@ -106,31 +130,28 @@ public class TestBidswitch  {
 			int code = http.getResponseCode();
 			assertEquals(code,200);
 			
-			Map m = mapper.readValue(s,Map.class);
-			String id = (String)m.get("id");
+			m = mapper.readValue(s,Map.class);
+			id = (String)m.get("id");
 			assertTrue(id.equals("123"));
 			assertNotNull(m.get("ext"));
-			Map<String,String> mx = (Map)m.get("ext");
+			mx = (Map)m.get("ext");
 			assertNotNull(mx.get("protocol"));
 			assertTrue(mx.get("protocol").equals("5.3"));
 			
-			List<Map> seatbids = (List)m.get("seatbids");
+			seatbids = (List)m.get("seatbids");
 			assertNotNull(seatbids);
 			assertTrue(seatbids.size()==1);
-			Map seatbid = seatbids.get(0);
-			String str = (String)seatbid.get("seat");
+			seatbid = seatbids.get(0);
+			str = (String)seatbid.get("seat");
 			assertNotNull(str);
 			assertTrue(str.equals("4"));
 			
-			List<Map> bids = (List)seatbid.get("bids");
+			bids = (List)seatbid.get("bids");
 			assertNotNull(bids);
 			assertTrue(bids.size()==1);
-			Map xbid = (Map)bids.get(0);
+			xbid = (Map)bids.get(0);
 			
 			str = (String)xbid.get("nurl");
-			assertTrue(str==null);
-		
-			str = (String)xbid.get("burl");
 			assertNotNull(str);
 			assertTrue(str.equals("http://localhost:8080/rtb/win/answers.com/SITE/bidswitch/${AUCTION_PRICE}/26.638/-80.237/bidswitch-test/bannerad/123")); 
 			

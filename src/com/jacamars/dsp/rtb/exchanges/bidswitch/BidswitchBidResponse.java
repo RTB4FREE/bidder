@@ -96,6 +96,7 @@ public class BidswitchBidResponse extends BidResponse{
 		/** The configuration used for generating this response */
 		Configuration config = Configuration.getInstance();
 		
+		StringBuilder nurl = new StringBuilder();
 		///////////////////////////// PROB NOT NEEDED /////////////////////
 		StringBuilder linkUrlX = new StringBuilder();
 		linkUrlX.append(config.redirectUrl);
@@ -194,7 +195,7 @@ public class BidswitchBidResponse extends BidResponse{
 		snurl.append(creat.impid);
 		snurl.append("/");
 		snurl.append(oidStr.replaceAll("#", "%23"));
-		bid.put("burl", snurl.toString());
+		bid.put("nurl", snurl.toString());
 		if (creat.extensions != null) {
 			bid.put("ext", creat.extensions);
 		}
