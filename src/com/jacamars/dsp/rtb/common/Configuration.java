@@ -1018,7 +1018,8 @@ public class Configuration {
 				String name = null;
 
 				if (tags.isEmpty()) {
-					System.err.println("Error: " + keyName + " has no tags");
+					object.close();
+					logger.warn("Error, S3 object: {} has no tags", keyName);
 				} else {
 					for (Tag tag : tags) {
 						String key = tag.getKey();
@@ -1033,18 +1034,23 @@ public class Configuration {
 						}
 					}
 
-					if (name == null)
+					if (name == null) {
+						object.close();
 						throw new Exception("Error: " + keyName + " is missing a name tag");
-					if (name.contains(" "))
+					}
+					if (name.contains(" ")) {
+						object.close();
 						throw new Exception("Error: " + keyName + " has a name attribute with a space in it");
-					if (type == null)
+					}
+					if (type == null) {
+						object.close();
 						throw new Exception("Error: " + keyName + " has no type tag");
+					}
 
 					if (!name.startsWith("$"))
 						name = "$" + name;
 
-					//readData(type, name, object, size);
-
+					// The runnable will call object.close();
 					Runnable w = new AwsWorker(type, name, object, size);
 					executor.execute(w);
 
