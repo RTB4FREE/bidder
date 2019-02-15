@@ -52,6 +52,7 @@ public class Probe {
 	public static final String WRONG_EXCHANGE = new String("Wrong exchange\n");
 	public static final String SPEND_RATE_EXCEEDED = new String("Spend Rate Exceeded\n");
 	public static final String SITE_OR_APP_DOMAIN = new String("site.domain OR app.domain");
+	public static final String FORMAT_NOMATCH = new String("Format in impression does not match any creative size");
 	public static final String GLOBAL = new String("Global");
 
 

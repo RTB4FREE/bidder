@@ -535,7 +535,6 @@ public class Creative {
             List<Deal> deals = new ArrayList<Deal>();
 			for (int i = 0; i < attributes.size(); i++) {
 				n = attributes.get(i);
-
 				if (n.test(br,this,adId,imp,errorString,probe,deals) == false) {
 				    if (n.hierarchy == null) {
                         if (errorString != null)
@@ -548,6 +547,7 @@ public class Creative {
                         }
                         probe.process(br.getExchange(), adId, impid, Probe.CREATIVE_MISMATCH + n.hierarchy);
                     }
+				    System.out.println("XXXX: 1");
 					return null;
 				}
 

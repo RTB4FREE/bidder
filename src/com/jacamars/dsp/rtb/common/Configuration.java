@@ -379,7 +379,7 @@ public class Configuration {
 			instanceName = shard + ":" + useName;
 
 		/**
-		 * Set up tem p files
+		 * Set up temp files
 		 */
 		Files.createDirectories(Paths.get("www/temp")); // create the temp
 														// directory in www so
@@ -484,6 +484,14 @@ public class Configuration {
 			instanceBidRequest(x);
 		}
 
+		/**
+		 * Set GDPR mode
+		 */
+		String gdpr = (String)m.get("GDPR_MODE");
+		if (gdpr != null && gdpr.length()>0) {
+			RTBServer.GDPR_MODE = Boolean.parseBoolean(gdpr);
+		}
+		
 		/**
 		 * Create forensiq
 		 */
@@ -809,6 +817,7 @@ public class Configuration {
 		logger.info("{win_url} = " + winUrl);
 
 		logger.info("**********************************************************");
+		logger.info("GDPR Mode = " + RTBServer.GDPR_MODE);
 
 	}
 
@@ -841,9 +850,25 @@ public class Configuration {
 	 */
 	public static String substitute(String address) throws Exception {
 
+		if (address == null)
+			return address;
+		
+		while(address.contains("$S3REGION"))
+			address = GetEnvironmentVariable(address,"$S3REGION","");
+		while(address.contains("$S3BUCKET"))
+			address = GetEnvironmentVariable(address,"$S3BUCKET","");
+		while(address.contains("$S3ACCESSKEY"))
+			address = GetEnvironmentVariable(address,"$S3ACCESSKEY","");
+		while(address.contains("$S3SECRETKEY"))
+			address = GetEnvironmentVariable(address,"$S3SECRETKEY","");
+
+		
 		while(address.contains("$FREQGOV"))
 			address = GetEnvironmentVariable(address,"$FREQGOV", "true");
 
+		while(address.contains("$GDPR_MODE"))
+			address = GetEnvironmentVariable(address,"$GDPR_MODE", "false");
+		
 		while(address.contains("$HOSTNAME"))
 			address = GetEnvironmentVariable(address,"$HOSTNAME",Configuration.instanceName);
 		while(address.contains("$BROKERLIST"))
@@ -1006,7 +1031,8 @@ public class Configuration {
 				String name = null;
 
 				if (tags.isEmpty()) {
-					System.err.println("Error: " + keyName + " has no tags");
+					object.close();
+					logger.warn("Error, S3 object: {} has no tags", keyName);
 				} else {
 					for (Tag tag : tags) {
 						String key = tag.getKey();
@@ -1021,18 +1047,23 @@ public class Configuration {
 						}
 					}
 
-					if (name == null)
+					if (name == null) {
+						object.close();
 						throw new Exception("Error: " + keyName + " is missing a name tag");
-					if (name.contains(" "))
+					}
+					if (name.contains(" ")) {
+						object.close();
 						throw new Exception("Error: " + keyName + " has a name attribute with a space in it");
-					if (type == null)
+					}
+					if (type == null) {
+						object.close();
 						throw new Exception("Error: " + keyName + " has no type tag");
+					}
 
 					if (!name.startsWith("$"))
 						name = "$" + name;
 
-					//readData(type, name, object, size);
-
+					// The runnable will call object.close();
 					Runnable w = new AwsWorker(type, name, object, size);
 					executor.execute(w);
 

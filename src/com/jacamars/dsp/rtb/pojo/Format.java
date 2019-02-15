@@ -37,6 +37,15 @@ public class Format {
                     return f;
             }
         }
+        
+        if (cr.w != null && imp.w != null && 
+        		cr.h != null && imp.h != null &&
+        		cr.w.intValue() == imp.w.intValue() && cr.h.intValue() == imp.h.intValue()) {
+        	Format f = new Format(cr.w,cr.h);
+        	return f;
+        }
+        
+        
 
         return null;
     }

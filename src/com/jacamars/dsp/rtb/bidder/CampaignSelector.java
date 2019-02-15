@@ -251,7 +251,7 @@ class SelectionWorker implements Runnable {
                 logger.info("Campaign was stale, in the selection list");
                 break;
             }
-
+        
             if (test.isAdx == exchangeIsAdx) {
 
                 if (test.isGoverned(br)) {

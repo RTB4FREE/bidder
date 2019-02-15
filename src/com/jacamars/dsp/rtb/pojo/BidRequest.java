@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.node.*;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.bidder.SelectedCreative;
 import com.jacamars.dsp.rtb.common.*;
+import com.jacamars.dsp.rtb.exchanges.adx.AdxBidRequest;
 import com.jacamars.dsp.rtb.fraud.FraudLog;
 import com.jacamars.dsp.rtb.geo.Solution;
 import com.jacamars.dsp.rtb.tools.AmalgamatedKey;
@@ -37,6 +38,19 @@ import org.slf4j.LoggerFactory;
  */
 public class BidRequest {
 
+	static List<String> REGS_GDPR = new ArrayList();
+	static List<String> USER_CONSENT = new ArrayList();
+	static {
+		REGS_GDPR.add("regs");
+		REGS_GDPR.add("ext");
+		REGS_GDPR.add("gdpr");
+		
+		USER_CONSENT.add("user");
+		USER_CONSENT.add("ext");
+		USER_CONSENT.add("consent");
+	}
+	
+	
 	public static final Logger logger = LoggerFactory.getLogger(BidRequest.class);
 
 	private static volatile ExchangeCounts ec = ExchangeCounts.getInstance();
@@ -52,6 +66,8 @@ public class BidRequest {
 	transient public boolean usesEncodedAdm = true;
 	/** indicstes this SSP supports multibid */
 	transient public boolean multibid = false;
+	
+	boolean consentGiven = false;
 	/**
 	 * The bid request values are mapped into a hashmap for fast lookup by
 	 * campaigns
@@ -1142,11 +1158,32 @@ public class BidRequest {
 	}
 
 	/**
-	 * Determine if the exhcange using this type of request uses a multibids.
+	 * Determine if the exchange using this type of request uses a multibids.
 	 * @param exchange String. The exchange name.
 	 * @return boolean. Returns true if this exchange supports multibids. Else false.
 	 */
 	public static Boolean usesMultibids(String exchange) {
 		return multibids.contains(exchange);
+	}
+	
+	/**
+	 * Implement GDPR Compliance
+	 */
+	public void enforceGDPR() {
+		if (exchange.equals(AdxBidRequest.ADX))
+			return;
+		
+		JsonNode regs_gdpr = (JsonNode)this.walkTree(REGS_GDPR);
+		if (regs_gdpr == null)
+			return;
+		
+		if (regs_gdpr.asInt() == 0)
+			return;
+		
+		JsonNode user_consent = (JsonNode)this.walkTree(USER_CONSENT);
+		if (user_consent == null || user_consent.asText().equals("")) {
+			((ObjectNode)rootNode).remove("user");
+			return;
+		}
 	}
 }

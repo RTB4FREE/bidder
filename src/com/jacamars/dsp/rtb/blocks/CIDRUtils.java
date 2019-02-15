@@ -42,7 +42,7 @@ public class CIDRUtils {
     public long getStartAddress() {
     	ByteBuffer buffer = ByteBuffer.allocate(Long.SIZE);
     	buffer.put(startAddress.getAddress());
-    	buffer.position(0);
+    	//buffer.position(0);
     	Long longValue = buffer.getLong();
     	return longValue;
     }
