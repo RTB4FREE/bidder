@@ -64,7 +64,6 @@ import com.jacamars.dsp.rtb.tools.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * The singleton class that makes up the Configuration object. A configuration
  * is a JSON file that describes the campaigns and operational parameters needed
@@ -87,7 +86,7 @@ public class Configuration {
 	public static final int REQUEST_STRATEGY_BIDS = 1;
 	/** Log only requests with wins */
 	public static final int REQUEST_STRATEGY_WINS = 2;
-	
+
 	/** Default index page */
 	public static String indexPage = "/index.html";
 
@@ -103,8 +102,8 @@ public class Configuration {
 	/** The Nashhorn shell used by the bidder */
 	JJS shell;
 	/**
-	 * The standard HTTP port the bidder uses, note this commands from the
-	 * command line -p
+	 * The standard HTTP port the bidder uses, note this commands from the command
+	 * line -p
 	 */
 	public int port = 8080;
 	/** The standard HTTPS port the bidder runs on, if SSL is configured */
@@ -127,17 +126,18 @@ public class Configuration {
 	public List<Map> seatsList;
 	/** The blocking files */
 	public List<Map> filesList;
-    /** The 0MQ port used for freq cap */
-    public volatile int swarmPort;
-
+	/** The 0MQ port used for freq cap */
+	public volatile int swarmPort;
 
 	/** The campaigns used to make bids */
 	private volatile List<Campaign> campaignsList = new ArrayList<Campaign>();
 	/** The list of exchanges that will be allowed, empty means all allowed */
 	public volatile Set<String> overrideExchanges = null;
-	/** If overrideExchanges are used, then these are the only campaigns allowed to bid regardless of what campaignsList says */
+	/**
+	 * If overrideExchanges are used, then these are the only campaigns allowed to
+	 * bid regardless of what campaignsList says
+	 */
 	public volatile List<Campaign> overrideList = new ArrayList<Campaign>();
-
 
 	/** An empty template for the exchange formatted message */
 	public Map template = new HashMap();
@@ -176,8 +176,8 @@ public class Configuration {
 	public static String s3_bucket;
 
 	/**
-	 * HTTP admin port, usually same as bidder, but set this for a different
-	 * port for admin functions
+	 * HTTP admin port, usually same as bidder, but set this for a different port
+	 * for admin functions
 	 */
 	public int adminPort = 0;
 	/** Tell whether the port is supposed to be SSL or not, default is not */
@@ -215,9 +215,9 @@ public class Configuration {
 	/** The channel trasnmitting pixels */
 	public volatile String PIXELS_CHANNEL = null;
 	/** The channel the bidder sends command responses out on */
-	public volatile static String RESPONSES_SEND= null;
+	public volatile static String RESPONSES_SEND = null;
 	/** The channel the bidder receives responses for commands on */
-	public volatile static String RESPONSES_RECEIVE= null;
+	public volatile static String RESPONSES_RECEIVE = null;
 
 	// Channel that reports reasons
 	public volatile static String REASONS_CHANNEL = null;
@@ -225,9 +225,9 @@ public class Configuration {
 	public volatile static String commandsPort;
 	/** Whether to allow multiple bids per response */
 	public volatile static boolean multibid = false;
-	
+
 	/** Configuration defined macro definitions */
-	transient volatile Map<String,String> systemMacros = new HashMap();
+	transient volatile Map<String, String> systemMacros = new HashMap();
 
 	/** Logging strategy for logs */
 	public volatile static int requstLogStrategy = REQUEST_STRATEGY_ALL;
@@ -259,7 +259,7 @@ public class Configuration {
 	/** Deadman switch */
 	public volatile DeadmanSwitch deadmanSwitch;
 	String deadmanKey = null;
-	
+
 	/** Set the throttle */
 	public volatile long throttle = 100;
 
@@ -298,9 +298,9 @@ public class Configuration {
 	static volatile String myIpAddress = null;
 
 	/** 0MQ channel we receive commands from */
-    public static String COMMANDS = null;
+	public static String COMMANDS = null;
 
-    /**
+	/**
 	 * Private constructor, class has no public constructor.
 	 */
 	private Configuration() throws Exception {
@@ -325,37 +325,39 @@ public class Configuration {
 
 	public void initialize(String fileName) throws Exception {
 		this.fileName = fileName;
-		initialize(fileName, "", 8080, 8081,null);
+		initialize(fileName, "", 8080, 8081, null);
 	}
 
 	/**
 	 * Initialize the system from the JSON or Aerospike configuration file.
 	 * 
-	 * @param path String - The file name containing the Java Bean Shell code.
-	 * @param shard Strimg. The shard name
-	 * @param port int. The port the web access listens on
-	 * @param sslPort  int. The port the SSL listens on.
-     * @param exchanges String. The comma separated list of exchanges
-	 * @throws Exception
-	 *             on file errors.
+	 * @param path      String - The file name containing the Java Bean Shell code.
+	 * @param shard     Strimg. The shard name
+	 * @param port      int. The port the web access listens on
+	 * @param sslPort   int. The port the SSL listens on.
+	 * @param exchanges String. The comma separated list of exchanges
+	 * @throws Exception on file errors.
 	 */
 	public void initialize(String path, String shard, int port, int sslPort, String exchanges) throws Exception {
 		this.fileName = path;
 
 		/**
-		 * Override the exchanges in payday.json. This means any campaign that does not specifically have a rule using "exchange" will be allowed,
-		 * but any campaign that has a rule with "exchange" that does not match the list will be marked INACTIVE
+		 * Override the exchanges in payday.json. This means any campaign that does not
+		 * specifically have a rule using "exchange" will be allowed, but any campaign
+		 * that has a rule with "exchange" that does not match the list will be marked
+		 * INACTIVE
 		 */
 		Map<String, String> env = System.getenv();
 		if (env.get("EXCHANGES") != null || exchanges != null) {
 			String str = env.get("EXCHANGES");
 			if (exchanges != null)
-			    str = exchanges;
-			String [] parts = str.split(",");
+				str = exchanges;
+			String[] parts = str.split(",");
 			overrideExchanges = Sets.newHashSet(parts);
-			logger.warn("*** Exchanges configured in config file are restricted by EXCHANGES environment to this: {}",overrideExchanges);
+			logger.warn("*** Exchanges configured in config file are restricted by EXCHANGES environment to this: {}",
+					overrideExchanges);
 		}
-		
+
 		/******************************
 		 * System Name
 		 *****************************/
@@ -392,17 +394,17 @@ public class Configuration {
 		String str = null;
 		if (path.startsWith("zookeeper")) {
 			String parts[] = path.split(":");
-			logger.info("Zookeeper: {}",""+parts);
+			logger.info("Zookeeper: {}", "" + parts);
 			zk = new ZkConnect(parts[1]);
 			zk.join(parts[2], "bidders", instanceName);
 			str = zk.readConfig(parts[2] + "/bidders");
-		}  else {
+		} else {
 			byte[] encoded = Files.readAllBytes(Paths.get(path));
 			str = Charset.defaultCharset().decode(ByteBuffer.wrap(encoded)).toString();
 
 			str = Configuration.substitute(str);
 
-			// System.out.println(str);
+			System.out.println(str);
 		}
 
 		Map<?, ?> m = DbTools.mapper.readValue(str, Map.class);
@@ -417,51 +419,53 @@ public class Configuration {
 
 		if (m.get("s3") != null) {
 			Map<String, Object> ms3 = (Map) m.get("s3");
-			String accessKey = (String)ms3.get("access_key_id");
-			String secretAccessKey = (String)ms3.get("secret_access_key");
-			String region = (String)ms3.get("region");
-			s3_bucket = (String)ms3.get("bucket");
+			String accessKey = (String) ms3.get("access_key_id");
+			String secretAccessKey = (String) ms3.get("secret_access_key");
+			String region = (String) ms3.get("region");
+			s3_bucket = (String) ms3.get("bucket");
 
-			ClientConfiguration cf = new ClientConfiguration();
+			if (!(accessKey.length() == 0 || secretAccessKey.length() == 0 || region.length() == 0)) {
 
-			if (ms3.get("proxyhost") != null) {
-				String proxyhost = (String)ms3.get("proxyhost");
-				int proxyport = (Integer)ms3.get("proxyport");
-				logger.info("S3 Using host: {}, port: {}",proxyhost,proxyport);
-				String proto = (String)ms3.get("proxyprotocol");
-				cf.setProxyHost(proxyhost);
-				cf.setProxyPort(proxyport);
-				if (proto != null) {
-					if (proto.equalsIgnoreCase("http"))
-						cf.setProtocol(Protocol.HTTP);
-					else
-						cf.setProtocol(Protocol.HTTPS);
+				ClientConfiguration cf = new ClientConfiguration();
+
+				if (ms3.get("proxyhost") != null) {
+					String proxyhost = (String) ms3.get("proxyhost");
+					int proxyport = (Integer) ms3.get("proxyport");
+					logger.info("S3 Using host: {}, port: {}", proxyhost, proxyport);
+					String proto = (String) ms3.get("proxyprotocol");
+					cf.setProxyHost(proxyhost);
+					cf.setProxyPort(proxyport);
+					if (proto != null) {
+						if (proto.equalsIgnoreCase("http"))
+							cf.setProtocol(Protocol.HTTP);
+						else
+							cf.setProtocol(Protocol.HTTPS);
+					}
 				}
+
+				BasicAWSCredentials creds = new BasicAWSCredentials(accessKey, secretAccessKey);
+				s3 = AmazonS3ClientBuilder.standard().withClientConfiguration(cf)
+						.withCredentials(new AWSStaticCredentialsProvider(creds)).withRegion(Regions.fromName(region))
+						.build();
+
+				ObjectListing listing = s3.listObjects(new ListObjectsRequest().withBucketName(s3_bucket));
+
+				/**
+				 * Lazy Load
+				 */
+				Runnable task = () -> {
+					try {
+						processDirectory(s3, listing, s3_bucket);
+					} catch (Exception error) {
+						System.err.println("ERROR IN AWS LISTING: " + error.toString());
+					}
+				};
+				Thread thread = new Thread(task);
+				thread.start();
+			} else {
+				logger.info("S3 is not configured");
 			}
-
-			BasicAWSCredentials creds = new BasicAWSCredentials(accessKey, secretAccessKey);
-			s3 = AmazonS3ClientBuilder.
-					standard().
-					withClientConfiguration(cf).
-					withCredentials(new AWSStaticCredentialsProvider(creds)).
-					withRegion(Regions.fromName(region)).
-					build();
-
-			ObjectListing listing = s3.listObjects(new ListObjectsRequest().withBucketName(s3_bucket));
-
-			/**
-			 * Lazy Load
-			 */
-			Runnable task = () -> {
-				try {
-					processDirectory(s3, listing, s3_bucket);
-				} catch (Exception error) {
-					System.err.println("ERROR IN AWS LISTING: " + error.toString());
-				}
-			};
-			Thread thread = new Thread(task);
-			thread.start();
-		} 
+		}
 		/**
 		 * SSL
 		 */
@@ -474,8 +478,8 @@ public class Configuration {
 			ssl.setKeyStorePath = (String) x.get("setKeyStorePath");
 		}
 		/**
-		 * Create the seats id map, and create the bin and win handler classes
-		 * for each exchange
+		 * Create the seats id map, and create the bin and win handler classes for each
+		 * exchange
 		 */
 		seatsList = (List<Map>) m.get("seats");
 		for (int i = 0; i < seatsList.size(); i++) {
@@ -487,11 +491,11 @@ public class Configuration {
 		/**
 		 * Set GDPR mode
 		 */
-		String gdpr = (String)m.get("GDPR_MODE");
-		if (gdpr != null && gdpr.length()>0) {
+		String gdpr = (String) m.get("GDPR_MODE");
+		if (gdpr != null && gdpr.length() > 0) {
 			RTBServer.GDPR_MODE = Boolean.parseBoolean(gdpr);
 		}
-		
+
 		/**
 		 * Create forensiq
 		 */
@@ -543,56 +547,55 @@ public class Configuration {
 		 * Deal with the app object
 		 */
 		m = (Map) m.get("app");
-		
+
 		if (m.get("indexPage") != null)
-			indexPage = (String)m.get("indexPage");
-		
-		if (m.get("throttle")!=null) {
-			String key = (String)m.get("throttle");
+			indexPage = (String) m.get("indexPage");
+
+		if (m.get("throttle") != null) {
+			String key = (String) m.get("throttle");
 			throttle = Long.parseLong(key);
 		}
 
 		if (m.get("deadmanswitch") != null) {
-		    deadmanKey = (String)m.get("deadmanswitch");
-		    if (deadmanKey.equalsIgnoreCase("NONE"))
-		    	deadmanKey = null;
-        }
-		
-		 if (m.get("trace") != null) {
-			 String strace = (String)m.get("trace");
-			 if (strace.equalsIgnoreCase("true"))
-			     RTBServer.trace = true;
-			 else
-			     RTBServer.trace = false;
+			deadmanKey = (String) m.get("deadmanswitch");
+			if (deadmanKey.equalsIgnoreCase("NONE"))
+				deadmanKey = null;
+		}
 
-	    }
+		if (m.get("trace") != null) {
+			String strace = (String) m.get("trace");
+			if (strace.equalsIgnoreCase("true"))
+				RTBServer.trace = true;
+			else
+				RTBServer.trace = false;
+
+		}
 
 		if (m.get("concurrency") != null) {
-			String mstr = (String)m.get("concurrency");
+			String mstr = (String) m.get("concurrency");
 			concurrency = Integer.parseInt(mstr);
 		}
-		
-		if (m.get("systemMacros")!=null) {
-			systemMacros = (Map<String,String>)m.get("systemMacros");
 
-            for (String name : systemMacros.keySet()) {
-                String what = systemMacros.get(name);
-                what = substitute(what);
-                systemMacros.put(name,what);
-                MacroProcessing.addMacro(name);
-            }
+		if (m.get("systemMacros") != null) {
+			systemMacros = (Map<String, String>) m.get("systemMacros");
+
+			for (String name : systemMacros.keySet()) {
+				String what = systemMacros.get(name);
+				what = substitute(what);
+				systemMacros.put(name, what);
+				MacroProcessing.addMacro(name);
+			}
 		}
-
 
 		password = (String) m.get("password");
 
 		if (m.get("threads") != null) {
-			String mstr = (String)m.get("threads");
+			String mstr = (String) m.get("threads");
 			RTBServer.threads = Integer.parseInt(mstr);
 		}
 
 		if (m.get("adminPort") != null) {
-			String mstr = (String)m.get("adminPort");
+			String mstr = (String) m.get("adminPort");
 			adminPort = (Integer) Integer.parseInt(mstr);
 		}
 		if (m.get("adminSSL") != null) {
@@ -605,8 +608,8 @@ public class Configuration {
 		else
 			RTBServer.strategy = STRATEGY_MAX_CONNECTIONS;
 
-		if (m.get("nobid-reason")!=null)
-		    printNoBidReason = Boolean.parseBoolean((String)verbosity.get("nobid-reason"));
+		if (m.get("nobid-reason") != null)
+			printNoBidReason = Boolean.parseBoolean((String) verbosity.get("nobid-reason"));
 
 		template = (Map) m.get("template");
 		if (template == null) {
@@ -644,14 +647,13 @@ public class Configuration {
 			MyJedisPool.port = rport;
 			jedisPool = new MyJedisPool(1000, 1000, 5);
 
-			logger.info("*** JEDISPOOL = {}/{}/{} {}",jedisPool,host,rport,rsize);
+			logger.info("*** JEDISPOOL = {}/{}/{} {}", jedisPool, host, rport, rsize);
 		}
 
 		Map zeromq = (Map) m.get("zeromq");
 		if (zeromq == null) {
-			throw new Exception("Zeromq is mot configured!");	
+			throw new Exception("Zeromq is mot configured!");
 		}
-
 
 		String value = null;
 		Double dValue = 0.0;
@@ -662,8 +664,8 @@ public class Configuration {
 		 */
 		if ((value = (String) zeromq.get("videoevents")) != null)
 			VIDEOEVENTS_CHANNEL = value;
-        if ((value = (String) zeromq.get("postbackevents")) != null)
-            POSTBACKEVENTS_CHANNEL = value;
+		if ((value = (String) zeromq.get("postbackevents")) != null)
+			POSTBACKEVENTS_CHANNEL = value;
 		if ((value = (String) zeromq.get("bidchannel")) != null)
 			BIDS_CHANNEL = value;
 		if ((value = (String) zeromq.get("nobidchannel")) != null)
@@ -680,28 +682,27 @@ public class Configuration {
 			PIXELS_CHANNEL = value;
 		if ((value = (String) zeromq.get("fraud")) != null)
 			FORENSIQ_CHANNEL = value;
-		COMMANDS  = (String)zeromq.get("commands");
-		RESPONSES_SEND = (String)zeromq.get("responses");
-		String ls = (String)zeromq.get("xfrport");
+		COMMANDS = (String) zeromq.get("commands");
+		RESPONSES_SEND = (String) zeromq.get("responses");
+		String ls = (String) zeromq.get("xfrport");
 		ls = substitute(ls);
 		int listen = Integer.parseInt(ls);
 		String host = getHostFrom(RESPONSES_SEND);
-		int pub  = getPortFrom(RESPONSES_SEND);
+		int pub = getPortFrom(RESPONSES_SEND);
 		int sub = getPortFrom(COMMANDS);
 
-		String test = (String)zeromq.get("frequencygoverner");
+		String test = (String) zeromq.get("frequencygoverner");
 		if (test != null && test.equals("true"))
 			FrequencyGoverner.silent = false;
 		else
 			FrequencyGoverner.silent = true;
-		RTBServer.frequencyGoverner = new FrequencyGoverner(host,sub,pub,900);
+		RTBServer.frequencyGoverner = new FrequencyGoverner(host, sub, pub, 900);
 
 		redisson = new RedissonClient();
-		redisson.setSharedObject(host,listen);
+		redisson.setSharedObject(host, listen);
 
 		Database.getInstance(redisson);
 		readDatabaseIntoCache("database.json");
-
 
 		if ((value = (String) zeromq.get("status")) != null)
 			PERF_CHANNEL = value;
@@ -710,35 +711,32 @@ public class Configuration {
 		if ((value = (String) zeromq.get("reasons")) != null)
 			REASONS_CHANNEL = value;
 
-
 		/////////////////////////////////////////////////////////////////////
 
 		if (zeromq.get("requeststrategy") != null) {
 			strategy = (String) zeromq.get("requeststrategy");
 			if (strategy.equalsIgnoreCase("all") || strategy.equalsIgnoreCase("requests"))
 				requstLogStrategy = REQUEST_STRATEGY_ALL;
-			else
-			if (strategy.equalsIgnoreCase("bids"))
+			else if (strategy.equalsIgnoreCase("bids"))
 				requstLogStrategy = REQUEST_STRATEGY_BIDS;
-			else
-			if (strategy.equalsIgnoreCase("WINS"))
+			else if (strategy.equalsIgnoreCase("WINS"))
 				requstLogStrategy = REQUEST_STRATEGY_WINS;
+		} else {
+			if (strategy.contains(".") == false) {
+				int n = Integer.parseInt(strategy);
+				ExchangeLogLevel.getInstance().setStdLevel(n);
 			} else {
-			   if (strategy.contains(".") == false) {
-			   		int n = Integer.parseInt(strategy);
-					ExchangeLogLevel.getInstance().setStdLevel(n);
-				} else {
-					Double perc = Double.parseDouble(strategy);
-					ExchangeLogLevel.getInstance().setStdLevel(perc.intValue());
-				}
+				Double perc = Double.parseDouble(strategy);
+				ExchangeLogLevel.getInstance().setStdLevel(perc.intValue());
+			}
 		}
 		/********************************************************************/
 
 		if (deadmanKey != null) {
-		    deadmanSwitch = new DeadmanSwitch(redisson,deadmanKey);
-		    deadmanSwitch.start();
-        }
-		
+			deadmanSwitch = new DeadmanSwitch(redisson, deadmanKey);
+			deadmanSwitch.start();
+		}
+
 		campaignsList.clear();
 		overrideList.clear();
 
@@ -748,17 +746,17 @@ public class Configuration {
 			logger.error("No vasturl is set, it will be set to localhost, which will NOT work in production");
 		}
 
-        postbackUrl = (String) m.get("postbackurl");
-        if (postbackUrl == null) {
-            postbackUrl = "http://localhost:8080/postback";
-            logger.error("No postback is set, it will be set to localhost, which will NOT work in production");
-        }
+		postbackUrl = (String) m.get("postbackurl");
+		if (postbackUrl == null) {
+			postbackUrl = "http://localhost:8080/postback";
+			logger.error("No postback is set, it will be set to localhost, which will NOT work in production");
+		}
 
-        eventUrl = (String) m.get("eventurl");
-        if (eventUrl == null) {
-            eventUrl = "http://localhost:8080/track";
-            logger.error("No eventurl is set, it will be set to localhost, which will NOT work in production");
-        }
+		eventUrl = (String) m.get("eventurl");
+		if (eventUrl == null) {
+			eventUrl = "http://localhost:8080/track";
+			logger.error("No eventurl is set, it will be set to localhost, which will NOT work in production");
+		}
 
 		pixelTrackingUrl = (String) m.get("pixel-tracking-url");
 		winUrl = (String) m.get("winurl");
@@ -770,7 +768,7 @@ public class Configuration {
 		initialLoadlist = (List<String>) m.get("campaigns");
 
 		for (String camp : initialLoadlist) {
-		    fastAddCampaign(camp);
+			fastAddCampaign(camp);
 		}
 
 		recompile();
@@ -778,20 +776,18 @@ public class Configuration {
 		if (winUrl.contains("localhost")) {
 			logger.warn("*** WIN URL IS SET TO LOCALHOST, NO REMOTE ACCESS WILL WORK FOR WINS ***");
 		}
-		
+
 		printEnvironment();
 	}
-	
+
 	void printEnvironment() throws Exception {
 
-		String[] args = new String[]{"FREQGOV","HOSTNAME","BROKERLIST","PUBSUB","WIN","PIXEL","VIDEO","BID","EXTERNAL",
-				"PUBPORT","SUBPORT","INITPORT","TRACE","THREADS","CONCURRENCY","ADMINPORT","REQUESTSTRATEGY","ACCOUNTING",
-				"THROTTLE","IPADRESS","TRACKER","BROKERLIST","NOBIDREASON"
-		};
+		String[] args = new String[] { "FREQGOV", "HOSTNAME", "BROKERLIST", "PUBSUB", "WIN", "PIXEL", "VIDEO", "BID",
+				"EXTERNAL", "PUBPORT", "SUBPORT", "INITPORT", "TRACE", "THREADS", "CONCURRENCY", "ADMINPORT",
+				"REQUESTSTRATEGY", "ACCOUNTING", "THROTTLE", "IPADRESS", "TRACKER", "BROKERLIST", "NOBIDREASON" };
 
-		String[] macros = {"pixel_tracker","redirect_tracker","postback_tracker","event_tracker","pixel-tracking-url",
-				"winurl","redirect-url","vasturl","eventurl","postbackurl"
-		};
+		String[] macros = { "pixel_tracker", "redirect_tracker", "postback_tracker", "event_tracker",
+				"pixel-tracking-url", "winurl", "redirect-url", "vasturl", "eventurl", "postbackurl" };
 
 		Map<String, String> env = System.getenv();
 		logger.info("************* ENVIROMENT VARIABLES SET ******************");
@@ -822,28 +818,29 @@ public class Configuration {
 	}
 
 	public static String getHostFrom(String address) {
-		String s = address.replaceAll("tcp://","");
+		String s = address.replaceAll("tcp://", "");
 		int i = s.indexOf(":");
 		if (i >= 0)
-			return s.substring(0,i);
+			return s.substring(0, i);
 		else
 			return s;
 	}
 
 	public static int getPortFrom(String address) {
-		address = address.replaceAll("tcp://","");
+		address = address.replaceAll("tcp://", "");
 		int i = address.indexOf(":");
 		if (i < 0)
 			return -1;
-		address = address.substring(i+1);
+		address = address.substring(i + 1);
 		i = address.indexOf("&");
 		if (i > 0)
-			address = address.substring(0,i);
+			address = address.substring(0, i);
 		return Integer.parseInt(address);
 	}
 
 	/**
 	 * Substitute the macros and environment variables found in the the string.
+	 * 
 	 * @param address String. The address being queries/
 	 * @return String. All found environment vars will be substituted.
 	 * @throws Exception on parsing errors.
@@ -853,76 +850,79 @@ public class Configuration {
 		if (address == null)
 			return address;
 		
-		while(address.contains("$S3REGION"))
-			address = GetEnvironmentVariable(address,"$S3REGION","");
-		while(address.contains("$S3BUCKET"))
-			address = GetEnvironmentVariable(address,"$S3BUCKET","");
-		while(address.contains("$S3ACCESSKEY"))
-			address = GetEnvironmentVariable(address,"$S3ACCESSKEY","");
-		while(address.contains("$S3SECRETKEY"))
-			address = GetEnvironmentVariable(address,"$S3SECRETKEY","");
+		while(address.contains("$BIDSWITCH_ID"))
+			address = GetEnvironmentVariable(address,"$BIDSWITCH_ID","bidswitch-id");
 
-		
-		while(address.contains("$FREQGOV"))
-			address = GetEnvironmentVariable(address,"$FREQGOV", "true");
+		while (address.contains("$S3REGION"))
+			address = GetEnvironmentVariable(address, "$S3REGION", "");
+		while (address.contains("$S3BUCKET"))
+			address = GetEnvironmentVariable(address, "$S3BUCKET", "");
+		while (address.contains("$S3ACCESSKEY"))
+			address = GetEnvironmentVariable(address, "$S3ACCESSKEY", "");
+		while (address.contains("$S3SECRETKEY"))
+			address = GetEnvironmentVariable(address, "$S3SECRETKEY", "");
 
-		while(address.contains("$GDPR_MODE"))
-			address = GetEnvironmentVariable(address,"$GDPR_MODE", "false");
-		
-		while(address.contains("$HOSTNAME"))
-			address = GetEnvironmentVariable(address,"$HOSTNAME",Configuration.instanceName);
-		while(address.contains("$BROKERLIST"))
-			address = GetEnvironmentVariable(address,"$BROKERLIST","localhost:9092");
-		while(address.contains("$PUBSUB"))
-			address = GetEnvironmentVariable(address,"$PUBSUB","localhost");
+		while (address.contains("$FREQGOV"))
+			address = GetEnvironmentVariable(address, "$FREQGOV", "true");
 
-		while(address.contains("$WIN"))
-			address = GetEnvironmentVariable(address,"$WIN","localhost");
-		while(address.contains("$PIXEL"))
-			address = GetEnvironmentVariable(address,"$PIXEL","localhost");
-		while(address.contains("$VIDEO"))
-			address = GetEnvironmentVariable(address,"$VIDEO","localhost");
-		while(address.contains("$BID"))
-			address = GetEnvironmentVariable(address,"$BID","localhost");
-		while(address.contains("$EXTERNAL"))
-			address = GetEnvironmentVariable(address,"$EXTERNAL","http://localhost:8080");
+		while (address.contains("$GDPR_MODE"))
+			address = GetEnvironmentVariable(address, "$GDPR_MODE", "false");
 
-		while(address.contains("$PUBPORT"))
-			address = GetEnvironmentVariable(address,"$PUBPORT","6000");
-		while(address.contains("$SUBPORT"))
-			address = GetEnvironmentVariable(address,"$SUBPORT","6001");
-		while(address.contains("$INITPORT"))
-			address = GetEnvironmentVariable(address,"$INITPORT","6002");
-		while(address.contains("$THREADS"))
-			address = GetEnvironmentVariable(address,"$THREADS","2000");
-		while(address.contains("$CONCURRENCY"))
-			address = GetEnvironmentVariable(address,"$CONCURRENCY","3");
-		while(address.contains("$ADMINPORT"))
-			address = GetEnvironmentVariable(address,"$ADMINPORT","8155");
-		while(address.contains("$REQUESTSTRATEGY"))
-			address = GetEnvironmentVariable(address,"$REQUESTSTRATEGY","100");
-		while(address.contains("$ACCOUNTING"))
-			address = GetEnvironmentVariable(address,"$ACCOUNTING","accountingsystem");
-		while(address.contains("$INDEXPAGE"))
-			address = GetEnvironmentVariable(address,"$INDEXPAGE","/index.html");
-		while(address.contains("$THROTTLE"))
-			address = GetEnvironmentVariable(address,"$THROTTLE","100");
-		while(address.contains("$NOBIDREASON"))
-			address = GetEnvironmentVariable(address,"$NOBIDREASON","false");
+		while (address.contains("$HOSTNAME"))
+			address = GetEnvironmentVariable(address, "$HOSTNAME", Configuration.instanceName);
+		while (address.contains("$BROKERLIST"))
+			address = GetEnvironmentVariable(address, "$BROKERLIST", "localhost:9092");
+		while (address.contains("$PUBSUB"))
+			address = GetEnvironmentVariable(address, "$PUBSUB", "localhost");
 
-		while(address.contains("$IPADDRESS"))
+		while (address.contains("$WIN"))
+			address = GetEnvironmentVariable(address, "$WIN", "localhost");
+		while (address.contains("$PIXEL"))
+			address = GetEnvironmentVariable(address, "$PIXEL", "localhost");
+		while (address.contains("$VIDEO"))
+			address = GetEnvironmentVariable(address, "$VIDEO", "localhost");
+		while (address.contains("$BID"))
+			address = GetEnvironmentVariable(address, "$BID", "localhost");
+		while (address.contains("$EXTERNAL"))
+			address = GetEnvironmentVariable(address, "$EXTERNAL", "http://localhost:8080");
+
+		while (address.contains("$PUBPORT"))
+			address = GetEnvironmentVariable(address, "$PUBPORT", "6000");
+		while (address.contains("$SUBPORT"))
+			address = GetEnvironmentVariable(address, "$SUBPORT", "6001");
+		while (address.contains("$INITPORT"))
+			address = GetEnvironmentVariable(address, "$INITPORT", "6002");
+		while (address.contains("$THREADS"))
+			address = GetEnvironmentVariable(address, "$THREADS", "2000");
+		while (address.contains("$CONCURRENCY"))
+			address = GetEnvironmentVariable(address, "$CONCURRENCY", "3");
+		while (address.contains("$ADMINPORT"))
+			address = GetEnvironmentVariable(address, "$ADMINPORT", "8155");
+		while (address.contains("$REQUESTSTRATEGY"))
+			address = GetEnvironmentVariable(address, "$REQUESTSTRATEGY", "100");
+		while (address.contains("$ACCOUNTING"))
+			address = GetEnvironmentVariable(address, "$ACCOUNTING", "accountingsystem");
+		while (address.contains("$INDEXPAGE"))
+			address = GetEnvironmentVariable(address, "$INDEXPAGE", "/index.html");
+		while (address.contains("$THROTTLE"))
+			address = GetEnvironmentVariable(address, "$THROTTLE", "100");
+		while (address.contains("$NOBIDREASON"))
+			address = GetEnvironmentVariable(address, "$NOBIDREASON", "false");
+
+		while (address.contains("$IPADDRESS"))
 			address = GetIpAddressFromInterface(address);
-		
-		while(address.contains("$TRACKER"))
-	        address = GetEnvironmentVariable(address,"$TRACKER","localhost:8080");
-		  
-        address = GetEnvironmentVariable(address,"$TRACE","false");
-        
+
+		while (address.contains("$TRACKER"))
+			address = GetEnvironmentVariable(address, "$TRACKER", "localhost:8080");
+
+		address = GetEnvironmentVariable(address, "$TRACE", "false");
+
 		return address;
 	}
 
 	/**
 	 * Retrieve a variable from the environment variables
+	 * 
 	 * @param address String. The address string to change.
 	 * @param varName String. The name of the environment variable, begins with $
 	 * @return String. The address string modified.
@@ -941,14 +941,17 @@ public class Configuration {
 	}
 
 	/**
-	 * Retrieve a variable from the environment variables, and if it exists, use that, else use the alternate.
+	 * Retrieve a variable from the environment variables, and if it exists, use
+	 * that, else use the alternate.
+	 * 
 	 * @param address String. The address string to change.
 	 * @param varName String. The name of the environment variable, begins with $
-	 * @param altName String. The name to use if the environment variables is not defined.
+	 * @param altName String. The name to use if the environment variables is not
+	 *                defined.
 	 * @return String. The address string modified.
 	 */
 	public static String GetEnvironmentVariable(String address, String varName, String altName) {
-		String test = GetEnvironmentVariable(address,varName);
+		String test = GetEnvironmentVariable(address, varName);
 		if (test == null) {
 			test = address.replace(varName, altName);
 		}
@@ -956,34 +959,38 @@ public class Configuration {
 	}
 
 	/**
-	 * Get the first IP address from a specified interface, in the form $IPADRESS#IFACE-NAME#
+	 * Get the first IP address from a specified interface, in the form
+	 * $IPADRESS#IFACE-NAME#
+	 * 
 	 * @param address String. The address we are looking at
-	 * @return String. The first occurrance of $IPADDRESS#XXX# will be substituted, if found
+	 * @return String. The first occurrance of $IPADDRESS#XXX# will be substituted,
+	 *         if found
 	 * @throws Exception on parsing errors.
 	 */
 	public static String GetIpAddressFromInterface(String address) throws Exception {
 		int i = address.indexOf("$IPADDRESS");
-		if (i<0)
+		if (i < 0)
 			return address;
 
-		if (address.charAt(i+10)=='#') {
-			String chunk = address.substring(i+12);
+		if (address.charAt(i + 10) == '#') {
+			String chunk = address.substring(i + 12);
 			int j = chunk.indexOf("#");
 			if (j < 0)
-				address = address.replace("$IPADDRESS",Performance.getInternalAddress());
+				address = address.replace("$IPADDRESS", Performance.getInternalAddress());
 			else {
-				String key = address.substring(i,i+13+j);
-				String [] parts = key.split("#");
-				address = address.replace(key,Performance.getInternalAddress(parts[1]));
+				String key = address.substring(i, i + 13 + j);
+				String[] parts = key.split("#");
+				address = address.replace(key, Performance.getInternalAddress(parts[1]));
 			}
 		} else {
-			address = address.replace("$IPADDRESS",Performance.getInternalAddress());
+			address = address.replace("$IPADDRESS", Performance.getInternalAddress());
 		}
 		return address;
 	}
-	
+
 	/**
 	 * Return macros defined in the configuration file
+	 * 
 	 * @param macro String. The name of the macro.
 	 * @return String. The returned value.
 	 */
@@ -993,6 +1000,7 @@ public class Configuration {
 
 	/**
 	 * Return the bid request log strategy as a string
+	 * 
 	 * @return String. The strategy we are currently using.
 	 */
 	public String requstLogStrategyAsString() {
@@ -1081,6 +1089,7 @@ public class Configuration {
 
 	/**
 	 * Initialized a template bid request. This is added to the seatlist.
+	 * 
 	 * @param x Map. Definition of the seat.
 	 * @throws Exception on parsing errors.
 	 */
@@ -1141,34 +1150,33 @@ public class Configuration {
 					String option = parts[ind];
 					String[] tuples = option.split("=");
 					switch (tuples[0]) {
-						case "usesEncodedAdm":
-							br.usesEncodedAdm = true;
-							break;
-						case "!usesEncodedAdm":
-							br.usesEncodedAdm = false;
-							break;
-						case "rlog":
-							Double rlog = Double.parseDouble(tuples[1]);
-							ExchangeLogLevel.getInstance().setExchangeLogLevel(name, rlog.intValue());
-							break;
-						case "useStrings":
-							break;
-						case "!useStrings":
-							break;
-						case "!usesPiggyBackWins":
-							break;
-						case "usesPiggyBackWins":
-							BidRequest.setUsesPiggyBackWins(name);
-							break;
-						default:
-							System.err.println("Unknown request: " + tuples[0] + " in definition of " + className);
+					case "usesEncodedAdm":
+						br.usesEncodedAdm = true;
+						break;
+					case "!usesEncodedAdm":
+						br.usesEncodedAdm = false;
+						break;
+					case "rlog":
+						Double rlog = Double.parseDouble(tuples[1]);
+						ExchangeLogLevel.getInstance().setExchangeLogLevel(name, rlog.intValue());
+						break;
+					case "useStrings":
+						break;
+					case "!useStrings":
+						break;
+					case "!usesPiggyBackWins":
+						break;
+					case "usesPiggyBackWins":
+						BidRequest.setUsesPiggyBackWins(name);
+						break;
+					default:
+						System.err.println("Unknown request: " + tuples[0] + " in definition of " + className);
 					}
 				}
 			}
 
 			/**
-			 * Appnexus requires additional support for ready, pixel and
-			 * click
+			 * Appnexus requires additional support for ready, pixel and click
 			 */
 			if (className.contains("Appnexus")) {
 				RTBServer.exchanges.put(uri + "/ready", new Appnexus(Appnexus.READY));
@@ -1195,21 +1203,21 @@ public class Configuration {
 		SimpleSet sset;
 		Bloom b;
 		Cuckoo c;
-		switch(type) {
+		switch (type) {
 		case "range":
-			map = new NavMap(fileName,fileName,false);
+			map = new NavMap(fileName, fileName, false);
 			message = "Added NavMap " + fileName + ": from file, has " + map.size() + " members";
 			break;
 		case "cidr":
-			map = new NavMap(fileName,fileName,true);
+			map = new NavMap(fileName, fileName, true);
 			message = "Added NavMap " + fileName + ": from file, has " + map.size() + " members";
 			break;
 		case "bloom":
-			b = new Bloom(fileName,fileName);
+			b = new Bloom(fileName, fileName);
 			message = "Initialize Bloom Filter: " + fileName + " from file, members = " + b.getMembers();
 			break;
 		case "cuckoo":
-			c = new Cuckoo(fileName,fileName);
+			c = new Cuckoo(fileName, fileName);
 			break;
 		case "multiset":
 			set = new SimpleMultiset(fileName, fileName);
@@ -1219,11 +1227,11 @@ public class Configuration {
 			sset = new SimpleSet(fileName, fileName);
 			message = "Initialize Multiset " + fileName + " from file, entries = " + sset.size();
 			break;
-			
+
 		default:
 			message = "Unknown type: " + type;
 		}
-		logger.info("*** {}",message);
+		logger.info("*** {}", message);
 		return message;
 	}
 
@@ -1255,7 +1263,7 @@ public class Configuration {
 		default:
 			message = "Unknown type: " + type;
 		}
-		logger.info("*** {}",message);
+		logger.info("*** {}", message);
 		return message;
 	}
 
@@ -1292,66 +1300,61 @@ public class Configuration {
 				Constructor<?> cons = cl.getConstructor(String.class, String.class);
 				cons.newInstance(name, fileName);
 			}
-			logger.info("*** Configuration Initialized {} with {}",name, fileName);
+			logger.info("*** Configuration Initialized {} with {}", name, fileName);
 		}
 	}
 
 	/**
-	 * Purpose is to test if the Cache2k system is usable with the win URL
-	 * specified in the configuration file.
+	 * Purpose is to test if the Cache2k system is usable with the win URL specified
+	 * in the configuration file.
 	 * 
-	 * @throws Exception
-	 *             if the Win URL is not set to this instance.
+	 * @throws Exception if the Win URL is not set to this instance.
 	 */
 	public void testWinUrlWithCache2k() throws Exception {
 		String test = null;
-			HttpPostGet hp = new HttpPostGet();
-			String[] parts = winUrl.split("/");
-			test = "http://" + parts[2] + "/info";
-			test = hp.sendGet(test, 5000, 5000);
-			if (test == null) {
-				throw new Exception("Info on " + test + " failed!");
-			}
-			Map m = DbTools.mapper.readValue(test, Map.class);
-			test = (String) m.get("from");
-			if (test.equals(instanceName) == false) {
-				throw new Exception("Win URL must resolve this instance if using Cache2K!, instead it is: " + test
-						+ ", expecting " + instanceName);
-			}
+		HttpPostGet hp = new HttpPostGet();
+		String[] parts = winUrl.split("/");
+		test = "http://" + parts[2] + "/info";
+		test = hp.sendGet(test, 5000, 5000);
+		if (test == null) {
+			throw new Exception("Info on " + test + " failed!");
+		}
+		Map m = DbTools.mapper.readValue(test, Map.class);
+		test = (String) m.get("from");
+		if (test.equals(instanceName) == false) {
+			throw new Exception("Win URL must resolve this instance if using Cache2K!, instead it is: " + test
+					+ ", expecting " + instanceName);
+		}
 
 	}
 
 	/**
-	 * Used to load ./database.json into Cache2k. This is used when aerospike is
-	 * not present. This instance will handle its own cache, and do its own win
+	 * Used to load ./database.json into Cache2k. This is used when aerospike is not
+	 * present. This instance will handle its own cache, and do its own win
 	 * processing.
 	 * 
-	 * @param fname
-	 *            String. The file name of the database.
-	 * @throws Exception
-	 *             on file or cache2k errors.
+	 * @param fname String. The file name of the database.
+	 * @throws Exception on file or cache2k errors.
 	 */
 	private static void readDatabaseIntoCache(String fname) throws Exception {
-        String content = new String(Files.readAllBytes(Paths.get(fname)), StandardCharsets.UTF_8);
-        content = substitute(content);
+		String content = new String(Files.readAllBytes(Paths.get(fname)), StandardCharsets.UTF_8);
+		content = substitute(content);
 
-        logger.debug(content);
-        Database db = Database.getInstance();
+		logger.debug(content);
+		Database db = Database.getInstance();
 
-        List<Campaign> list = DbTools.mapper.readValue(content,
-                DbTools.mapper.getTypeFactory().constructCollectionType(List.class, Campaign.class));
-        db.update(list);
-    }
+		List<Campaign> list = DbTools.mapper.readValue(content,
+				DbTools.mapper.getTypeFactory().constructCollectionType(List.class, Campaign.class));
+		db.update(list);
+	}
 
 	/**
 	 * Return the instance of Configuration, and if necessary, instantiates it
 	 * first.
 	 * 
-	 * @param fileName
-	 *            String. The name of the initialization file.
+	 * @param fileName String. The name of the initialization file.
 	 * @return Configuration. The instance of this singleton.
-	 * @throws Exception
-	 *             on JSON errors.
+	 * @throws Exception on JSON errors.
 	 */
 	public static Configuration getInstance(String fileName) throws Exception {
 		if (theInstance == null) {
@@ -1372,20 +1375,17 @@ public class Configuration {
 	}
 
 	/**
-	 * Get an instance of the configuration object, using the specified config
-	 * file, shard name and http poty
+	 * Get an instance of the configuration object, using the specified config file,
+	 * shard name and http poty
 	 * 
-	 * @param fileName
-	 *            String. The filename of the configuration file.
-	 * @param shard
-	 *            String. The shard name for this instance.
-	 * @param port
-	 *            int. The HTTP port byumber
+	 * @param fileName String. The filename of the configuration file.
+	 * @param shard    String. The shard name for this instance.
+	 * @param port     int. The HTTP port byumber
 	 * @return Configuration singleton.
-	 * @throws Exception
-	 *             on file errors and JSON errors.
+	 * @throws Exception on file errors and JSON errors.
 	 */
-	public static Configuration getInstance(String fileName, String shard, int port, int sslPort, String exchanges) throws Exception {
+	public static Configuration getInstance(String fileName, String shard, int port, int sslPort, String exchanges)
+			throws Exception {
 		if (theInstance == null) {
 			synchronized (Configuration.class) {
 				if (theInstance == null) {
@@ -1449,10 +1449,8 @@ public class Configuration {
 	/**
 	 * Encode the smaato campaign variables.
 	 * 
-	 * @param value
-	 *            String. The string of javascript to execute.
-	 * @throws Exception
-	 *             on JavaScript errors.
+	 * @param value String. The string of javascript to execute.
+	 * @throws Exception on JavaScript errors.
 	 */
 	private void encodeSmaato(String value) throws Exception {
 		NashHorn scripter = new NashHorn();
@@ -1478,7 +1476,8 @@ public class Configuration {
 	 */
 	public static Configuration getInstance() {
 		if (theInstance == null)
-			return null; // throw new RuntimeException("Please initialize the Configuration instance first.");
+			return null; // throw new RuntimeException("Please initialize the Configuration instance
+							// first.");
 		return theInstance;
 	}
 
@@ -1497,11 +1496,9 @@ public class Configuration {
 	/**
 	 * Returns an input stream from the file of the given name.
 	 * 
-	 * @param fname
-	 *            String. The fully qualified file name.
+	 * @param fname String. The fully qualified file name.
 	 * @return InputStream. The stream to read from.
-	 * @throws Exception
-	 *             on file errors.
+	 * @throws Exception on file errors.
 	 */
 	public static InputStream getInputStream(String fname) throws Exception {
 		File f = new File(fname);
@@ -1509,44 +1506,46 @@ public class Configuration {
 	}
 
 	/**
-	 * Can this campaign id bid? If it's instantaneous spend rate exceeds the campaign setting, then no, it can't/
+	 * Can this campaign id bid? If it's instantaneous spend rate exceeds the
+	 * campaign setting, then no, it can't/
+	 * 
 	 * @param adid String. The adid of the campaign.
 	 * @return boolean. Returns true if the campaign can bid.
 	 */
 	public boolean canBid(String adid) {
-		return handyMap.canBid(adid,0);
+		return handyMap.canBid(adid, 0);
 	}
 
 	/**
-	 * This deletes a campaign from the campaignsList (the running commands)
-	 * this does not delete from the database.
+	 * This deletes a campaign from the campaignsList (the running commands) this
+	 * does not delete from the database.
 	 *
-	 * @param name
-	 *            String. The id of the campaign to delete
-	 * @return boolean. Returns true if the campaign was found, else returns
-	 *         false.
+	 * @param name String. The id of the campaign to delete
+	 * @return boolean. Returns true if the campaign was found, else returns false.
 	 */
 	public boolean deleteCampaign(String name) throws Exception {
 		List<Campaign> deletions = new ArrayList<Campaign>();
 		Iterator<Campaign> it = campaignsList.iterator();
 
 		for (Campaign c : campaignsList) {
-            if (c != null && c.adId.equals(name)) {
-                campaignsList.remove(c);
-                overrideList.remove(c);
-                recompile();
-                return true;
-            }
-        }
+			if (c != null && c.adId.equals(name)) {
+				campaignsList.remove(c);
+				overrideList.remove(c);
+				recompile();
+				return true;
+			}
+		}
 
-        return false;
+		return false;
 	}
 
 	/**
 	 * Set the weights of a campaign.
-	 * @param name String. The name of the campaign.
+	 * 
+	 * @param name    String. The name of the campaign.
 	 * @param weights String weights. In the form crid=x,crid=y,crid=z...
-	 * @return boolean. Returns true if the assignment worked, else it returns false.
+	 * @return boolean. Returns true if the assignment worked, else it returns
+	 *         false.
 	 * @throws Exception on parsing errors.
 	 */
 	public boolean setWeights(String name, String weights) throws Exception {
@@ -1562,25 +1561,26 @@ public class Configuration {
 
 	/**
 	 * Get the weights set on a campaign.
+	 * 
 	 * @param name String. The name of the campaign,
 	 * @return ProportionalEntry. The PE weights.
 	 * @throws Exception if campaign is not found.
 	 */
 	public ProportionalEntry getWeights(String name) throws Exception {
-        for (Campaign c : campaignsList) {
-            if (c != null && c.adId.equals(name)) {
-                if (c.weights == null) {
-                    return null;
-                }
-                return c.weights;
-            }
-        }
-        throw new Exception("No such campaign: " + name);
-    }
+		for (Campaign c : campaignsList) {
+			if (c != null && c.adId.equals(name)) {
+				if (c.weights == null) {
+					return null;
+				}
+				return c.weights;
+			}
+		}
+		throw new Exception("No such campaign: " + name);
+	}
 
 	/**
-	 * Recompile the bid attributes we will parse from bid requests, based on
-	 * the aggregate of all campaign bid constraints.
+	 * Recompile the bid attributes we will parse from bid requests, based on the
+	 * aggregate of all campaign bid constraints.
 	 */
 	public void recompile() throws Exception {
 		int percentage = RTBServer.percentage.intValue(); // save the current
@@ -1596,8 +1596,9 @@ public class Configuration {
 	}
 
 	/**
-	 * Return the EFFECTIVE campaigns list. If this is not an exchange specific list, then returns the campaignsList, otherwise
-	 * it returns the overrideList.
+	 * Return the EFFECTIVE campaigns list. If this is not an exchange specific
+	 * list, then returns the campaignsList, otherwise it returns the overrideList.
+	 * 
 	 * @return List. The list of campaigns.
 	 */
 	public List<Campaign> getCampaignsList() {
@@ -1608,10 +1609,10 @@ public class Configuration {
 	}
 
 	/**
-	 * Sort the rules for selecting campaigns and creatives in descending order, so we can
-	 * shorten the time to no-bid
+	 * Sort the rules for selecting campaigns and creatives in descending order, so
+	 * we can shorten the time to no-bid
 	 */
-	public  void sortCampaignsAndCreatives() {
+	public void sortCampaignsAndCreatives() {
 		boolean state = RTBServer.stopped;
 		RTBServer.stopped = true;
 
@@ -1624,35 +1625,33 @@ public class Configuration {
 			return;
 		}
 
-		for (int i=0;i<campaignsList.size();i++) {
+		for (int i = 0; i < campaignsList.size(); i++) {
 			campaignsList.get(i).sortNodes();
 		}
 
 		RTBServer.stopped = state;
 	}
 
-
 	/**
-     * Return the actual backing campaigmsList
-     * @return List. The Campaigns list.
-     */
+	 * Return the actual backing campaigmsList
+	 * 
+	 * @return List. The Campaigns list.
+	 */
 	public List<Campaign> getCampaignsListReal() {
-	    return campaignsList;
-    }
+		return campaignsList;
+	}
 
-    public void clearCampaigns() {
-	    campaignsList.clear();
-	    overrideList.clear();
-    }
+	public void clearCampaigns() {
+		campaignsList.clear();
+		overrideList.clear();
+	}
 
 	/**
 	 * Add a campaign to the list of campaigns we are running. Does not add to
 	 * Aerospike.
 	 * 
-	 * @param c
-	 *            Campaign. The campaign to add into the accounting.
-	 * @throws Exception
-	 *             if the encoding of the attributes fails.
+	 * @param c Campaign. The campaign to add into the accounting.
+	 * @throws Exception if the encoding of the attributes fails.
 	 */
 	public void addCampaign(Campaign c) throws Exception {
 		if (c == null)
@@ -1685,59 +1684,55 @@ public class Configuration {
 		recompile();
 	}
 
-    /**
-     * Quickly add a campaign to the list of campaigns we are running, does not do checks or recompile.
-     * Use this when initially loading the campaign.
-     *
-     * @param c
-     *            Campaign. The campaign to add into the accounting.
-     * @throws Exception
-     *             if the encoding of the attributes fails.
-     */
-    public void fastAddCampaign(Campaign c) throws Exception {
-        if (c == null)
-            return;
+	/**
+	 * Quickly add a campaign to the list of campaigns we are running, does not do
+	 * checks or recompile. Use this when initially loading the campaign.
+	 *
+	 * @param c Campaign. The campaign to add into the accounting.
+	 * @throws Exception if the encoding of the attributes fails.
+	 */
+	public void fastAddCampaign(Campaign c) throws Exception {
+		if (c == null)
+			return;
 
-   
-        handyMap.addCampaign(c);
+		handyMap.addCampaign(c);
 
-        c.encodeCreatives();
-        c.encodeAttributes();
-        campaignsList.add(c);
+		c.encodeCreatives();
+		c.encodeAttributes();
+		campaignsList.add(c);
 
-        if (overrideExchanges != null) {
-            for (String e : overrideExchanges) {
-                if (c.canUseExchange(e)) {
-                    overrideList.add(c);
-                    break;
-                }
-            }
-        }
-        
-        if (RTBServer.trace) {
-        	logger.info("***************** CAMPAIGN ********************");
-        	logger.info(c.toJson());
-        }
-        
-    }
+		if (overrideExchanges != null) {
+			for (String e : overrideExchanges) {
+				if (c.canUseExchange(e)) {
+					overrideList.add(c);
+					break;
+				}
+			}
+		}
 
-    /**
+		if (RTBServer.trace) {
+			logger.info("***************** CAMPAIGN ********************");
+			logger.info(c.toJson());
+		}
+
+	}
+
+	/**
 	 * A horrible hack to find out the ad type.
+	 * 
 	 * @param adid String. The ad id.
 	 * @param crid String. The creative id.
 	 * @return String. Returns the type, or, null if anything goes wrong.
 	 */
 	public String getAdType(String adid, String crid) {
-		return  handyMap.getAdType(adid,crid);
+		return handyMap.getAdType(adid, crid);
 	}
 
 	/**
 	 * Efficiently add a list of campaigns to the system
 	 *
-	 * @param campaigns
-	 *            String[]. The array of campaign adids to load.
-	 * @throws Exception
-	 *             on Database errors.
+	 * @param campaigns String[]. The array of campaign adids to load.
+	 * @throws Exception on Database errors.
 	 */
 	public synchronized String addCampaignsList(String[] campaigns) throws Exception {
 		String rets = "";
@@ -1764,10 +1759,8 @@ public class Configuration {
 	/**
 	 * Is the identified campaign running?
 	 * 
-	 * @param owner
-	 *            String. The campaign owner
-	 * @param name
-	 *            String. The campaign adid.
+	 * @param owner String. The campaign owner
+	 * @param name  String. The campaign adid.
 	 * @return boolean. Rewturns true if it is loaded, else false.
 	 */
 	public boolean isRunning(String owner, String name) {
@@ -1795,40 +1788,39 @@ public class Configuration {
 	/**
 	 * Add a campaign to the campaigns list using the shared map database of
 	 * campaigns
+	 * 
 	 * @param name String. The name of the campaign.
-	 * @throws Exception
-	 *             if the addition of this campaign fails.
+	 * @throws Exception if the addition of this campaign fails.
 	 */
 	public void addCampaign(String name) throws Exception {
 		List<Campaign> list = Database.getInstance().getCampaigns();
 		for (Campaign c : list) {
-		    if (name.length() == 0 || c.adId.matches(name)) {
-		       // deleteCampaign(name);
-		        addCampaign(c);
-		        logger.info("Loaded  {}",c.adId );
+			if (name.length() == 0 || c.adId.matches(name)) {
+				// deleteCampaign(name);
+				addCampaign(c);
+				logger.info("Loaded  {}", c.adId);
 			}
 		}
 	}
 
-    /**
-     * Quickly load a campaign to the campaigns list using the shared map database of
-     * campaigns. Use this on initial loads, it avoids checks and recompiles.
-     * @param name String. The name of the campaign.
-     * @throws Exception
-     *             if the addition of this campaign fails.
-     */
-    public void fastAddCampaign(String name) throws Exception {
-        List<Campaign> list = Database.getInstance().getCampaigns();
-        for (Campaign c : list) {
-            if (name.length() == 0 || c.adId.matches(name)) {
-                fastAddCampaign(c);
-                logger.info("Loaded  {}",c.adId );
-            }
-        }
-    }
+	/**
+	 * Quickly load a campaign to the campaigns list using the shared map database
+	 * of campaigns. Use this on initial loads, it avoids checks and recompiles.
+	 * 
+	 * @param name String. The name of the campaign.
+	 * @throws Exception if the addition of this campaign fails.
+	 */
+	public void fastAddCampaign(String name) throws Exception {
+		List<Campaign> list = Database.getInstance().getCampaigns();
+		for (Campaign c : list) {
+			if (name.length() == 0 || c.adId.matches(name)) {
+				fastAddCampaign(c);
+				logger.info("Loaded  {}", c.adId);
+			}
+		}
+	}
 
-
-    /**
+	/**
 	 * Return your IP address by posting to api.externalip.net
 	 * 
 	 * @return String. The IP address of this instance.
@@ -1855,7 +1847,7 @@ public class Configuration {
 					myIP = new URL("http://icanhazip.com/");
 
 					BufferedReader in = new BufferedReader(new InputStreamReader(myIP.openStream()));
-					myIpAddress =  in.readLine();
+					myIpAddress = in.readLine();
 				} catch (Exception e2) {
 					e2.printStackTrace();
 				}
@@ -1880,7 +1872,7 @@ class CampaignBuilderWorker implements Runnable {
 	private String adid;
 	private String msg;
 
-	public CampaignBuilderWorker(String adid){
+	public CampaignBuilderWorker(String adid) {
 		this.adid = adid;
 	}
 
@@ -1897,7 +1889,7 @@ class CampaignBuilderWorker implements Runnable {
 	}
 
 	@Override
-	public String toString(){
+	public String toString() {
 		return msg;
 	}
 }
