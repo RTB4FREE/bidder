@@ -120,7 +120,7 @@ public class BidswitchBidResponse extends BidResponse{
 		m.put("id", oidStr);
 		
 		List<Map> seatbids = new ArrayList();
-		m.put("seatbids", seatbids);
+		m.put("seatbid", seatbids);
 		
 		Map seatbid = new HashMap();
 		seatbids.add(seatbid);
@@ -129,7 +129,7 @@ public class BidswitchBidResponse extends BidResponse{
 		List bids = new ArrayList();
 		Map bid = new HashMap();
 		bids.add(bid);
-		seatbid.put("bids", bids);
+		seatbid.put("bid", bids);
 		bid.put("id", imp.getImpid());
 		if (creat.currency != null && creat.currency.length() != 0) {
 			bid.put("cur", creat.currency);
