@@ -44,6 +44,7 @@ services:
       ACCOUNTING: "NONE"
       FREQGOV: "false"
       INDEXPAGE: "/index.html"
+      BIDSWITCH_ID: "5678"
     ports:
       - "8080:8080"
       - "8155:8155"

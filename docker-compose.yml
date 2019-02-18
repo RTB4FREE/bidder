@@ -59,6 +59,7 @@ services:
       OPENX_IKEY: ""
       ADX_EKEY:   ""
       ADX_IKEY:   ""
+      BIDSWITCH_ID: "1234"
     ports:
       - "8080:8080"
       - "8155:8155"
