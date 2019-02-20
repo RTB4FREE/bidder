@@ -294,7 +294,7 @@ public class Creative {
 		strPrice = Double.toString(price);
 		
 		if (extensions != null) {
-			String cat = extensions.get("category");
+			String cat = extensions.get("categories");
 			if (cat != null) {
 				categories = new ArrayList();
 				String[] cats = cat.split(",");
