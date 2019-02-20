@@ -22,7 +22,8 @@
 		"status": "active",
 		"extensions": {
         	"advertiser_name": "Coca-Cola",
-        	"agency_name": "CC-advertising"
+        	"agency_name": "CC-advertising",
+        	"categories": "IAB6, IAB7"
          }, 
          "attributes": [{	
 				"op": "EXISTS",
@@ -53,7 +54,8 @@
 		"status": "active",
 		"extensions": {
         	"advertiser_name": "Coca-Cola",
-        	"agency_name": "CC-advertising"
+        	"agency_name": "CC-advertising",
+        	"categories": "IAB6, IAB7"
          }, 
          "attributes": [
          	{	
