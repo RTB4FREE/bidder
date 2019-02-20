@@ -97,6 +97,9 @@ public class Creative {
 
 	/** Selection weight. Weight is 1 to n. >> is heavier weight. */
 	public int weight = 1;
+	
+	// If this creative is tagged with categories. Used by bidswitch for example
+	public List<String> categories;
 
 	// /////////////////////////////////////////////
 	/** Native content assets */
@@ -140,6 +143,7 @@ public class Creative {
 
 	/** A sorter for the campaign/creative attributes, who is most likely to cause a false will bubble up */
 	private SortNodesFalseCount nodeSorter = new SortNodesFalseCount();
+	
 
 	/**
 	 * Empty constructor for creation using json.
@@ -173,6 +177,7 @@ public class Creative {
 		c.forwardurl = forwardurl;
 		c.imageurl = imageurl;
 		c.dimensions = dimensions;
+		c.categories = categories;
 
 		c.encodeUrl();
 		return c;
@@ -287,6 +292,17 @@ public class Creative {
 		//strW = Integer.toString(w);
 		//strH = Integer.toString(h);
 		strPrice = Double.toString(price);
+		
+		if (extensions != null) {
+			String cat = extensions.get("category");
+			if (cat != null) {
+				categories = new ArrayList();
+				String[] cats = cat.split(",");
+				for (String c : cats) {
+					categories.add(c.trim());
+				}
+			}
+		}
 	}
 
 	/**

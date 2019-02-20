@@ -168,8 +168,8 @@ public class BidswitchBidResponse extends BidResponse{
 		} else 
 			bid.put("adm", getTemplate());
 		
-		if (camp.category != null && camp.category.size() > 0) {
-			bid.put("cat", camp.category);
+		if (creat.categories != null && creat.categories.size() > 0) {
+			bid.put("cat", creat.categories);
 		}
 		
 		snurl = new StringBuilder(config.winUrl);
