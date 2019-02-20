@@ -8,6 +8,7 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jacamars.dsp.rtb.bidder.SelectedCreative;
 import com.jacamars.dsp.rtb.common.Campaign;
 import com.jacamars.dsp.rtb.common.Configuration;
@@ -196,8 +197,13 @@ public class BidswitchBidResponse extends BidResponse{
 		snurl.append("/");
 		snurl.append(oidStr.replaceAll("#", "%23"));
 		bid.put("nurl", snurl.toString());
+		
+		// Just copy what we need
 		if (creat.extensions != null) {
-			bid.put("ext", creat.extensions);
+			ObjectNode ext = mapper.createObjectNode();
+			ext.put("agency_name", creat.extensions.get("agency_name"));
+			ext.put("advertiser_name", creat.extensions.get("advertiser_name"));
+			bid.put("ext", ext);
 		}
 
 		response.append(mapper.writeValueAsString(m));
