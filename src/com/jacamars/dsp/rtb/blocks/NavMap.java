@@ -41,10 +41,10 @@ public class NavMap extends LookingGlass implements Set {
 		this.name = name;
 		if (cidr) {
 			BufferedReader br = new BufferedReader(new FileReader(file));
-			doCidr(br, file);
+			doCidr(br);
 		} else {
 			BufferedReader br = new BufferedReader(new FileReader(file));
-			doRanges(br, file);
+			doRanges(br);
 		}
 
 		symbols.put(name, this);
@@ -66,10 +66,10 @@ public class NavMap extends LookingGlass implements Set {
 		this.name = name;
 		if (file.endsWith("cidr")) {
 			BufferedReader br = new BufferedReader(new FileReader(file));
-			doCidr(br, file);
+			doCidr(br);
 		} else if (file.endsWith("range")) {
 			BufferedReader br = new BufferedReader(new FileReader(file));
-			doRanges(br, file);
+			doRanges(br);
 		} else
 			throw new Exception(file + " Not in range or CIDR form");
 
@@ -87,15 +87,15 @@ public class NavMap extends LookingGlass implements Set {
 	 * @throws Exception
 	 *             on I/O errors.
 	 */
-	public NavMap(String name, S3Object object) throws Exception {
+	public NavMap(String name, S3Object object, String type) throws Exception {
 		this.name = name;
 		String file = object.getBucketName();
 		InputStream objectData = object.getObjectContent();
 		BufferedReader br = new BufferedReader(new InputStreamReader(objectData));
-		if (file.endsWith("cidr")) {
-			doCidr(br, file);
-		} else if (file.endsWith("range")) {
-			doRanges(br, file);
+		if (type.equalsIgnoreCase("cidr")) {
+			doCidr(br);
+		} else if (type.equalsIgnoreCase("range")) {
+			doRanges(br);
 		} else
 			throw new Exception(file + " Not in range or CIDR form");
 	}
@@ -105,12 +105,10 @@ public class NavMap extends LookingGlass implements Set {
 	 * 
 	 * @param br
 	 *            BufferedReader. The line-by-line reader.
-	 * @param file
-	 *            String. The file name.
 	 * @throws Exception
 	 *             on I/O errors.
 	 */
-	void doCidr(BufferedReader br, String file) throws Exception {
+	void doCidr(BufferedReader br) throws Exception {
 		long start;
 		long end;
 		String messagel;
@@ -178,7 +176,7 @@ public class NavMap extends LookingGlass implements Set {
 		return ipAddress.toString();
 	}
 
-	void doRanges(BufferedReader br, String file) throws Exception {
+	void doRanges(BufferedReader br) throws Exception {
 		long oldstart = 0;
 		long oldend = 0;
 		long start = 0;
