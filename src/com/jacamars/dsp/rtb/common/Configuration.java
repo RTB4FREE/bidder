@@ -1240,7 +1240,7 @@ public class Configuration {
 		switch (type) {
 		case "range":
 		case "cidr":
-			NavMap map = new NavMap(name, object);
+			NavMap map = new NavMap(name, object, type);
 			message = "Added NavMap " + name + ": has " + map.size() + " members";
 			break;
 		case "set":
