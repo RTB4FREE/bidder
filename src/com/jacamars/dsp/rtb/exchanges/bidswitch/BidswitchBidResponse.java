@@ -17,27 +17,28 @@ import com.jacamars.dsp.rtb.pojo.BidRequest;
 import com.jacamars.dsp.rtb.pojo.BidResponse;
 import com.jacamars.dsp.rtb.pojo.Impression;
 
-public class BidswitchBidResponse extends BidResponse{
-	
+public class BidswitchBidResponse extends BidResponse {
+
 	static ObjectMapper mapper = new ObjectMapper();
 
-    static {
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    }
+	static {
+		mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	}
 
 	private static String protocol = "5.3";
-	
+
 	/**
-	 * Bid response object for multiple bids per request support. 
-	 * @param br BidRequest used 
+	 * Bid response object for multiple bids per request support.
+	 * 
+	 * @param br    BidRequest used
 	 * @param multi List. The multiple creatives that bid.
 	 * @param xtime int. The time to process.
 	 * @throws Exception
 	 */
-	public BidswitchBidResponse(Bidswitch br, Impression imp, Campaign camp, Creative creat, double price, String dealId,
-			int xtime) throws Exception {
-		
+	public BidswitchBidResponse(Bidswitch br, Impression imp, Campaign camp, Creative creat, double price,
+			String dealId, int xtime) throws Exception {
+
 		this.br = br;
 		this.imp = imp;
 		this.camp = camp;
@@ -56,19 +57,18 @@ public class BidswitchBidResponse extends BidResponse{
 		this.imp = imp;
 		this.impid = imp.getImpid();
 		if (imp.nativead)
-			this.adtype="native";
+			this.adtype = "native";
+		else if (imp.video != null)
+			this.adtype = "video";
 		else
-		if (imp.video != null)
-			this.adtype="video";
-		else
-			this.adtype="banner";
+			this.adtype = "banner";
 		this.timestamp = System.currentTimeMillis();
 
 		impid = imp.getImpid();
 		adid = camp.adId;
 		crid = creat.impid;
 		this.domain = br.siteDomain;
-		
+
 		forwardUrl = substitute(creat.getForwardUrl()); // creat.getEncodedForwardUrl();
 		imageUrl = substitute(creat.imageurl);
 		exchange = br.getExchange();
@@ -82,138 +82,124 @@ public class BidswitchBidResponse extends BidResponse{
 
 		makeResponse(price);
 	}
-	
+
 	public void makeResponse(double price) {
-		
+
 		response = new StringBuilder();
+
 		try {
-		this.exchange = br.getExchange();
-		this.xtime = xtime;
-		this.oidStr = br.id;
-		this.timestamp = System.currentTimeMillis();
+			this.exchange = br.getExchange();
+			this.xtime = xtime;
+			this.oidStr = br.id;
+			this.timestamp = System.currentTimeMillis();
 
-		/******************************************/
-		
-		/** The configuration used for generating this response */
-		Configuration config = Configuration.getInstance();
-		
-		StringBuilder nurl = new StringBuilder();
-		///////////////////////////// PROB NOT NEEDED /////////////////////
-		StringBuilder linkUrlX = new StringBuilder();
-		linkUrlX.append(config.redirectUrl);
-		linkUrlX.append("/");
-		linkUrlX.append(oidStr.replaceAll("#", "%23"));
-		linkUrlX.append("/?url=");
+			/******************************************/
 
-		// //////////////////////////////////////////////////////////////////
+			/** The configuration used for generating this response */
+			Configuration config = Configuration.getInstance();
 
-		if (br.lat != null)
-			lat = br.lat.doubleValue();
-		if (br.lon != null)
-			lon = br.lon.doubleValue();
-		seat = Configuration.getInstance().seats.get(exchange);
+			StringBuilder nurl = new StringBuilder();
+			///////////////////////////// PROB NOT NEEDED /////////////////////
+			StringBuilder linkUrlX = new StringBuilder();
+			linkUrlX.append(config.redirectUrl);
+			linkUrlX.append("/");
+			linkUrlX.append(oidStr.replaceAll("#", "%23"));
+			linkUrlX.append("/?url=");
 
-		Map m = new HashMap();
-		Map mx = new HashMap();
-		mx.put("protocol", protocol);
-		
-		m.put("ext", mx);
-		m.put("id", oidStr);
-		
-		List<Map> seatbids = new ArrayList();
-		m.put("seatbid", seatbids);
-		
-		Map seatbid = new HashMap();
-		seatbids.add(seatbid);
-		seatbid.put("seat", seat);
-		
-		List bids = new ArrayList();
-		Map bid = new HashMap();
-		bids.add(bid);
-		seatbid.put("bid", bids);
-		bid.put("id", imp.getImpid());
-		if (creat.currency != null && creat.currency.length() != 0) {
-			bid.put("cur", creat.currency);
-		}
-		bid.put("price", price);
-		bid.put("cid", adid);
-		bid.put("crid", creat.impid);
+			// //////////////////////////////////////////////////////////////////
 
+			if (br.lat != null)
+				lat = br.lat.doubleValue();
+			if (br.lon != null)
+				lon = br.lon.doubleValue();
+			seat = Configuration.getInstance().seats.get(exchange);
+			
+			response.append("{\"ext\":{\"protocol\":\"").append(protocol).append("\"},");
+			response.append("\"id\":\"").append(oidStr).append("\",");
 
-		if (dealId != null) 
-			bid.put("dealid", dealId);
-		
-		if (imageUrl != null) 
-			bid.put("imageurl", imageUrl);
-		
-		List<String> adomain = new ArrayList();
-		adomain.add(camp.adomain);
-		bid.put("adomain", adomain);
-		
-		if (this.creat.isVideo()) {
-			if (br.usesEncodedAdm) {
-				bid.put("adm",this.creat.encodedAdm);
-				this.forwardUrl = this.creat.encodedAdm;   // not part of protocol, but stuff here for logging purposes
-			} else {
-				//response.append(this.creat.getForwardUrl());
-				//this.forwardUrl = this.creat.getForwardUrl();
-				bid.put("adm,",this.creat.unencodedAdm );
-				this.forwardUrl = this.creat.unencodedAdm ;
-			}
-		} else if (this.creat.isNative()) {
-			if (br.usesEncodedAdm)
-				nativeAdm = this.creat.getEncodedNativeAdm(br);
+			response.append("\"seatbid\":[{\"seat\":\"").append(seat).append("\",");
+			response.append("\"bid\":[{\"ext\":{");
+			response.append("\"agency_name\":\"").append(creat.extensions.get("agency_name")).append("\",");
+			response.append("\"advertiser_name\":\"").append(creat.extensions.get("advertiser_name")).append("\"},");
+			
+			snurl = new StringBuilder(config.winUrl);
+			snurl.append("/");
+			snurl.append(br.siteDomain);
+			snurl.append("/");
+			if (br.isSite())
+				snurl.append("SITE");
 			else
-				nativeAdm = this.creat.getUnencodedNativeAdm(br);
-			bid.put("adm", nativeAdm);
-		} else 
-			bid.put("adm", getTemplate());
-		
-		if (creat.categories != null && creat.categories.size() > 0) {
-			bid.put("cat", creat.categories);
-		}
-		
-		snurl = new StringBuilder(config.winUrl);
-		snurl.append("/");
-		snurl.append(br.siteDomain);
-		snurl.append("/");
-		if (br.isSite())
-			snurl.append("SITE");
-		else
-			snurl.append("APP");
-		snurl.append("/");
-		snurl.append(br.getExchange());
-		snurl.append("/");
-		snurl.append("${AUCTION_PRICE}"); // to get the win price back from the
-											// Exchange....
-		snurl.append("/");
-		snurl.append(lat);
-		snurl.append("/");
-		snurl.append(lon);
-		snurl.append("/");
-		snurl.append(adid);
-		snurl.append("/");
-		snurl.append(creat.impid);
-		snurl.append("/");
-		snurl.append(oidStr.replaceAll("#", "%23"));
-		bid.put("nurl", snurl.toString());
-		
-		// Just copy what we need
-		if (creat.extensions != null) {
-			ObjectNode ext = mapper.createObjectNode();
-			ext.put("agency_name", creat.extensions.get("agency_name"));
-			ext.put("advertiser_name", creat.extensions.get("advertiser_name"));
-			bid.put("ext", ext);
-		}
+				snurl.append("APP");
+			snurl.append("/");
+			snurl.append(br.getExchange());
+			snurl.append("/");
+			snurl.append("${AUCTION_PRICE}"); // to get the win price back from the
+												// Exchange....
+			snurl.append("/");
+			snurl.append(lat);
+			snurl.append("/");
+			snurl.append(lon);
+			snurl.append("/");
+			snurl.append(adid);
+			snurl.append("/");
+			snurl.append(creat.impid);
+			snurl.append("/");
+			snurl.append(oidStr.replaceAll("#", "%23"));
+			response.append("\"nurl\":\"").append(snurl.toString()).append("\",");
+			
+			response.append("\"crid\":\"").append(creat.impid).append("\",");
+			
+			response.append("\"adomain\":[\"").append(camp.adomain).append("\"],");
+			
+			response.append("\"price\":").append(price).append(",");
+			
+			response.append("\"imageurl\":\"").append(imageUrl).append("\",");
+			
+			response.append("\"id\":\"").append(imp.getImpid()).append("\",");
+			
 
-		response.append(mapper.writeValueAsString(m));
-		
+			if (creat.currency != null && creat.currency.length() != 0) {
+				response.append("\"cur\":\"").append(creat.currency).append("\",");
+			}
+	
+			if (dealId != null)
+				response.append("\"dealid\":\"").append(dealId).append("\",");
 
-		this.cost = creat.price; // pass this along so the bid response object // has a copy of the price
-		macroSubs(response);
+			if (this.creat.isVideo()) {
+				if (br.usesEncodedAdm) {
+					response.append("\"adm\":\"").append(this.creat.encodedAdm).append("\",");
+					this.forwardUrl = this.creat.encodedAdm; // not part of protocol, but stuff here for logging
+																// purposes
+				} else {
+					// response.append(this.creat.getForwardUrl());
+					// this.forwardUrl = this.creat.getForwardUrl();
+					response.append("\"adm\":\"").append(this.creat.unencodedAdm).append("\",");
+					this.forwardUrl = this.creat.unencodedAdm;
+				}
+			} else if (this.creat.isNative()) {
+				if (br.usesEncodedAdm)
+					nativeAdm = this.creat.getEncodedNativeAdm(br);
+				else
+					nativeAdm = this.creat.getUnencodedNativeAdm(br);
+				response.append("\"adm\":\"").append(nativeAdm).append("\",");
+			} else
+				response.append("\"adm\":\"").append(getTemplate()).append("\",");
+
+			if (creat.categories != null && creat.categories.size() > 0) {
+				response.append("\"cat\":[");
+				for (int i=0;i<creat.categories.size();i++) {
+					response.append("\"").append(creat.categories.get(i)).append("\"");
+					if (i+1 < creat.categories.size())
+						response.append(",");
+				}
+				response.append("]");
+			}
+			response.append("}]}]}");
+			this.cost = creat.price; // pass this along so the bid response object // has a copy of the price
+			macroSubs(response);
 		} catch (Exception error) {
 			error.printStackTrace();
-			throw (RuntimeException)error;
+			throw (RuntimeException) error;
 		}
 	}
 }
