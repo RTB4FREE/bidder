@@ -98,6 +98,8 @@ public class NavMap extends LookingGlass implements Set {
 			doRanges(br);
 		} else
 			throw new Exception(file + " Not in range or CIDR form");
+		
+		symbols.put(name, this);
 	}
 
 	/**
