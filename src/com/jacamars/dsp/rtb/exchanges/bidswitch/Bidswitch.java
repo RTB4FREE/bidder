@@ -69,6 +69,7 @@ public class Bidswitch extends BidRequest {
 	@Override
 	public boolean parseSpecial() {
 		setExchange(BIDSWITCH);
+        normalizeCountryCode();
 		return true;
 	}
 	

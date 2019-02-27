@@ -2,7 +2,6 @@ package com.jacamars.dsp.rtb.pojo;
 
 import java.io.ByteArrayOutputStream;
 
-
 import java.io.InputStream;
 
 import java.io.PrintWriter;
@@ -18,12 +17,14 @@ import javax.servlet.http.HttpServletResponse;
 import com.fasterxml.jackson.databind.node.*;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.bidder.SelectedCreative;
+import com.jacamars.dsp.rtb.blocks.LookingGlass;
 import com.jacamars.dsp.rtb.common.*;
 import com.jacamars.dsp.rtb.exchanges.adx.AdxBidRequest;
 import com.jacamars.dsp.rtb.fraud.FraudLog;
 import com.jacamars.dsp.rtb.geo.Solution;
 import com.jacamars.dsp.rtb.tools.AmalgamatedKey;
 import com.jacamars.dsp.rtb.tools.HexDump;
+import com.jacamars.dsp.rtb.tools.IsoTwo2Iso3;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -44,13 +45,12 @@ public class BidRequest {
 		REGS_GDPR.add("regs");
 		REGS_GDPR.add("ext");
 		REGS_GDPR.add("gdpr");
-		
+
 		USER_CONSENT.add("user");
 		USER_CONSENT.add("ext");
 		USER_CONSENT.add("consent");
 	}
-	
-	
+
 	public static final Logger logger = LoggerFactory.getLogger(BidRequest.class);
 
 	private static volatile ExchangeCounts ec = ExchangeCounts.getInstance();
@@ -66,11 +66,10 @@ public class BidRequest {
 	transient public boolean usesEncodedAdm = true;
 	/** indicstes this SSP supports multibid */
 	transient public boolean multibid = false;
-	
+
 	boolean consentGiven = false;
 	/**
-	 * The bid request values are mapped into a hashmap for fast lookup by
-	 * campaigns
+	 * The bid request values are mapped into a hashmap for fast lookup by campaigns
 	 */
 	public transient Map<String, Object> database = new HashMap();
 
@@ -101,27 +100,31 @@ public class BidRequest {
 	/** extension object for geo city, state, county, zip */
 	public Solution geoExtension;
 	/**
-	 * These are the keys found in the union of all campaigns (ie bid request
-	 * items that have constraints
+	 * These are the keys found in the union of all campaigns (ie bid request items
+	 * that have constraints
 	 */
 	protected static List<String> keys = new ArrayList<String>();
 	/** The compiled list of database values */
 	protected static Map<String, List<String>> mapp = new HashMap();
 	/**
-	 * Indicates there is an ext.rrtb4free object present in the bid request,
-	 * used by our own private exchange
+	 * Indicates there is an ext.rrtb4free object present in the bid request, used
+	 * by our own private exchange
 	 */
 	static boolean RTB4FREE;
+
+	// Reference to iso 2 to 3 character translation. Some SSPs require this.
+	protected static final IsoTwo2Iso3 isoMap = (IsoTwo2Iso3) LookingGlass.symbols.get("@ISO2-3");
+	protected static Map<String, TextNode> cache = new HashMap<String, TextNode>();
 
 	transient public boolean blackListed = false;
 
 	transient public static Set<String> blackList;
-	
+
 	/** Keep a list of piggybackers (piggyback a win on a pixel */
 	private static Set<String> piggyBackedWins = ConcurrentHashMap.newKeySet();
 
 	/** Keep a list of multibid capable exchanges */
-	private static Set<String> multibids =  ConcurrentHashMap.newKeySet();
+	private static Set<String> multibids = ConcurrentHashMap.newKeySet();
 
 	/** The pageurl of the request */
 	public String pageurl = "";
@@ -133,12 +136,12 @@ public class BidRequest {
 
 	/**
 	 * Take the union of all campaign attributes and place them into the static
-	 * mapp. This way the JSON is queried once and the query becomes the key,
-	 * and the JSON value becomes the map value. With multiple campaigns it is
-	 * important to not be traversing the JSON tree for each campaign.
+	 * mapp. This way the JSON is queried once and the query becomes the key, and
+	 * the JSON value becomes the map value. With multiple campaigns it is important
+	 * to not be traversing the JSON tree for each campaign.
 	 * 
-	 * The compiled attributes are stored in mapp. In setup, the compiled list
-	 * of key/values is then put in the 'database' object for the bidrequest.
+	 * The compiled attributes are stored in mapp. In setup, the compiled list of
+	 * key/values is then put in the 'database' object for the bidrequest.
 	 */
 	public synchronized static void compile() throws Exception {
 		RTB4FREE = false;
@@ -157,7 +160,7 @@ public class BidRequest {
 			// Now frequency caps */
 			if (c.frequencyCap != null) {
 				List<String> spec = c.frequencyCap.capSpecification;
-				for (int j=0;j<spec.size();j++) {
+				for (int j = 0; j < spec.size(); j++) {
 					String s = spec.get(j);
 					if (mapp.containsKey(s) == false) {
 						addMap(s);
@@ -165,11 +168,11 @@ public class BidRequest {
 				}
 			}
 
-			logger.debug("Compiling for domain: {} ",c.adomain);
+			logger.debug("Compiling for domain: {} ", c.adomain);
 			for (int j = 0; j < c.attributes.size(); j++) {
 				Node node = c.attributes.get(j);
 				if (mapp.containsKey(keys) == false) {
-					logger.debug("Compile unit: {}: {} values: {}",c.adomain,node.hierarchy,node.bidRequestValues);
+					logger.debug("Compile unit: {}: {} values: {}", c.adomain, node.hierarchy, node.bidRequestValues);
 
 					if (node.hierarchy.equals("") == false) {
 						keys.add(node.hierarchy);
@@ -201,13 +204,14 @@ public class BidRequest {
 			}
 			for (Creative creative : c.creatives) { // Handle creative specific
 													// attributes
-				logger.debug("Compiling creatives for: {}: {}",c.adomain,creative.impid);
+				logger.debug("Compiling creatives for: {}: {}", c.adomain, creative.impid);
 
 				for (Node node : creative.attributes) {
 
 					if (mapp.containsKey(keys) == false) {
 
-						logger.debug("Compile unit: {}/{}/{}: {}", c.adomain, creative.impid, node.hierarchy, node.bidRequestValues);
+						logger.debug("Compile unit: {}/{}/{}: {}", c.adomain, creative.impid, node.hierarchy,
+								node.bidRequestValues);
 
 						if (mapp.get(node.hierarchy) == null) {
 							keys.add(node.hierarchy);
@@ -221,7 +225,7 @@ public class BidRequest {
 		compileBuiltIns();
 
 		// Shuffle the campaigns
-        Preshuffle.getInstance().compile();
+		Preshuffle.getInstance().compile();
 
 		// Restart the bidder
 		startBidder();
@@ -293,7 +297,7 @@ public class BidRequest {
 		addMap("device.ua");
 		addMap("device.geo.country");
 
-		//addMap("regs.coppa");
+		// addMap("regs.coppa");
 
 		// For the amalgmated key
 		addMap("user.id");
@@ -314,10 +318,8 @@ public class BidRequest {
 	/**
 	 * Create a bid request from a file .
 	 * 
-	 * @param in
-	 *            String. The name of the file to read.
-	 * @throws Exception
-	 *             on file and json processing errors.
+	 * @param in String. The name of the file to read.
+	 * @throws Exception on file and json processing errors.
 	 */
 	public BidRequest(String in) throws Exception {
 		String content = new String(Files.readAllBytes(Paths.get(in)));
@@ -333,10 +335,8 @@ public class BidRequest {
 	/**
 	 * Create a bid from an input stream.
 	 * 
-	 * @param in
-	 *            InputStream. The stream to read the JSON from
-	 * @throws Exception
-	 *             on stream and JSON processing errors.
+	 * @param in InputStream. The stream to read the JSON from
+	 * @throws Exception on stream and JSON processing errors.
 	 */
 	public BidRequest(InputStream in) throws Exception {
 		rootNode = mapper.readTree(in);
@@ -370,18 +370,13 @@ public class BidRequest {
 
 	/**
 	 * Return a bid response of the appropriate type, normally it is a simple
-	 * BidResponse, but for non openRTB you may need to use a different
-	 * response.
+	 * BidResponse, but for non openRTB you may need to use a different response.
 	 * 
-	 * @param camp
-	 *            Campagign. The campaign used to create the response.
-	 * @param creat
-	 *            Creative. The creative used to make the response.
-	 * @param xtime
-	 *            int. The time it took to process the bid request
+	 * @param camp  Campagign. The campaign used to create the response.
+	 * @param creat Creative. The creative used to make the response.
+	 * @param xtime int. The time it took to process the bid request
 	 * @return BidResponse. The actual bidResaponse object
-	 * @throws Exception
-	 *             on JSON parsing errors.
+	 * @throws Exception on JSON parsing errors.
 	 */
 	public BidResponse buildNewBidResponse(Impression imp, Campaign camp, Creative creat, double price, String dealId,
 			int xtime) throws Exception {
@@ -393,11 +388,9 @@ public class BidRequest {
 	}
 
 	/**
-	 * Return's the bid response no bid JSON or other (protoc in Adx for
-	 * example).
+	 * Return's the bid response no bid JSON or other (protoc in Adx for example).
 	 * 
-	 * @param reason
-	 *            String. The reason you are returning no bid.
+	 * @param reason String. The reason you are returning no bid.
 	 * @return String. The reason code.
 	 */
 	public static String returnNoBid(String reason) {
@@ -431,8 +424,7 @@ public class BidRequest {
 	 * campaigns. THis traverses the JSON once, and stores the required values
 	 * needed by campaigns once.
 	 * 
-	 * @throws Exception
-	 *             on JSON processing errors.
+	 * @throws Exception on JSON processing errors.
 	 */
 	protected void setup() throws Exception {
 		id = rootNode.path("id").textValue();
@@ -467,7 +459,7 @@ public class BidRequest {
 			if ((test = getNode("site.domain")) != null)
 				siteDomain = ((TextNode) test).textValue();
 			else {
-				test = getNode("app.domain");				// this was requested by DSP-556
+				test = getNode("app.domain"); // this was requested by DSP-556
 				if (test != null) {
 					isSite = false;
 					siteDomain = ((TextNode) test).textValue();
@@ -501,15 +493,16 @@ public class BidRequest {
 			}
 
 			if (siteDomain != null) {
-				// handle encoded domain like http%3A%2F%2Fconlatatca.vn%2Ftuan-thai-10%2Fba-bau-boi-kem-chong-ran-da-nen-hay-khong%2F
+				// handle encoded domain like
+				// http%3A%2F%2Fconlatatca.vn%2Ftuan-thai-10%2Fba-bau-boi-kem-chong-ran-da-nen-hay-khong%2F
 				try {
 					siteDomain = URLDecoder.decode(siteDomain, "UTF-8");
 				} catch (Exception error) {
-					//Ignore this exception. Log level debug is enough
-					logger.debug("Error encountered in decoding siteDomain: '{}' was {}",siteDomain,error);
+					// Ignore this exception. Log level debug is enough
+					logger.debug("Error encountered in decoding siteDomain: '{}' was {}", siteDomain, error);
 				}
-				siteDomain = siteDomain.replace("http://","");
-				siteDomain = siteDomain.replace("https://","");
+				siteDomain = siteDomain.replace("http://", "");
+				siteDomain = siteDomain.replace("https://", "");
 				// extract only domain name.
 				if (siteDomain.indexOf("/") != -1) {
 					siteDomain = siteDomain.substring(0, siteDomain.indexOf("/"));
@@ -585,6 +578,7 @@ public class BidRequest {
 
 	/**
 	 * Returns true if this is a site, if an app, returns false.
+	 * 
 	 * @return boolean. Returns true if a web site, else returns false for app.
 	 */
 	public boolean isSite() {
@@ -599,22 +593,21 @@ public class BidRequest {
 		JsonNode ext = rootNode.path("ext");
 		if (ext instanceof MissingNode) {
 			ext = BidRequest.factory.objectNode();
-			ObjectNode oj = (ObjectNode)rootNode;
-			oj.set("ext",ext);
+			ObjectNode oj = (ObjectNode) rootNode;
+			oj.set("ext", ext);
 		} else {
-			ObjectNode oj = (ObjectNode)ext;
-			oj.put("synthkey",synthkey);
+			ObjectNode oj = (ObjectNode) ext;
+			oj.put("synthkey", synthkey);
 		}
 		database.put("synthkey", synthkey);
 	}
+
 	/**
 	 * Return a double, whether it's integer or not.
 	 * 
-	 * @param o
-	 *            Obhect. The json object.
+	 * @param o Obhect. The json object.
 	 * @return double. Returns the value as a double.
-	 * @throws Exception
-	 *             if the object is not a number.
+	 * @throws Exception if the object is not a number.
 	 */
 	public static double getDoubleFrom(Object o) throws Exception {
 		double x = 0;
@@ -633,8 +626,7 @@ public class BidRequest {
 	/**
 	 * Given a JSON bject, return it's string representation.
 	 * 
-	 * @param o
-	 *            Object. The object to interpret.
+	 * @param o Object. The object to interpret.
 	 * @return
 	 * @throws Exception
 	 */
@@ -642,13 +634,13 @@ public class BidRequest {
 		if (o == null)
 			return null;
 		if (o instanceof ArrayNode) {
-			ArrayNode n = (ArrayNode)o;
+			ArrayNode n = (ArrayNode) o;
 			String str = "";
-			for (int i=0;i<n.size();i++) {
+			for (int i = 0; i < n.size(); i++) {
 				JsonNode js = n.get(i);
 				str += js.asText();
-				if (i<n.size()-1)
-					str+=",";
+				if (i < n.size() - 1)
+					str += ",";
 			}
 			return str;
 		}
@@ -656,17 +648,20 @@ public class BidRequest {
 		return js.asText();
 	}
 
-	/** 
+	/**
 	 * Does this bid request pass muster for bot detection.
-	 * @return boolean. Returns true if not configured for bot detection or if configured and the bid was not deemed a bot.
+	 * 
+	 * @return boolean. Returns true if not configured for bot detection or if
+	 *         configured and the bid was not deemed a bot.
 	 * @throws Exception on I/O errors.
 	 */
 	public boolean forensiqPassed() throws Exception {
 
-		// This can happen on exchanges like appnexus and google which have some other crazy signals
+		// This can happen on exchanges like appnexus and google which have some other
+		// crazy signals
 		if (notABidRequest())
 			return true;
-		
+
 		if (Configuration.forensiq == null) {
 			return true;
 		}
@@ -702,7 +697,8 @@ public class BidRequest {
 
 	/**
 	 * Given a bid request, and a dotted string, return the value.
-	 * @param br BidRequest. The bid request to query.
+	 * 
+	 * @param br   BidRequest. The bid request to query.
 	 * @param what String. What json value to return (as a string.
 	 * @return String. The value as a string.
 	 */
@@ -721,8 +717,7 @@ public class BidRequest {
 	 * Given a key, return the value of the bid request of that key that is now
 	 * stored in the database.
 	 * 
-	 * @param what
-	 *            String. The key to use for the retrieval.
+	 * @param what String. The key to use for the retrieval.
 	 * @return Object. The value of that key.
 	 */
 	public Object getNode(String what) {
@@ -736,8 +731,7 @@ public class BidRequest {
 	/**
 	 * Add a constraint key to the mapp.
 	 * 
-	 * @param line
-	 *            String. The Javascript notation of the constraint.
+	 * @param line String. The Javascript notation of the constraint.
 	 */
 	public static void addMap(String line) {
 		String[] parts = line.split("\\.");
@@ -750,15 +744,12 @@ public class BidRequest {
 	}
 
 	/**
-	 * Compile the JSON values into the database from the list of constraint
-	 * keys. This is what queries the JSON and places it into the database
-	 * object.
+	 * Compile the JSON values into the database from the list of constraint keys.
+	 * This is what queries the JSON and places it into the database object.
 	 * 
-	 * @param key
-	 *            String. The key name.
-	 * @param list
-	 *            List. The constraint keys (eg device.geo.lat becomes
-	 *            ['device','geo','lat']).
+	 * @param key  String. The key name.
+	 * @param list List. The constraint keys (eg device.geo.lat becomes
+	 *             ['device','geo','lat']).
 	 */
 	void compileList(String key, List<String> list) {
 
@@ -797,12 +788,10 @@ public class BidRequest {
 	// //////////////////
 
 	/**
-	 * Interrogate an entity in the JSON using dotted format. Example:
-	 * {a:{b:c:1}}to find c: "a.b.c" Example: {a:{b:[{x:1},{x:2}]} to find x[1]:
-	 * "a.b.1.x"
+	 * Interrogate an entity in the JSON using dotted format. Example: {a:{b:c:1}}to
+	 * find c: "a.b.c" Example: {a:{b:[{x:1},{x:2}]} to find x[1]: "a.b.1.x"
 	 * 
-	 * @param line
-	 *            . String. The string defining the dotted name.
+	 * @param line . String. The string defining the dotted name.
 	 * @return Object. Returns the object at the 'line' location or null if it
 	 *         doesn't exist.
 	 */
@@ -828,14 +817,12 @@ public class BidRequest {
 	}
 
 	/**
-	 * Walk the JSON tree using the list. The list contains the object names.
-	 * Foe example, device.geo.lat is stored in the list as
-	 * ['device','geo','lat']. The JSON tree's device node is found, then in
-	 * device, the geo node is found, and then the 'lat' node is then found in
-	 * geo.
+	 * Walk the JSON tree using the list. The list contains the object names. Foe
+	 * example, device.geo.lat is stored in the list as ['device','geo','lat']. The
+	 * JSON tree's device node is found, then in device, the geo node is found, and
+	 * then the 'lat' node is then found in geo.
 	 * 
-	 * @param list
-	 *            String. The list of JSON node names.
+	 * @param list String. The list of JSON node names.
 	 * @return Object. The object found at 'x.y.z'
 	 */
 
@@ -900,8 +887,8 @@ public class BidRequest {
 	/**
 	 * Parse the incoming bid request.
 	 * 
-	 * @return boolean. Returns true if the Nexage specific parsing of the bid
-	 *         was successful.
+	 * @return boolean. Returns true if the Nexage specific parsing of the bid was
+	 *         successful.
 	 */
 	public boolean parse() {
 		// do normal rtb
@@ -911,8 +898,7 @@ public class BidRequest {
 	/**
 	 * Override to do whatever special parsing tour exchange requires.
 	 * 
-	 * @return boolean. Returns true if it parsed ok, else false on ill-formed
-	 *         JSON.
+	 * @return boolean. Returns true if it parsed ok, else false on ill-formed JSON.
 	 */
 	public boolean parseSpecial() {
 		return true;
@@ -922,11 +908,9 @@ public class BidRequest {
 	 * Override this to create a copy of the BidRequest that derives from thos
 	 * class.
 	 * 
-	 * @param in
-	 *            InputStream. The stream containing the JSON of the request.
+	 * @param in InputStream. The stream containing the JSON of the request.
 	 * @return BidRequest. The new object
-	 * @throws Exception
-	 *             on JSON or InputStream processing errors.
+	 * @throws Exception on JSON or InputStream processing errors.
 	 */
 	public BidRequest copy(InputStream in) throws Exception {
 		throw new Exception("copy constructor for Exchange handler is not implemented");
@@ -935,11 +919,10 @@ public class BidRequest {
 	/**
 	 * Returns the asset id in the bid request of the requested index
 	 * 
-	 * @param type String. The type of asset
+	 * @param type    String. The type of asset
 	 * @param subtype String. sub type of the asset
-	 * @param value int. The integer representation of the entity.
-	 * @return int. Returns the index in the asset object. If not found, returns
-	 *         -1
+	 * @param value   int. The integer representation of the entity.
+	 * @return int. Returns the index in the asset object. If not found, returns -1
 	 */
 	public int getNativeAdAssetIndex(String type, String subtype, int value) {
 		JsonNode nat = rootNode.path("imp");
@@ -978,11 +961,12 @@ public class BidRequest {
 	}
 
 	/**
-	 * Check for non standard Exchange specific things against the creative. Used for
-	 * exchanges like Appnexus, Adx, and Stroer. If the creative is not set up correctly,
-	 * then it can't be used ont this exchange.
+	 * Check for non standard Exchange specific things against the creative. Used
+	 * for exchanges like Appnexus, Adx, and Stroer. If the creative is not set up
+	 * correctly, then it can't be used ont this exchange.
+	 * 
 	 * @param creat Creative. The creative in question.
-	 * @param sb StringBuilder. If you want error reports.
+	 * @param sb    StringBuilder. If you want error reports.
 	 * @return boolean. Returns true if not restricted.
 	 */
 	public boolean checkNonStandard(Creative creat, StringBuilder sb) {
@@ -993,8 +977,7 @@ public class BidRequest {
 	/**
 	 * Set the exchange field.
 	 * 
-	 * @param exchange
-	 *            String. The name of the exchange
+	 * @param exchange String. The name of the exchange
 	 */
 	public void setExchange(String exchange) {
 		this.exchange = exchange;
@@ -1012,8 +995,7 @@ public class BidRequest {
 	/**
 	 * Add an impression.
 	 * 
-	 * @param imp
-	 *            Impression. The impression to add.
+	 * @param imp Impression. The impression to add.
 	 */
 	public void addImpression(Impression imp) {
 		impressions.add(imp);
@@ -1033,8 +1015,7 @@ public class BidRequest {
 	/**
 	 * Return the nth impression.
 	 * 
-	 * @param n
-	 *            int. The impression to return.
+	 * @param n int. The impression to return.
 	 * @return
 	 */
 	public Impression getImpression(int n) {
@@ -1046,18 +1027,16 @@ public class BidRequest {
 	/**
 	 * Handle any specific configurations, used by child classes (Exchange).
 	 * 
-	 * @param m
-	 *            Map. The extensions map,
-	 * @throws Exception
-	 *             on parsing errors.
+	 * @param m Map. The extensions map,
+	 * @throws Exception on parsing errors.
 	 */
 	public void handleConfigExtensions(Map m) {
 
 	}
 
 	/**
-	 * Override this method to indicate this is not a bid request. Like AppNexus
-	 * and their hokey /ready flag.
+	 * Override this method to indicate this is not a bid request. Like AppNexus and
+	 * their hokey /ready flag.
 	 * 
 	 * @return boolean Return true of this isn't a bid request.
 	 */
@@ -1076,8 +1055,8 @@ public class BidRequest {
 	}
 
 	/**
-	 * Override this method to return the data response the non bid request
-	 * return is supposed to be.
+	 * Override this method to return the data response the non bid request return
+	 * is supposed to be.
 	 * 
 	 * @return
 	 */
@@ -1087,6 +1066,7 @@ public class BidRequest {
 
 	/**
 	 * Increment the wind for this exchange.
+	 * 
 	 * @param exchange String. The exchange to tally.
 	 */
 	public static void incrementWins(String exchange) {
@@ -1121,24 +1101,28 @@ public class BidRequest {
 			return;
 		ec.incrementError(exchange);
 	}
-	
+
 	public static List<Map> getExchangeCounts() {
 		return ec.getList();
 	}
-	
+
 	/**
-	 * Determine if the exhcange using this type of request uses a piggybacked win url, or a faked one.
+	 * Determine if the exhcange using this type of request uses a piggybacked win
+	 * url, or a faked one.
+	 * 
 	 * @param exchange String. The exchange name.
-	 * @return boolean. Returns true if this is a piggy back. Else false means use the nutl.
+	 * @return boolean. Returns true if this is a piggy back. Else false means use
+	 *         the nutl.
 	 */
 	public static Boolean usesPiggyBackedWins(String exchange) {
 		if (piggyBackedWins == null)
 			return false;
 		return piggyBackedWins.contains(exchange);
 	}
-	
+
 	/**
 	 * Add the exchange to the piggy backed win set
+	 * 
 	 * @param exchange String. The exchange to add to the piggy back list
 	 */
 	public static void setUsesPiggyBackWins(String exchange) {
@@ -1147,8 +1131,10 @@ public class BidRequest {
 
 	/**
 	 * Set that the exchange of this name uses multibids or not.
+	 * 
 	 * @param exchange String. The name of the exchange.
-	 * @param set boolean. Use true if you want to support multibids, false to not support it.
+	 * @param set      boolean. Use true if you want to support multibids, false to
+	 *                 not support it.
 	 */
 	public static void setUsesMultibid(String exchange, boolean set) {
 		if (set)
@@ -1159,31 +1145,66 @@ public class BidRequest {
 
 	/**
 	 * Determine if the exchange using this type of request uses a multibids.
+	 * 
 	 * @param exchange String. The exchange name.
-	 * @return boolean. Returns true if this exchange supports multibids. Else false.
+	 * @return boolean. Returns true if this exchange supports multibids. Else
+	 *         false.
 	 */
 	public static Boolean usesMultibids(String exchange) {
 		return multibids.contains(exchange);
 	}
-	
+
 	/**
 	 * Implement GDPR Compliance
 	 */
 	public void enforceGDPR() {
 		if (exchange.equals(AdxBidRequest.ADX))
 			return;
-		
-		JsonNode regs_gdpr = (JsonNode)this.walkTree(REGS_GDPR);
+
+		JsonNode regs_gdpr = (JsonNode) this.walkTree(REGS_GDPR);
 		if (regs_gdpr == null)
 			return;
-		
+
 		if (regs_gdpr.asInt() == 0)
 			return;
-		
-		JsonNode user_consent = (JsonNode)this.walkTree(USER_CONSENT);
+
+		JsonNode user_consent = (JsonNode) this.walkTree(USER_CONSENT);
 		if (user_consent == null || user_consent.asText().equals("")) {
-			((ObjectNode)rootNode).remove("user");
+			((ObjectNode) rootNode).remove("user");
 			return;
 		}
 	}
+
+	/**
+	 * Convert iso2 country codes to iso3. C1X and bidswitch need this. The database
+	 * key device.geo.country shadows the json object. So we do a lookup and replace
+	 * it. But, then, we also need to replace the textnode of the bid request,
+	 * becaause it is still 2 character. This means that you need to know the 2 and
+	 * 3 char codes for the countries to do meaningful queries.
+	 *
+	 * So, we must overrwite the bid request country field to normalize it.
+	 */
+	protected void normalizeCountryCode() {
+		Object o = this.database.get("device.geo.country");
+		if (o instanceof MissingNode)
+			return;
+
+		TextNode country = (TextNode) o;
+		TextNode test = null;
+		if (country != null) {
+			test = cache.get(country.asText());
+			if (test == null) {
+				String iso3 = isoMap.query(country.asText());
+				test = new TextNode(iso3);
+			}
+			if (test != country) {
+				database.put("device.geo.country", test);
+				JsonNode device = rootNode.get("device");
+				ObjectNode geo = (ObjectNode) device.get("geo");
+				geo.set("country", test);
+
+			}
+		}
+	}
+
 }

@@ -20,9 +20,6 @@ import com.jacamars.dsp.rtb.tools.IsoTwo2Iso3;
 
 public class C1X extends BidRequest {
 
-		// Reference to symbol that
-		private static final IsoTwo2Iso3 isoMap = (IsoTwo2Iso3)LookingGlass.symbols.get("@ISO2-3");
-		private static Map<String,TextNode> cache = new HashMap<String,TextNode>();
         public C1X() {
                 super();
                 parseSpecial();
@@ -86,26 +83,8 @@ public class C1X extends BidRequest {
                 // C1X uses ISO2 country codes, we can't digest that with our campaign processor, so we
                 // will convert it for them and patch the bid request.
                 // Use a cache of country codes to keep from creating a lot of objects to be later garbage collected.
-
+                normalizeCountryCode();
                 
-                
-                
-                Object o = this.database.get("device.geo.country");
-                if (o instanceof MissingNode) {
-                	return true;
-                }
-                
-                TextNode country = (TextNode)o;
-                TextNode test = null;
-                if (country != null) {
-                	test = cache.get(country.asText());
-                	if (test == null) {
-                		String iso3 = isoMap.query(country.asText());
-                		test = new TextNode(iso3);
-                	}
-                	if (test != country)
-                		database.put("device.geo.country", test);
-                }
                 return true;
         }
         
