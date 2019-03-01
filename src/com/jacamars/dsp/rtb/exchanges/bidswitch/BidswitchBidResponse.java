@@ -147,15 +147,19 @@ public class BidswitchBidResponse extends BidResponse {
 			snurl.append(oidStr.replaceAll("#", "%23"));
 			response.append("\"nurl\":\"").append(snurl.toString()).append("\",");
 			
+			response.append("\"cid\":\"").append(camp.adId).append("\",");
+			
 			response.append("\"crid\":\"").append(creat.impid).append("\",");
 			
 			response.append("\"adomain\":[\"").append(camp.adomain).append("\"],");
 			
 			response.append("\"price\":").append(price).append(",");
 			
-			response.append("\"imageurl\":\"").append(imageUrl).append("\",");
+			response.append("\"iurl\":\"").append(imageUrl).append("\",");
 			
 			response.append("\"id\":\"").append(imp.getImpid()).append("\",");
+			
+			response.append("\"impid\":\"").append(imp.getImpid()).append("\",");
 			
 
 			if (creat.currency != null && creat.currency.length() != 0) {
