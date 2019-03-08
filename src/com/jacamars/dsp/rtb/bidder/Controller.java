@@ -237,7 +237,7 @@ public enum Controller {
     static final Logger logger = LoggerFactory.getLogger(Controller.class);
 
     /**
-     * Private construcotr with specified hosts
+     * Private constructor with specified hosts
      *
      * @throws Exception on REDIS errors.
      */
@@ -1285,6 +1285,9 @@ class CommandLoop implements com.jacamars.dsp.rtb.jmq.MessageListener<Object> {
     Configuration config = Configuration.getInstance();
 
     long time = 0;
+    
+    /** Keep a queue of ids of commands so we can block duplicates sent in error */
+    List<String> repeats = new ArrayList();
 
     /**
      * How long since the last we saw a message on the control loop.
@@ -1304,13 +1307,24 @@ class CommandLoop implements com.jacamars.dsp.rtb.jmq.MessageListener<Object> {
 
         boolean controller = false;
 
-        Controller.logger.info("GOT MESSAGE: {}",xitem);
-
         if (xitem instanceof Ping) {
             return;
         }
 
+
+        /**
+         * Watch out for chatty cathy
+         */
         BasicCommand item = (BasicCommand)xitem;
+        if (repeats.contains(item.id)) {
+            return;
+        }
+        if (repeats.size()>20)
+            repeats.remove(0);
+        repeats.add(item.id);
+        /////////////////////////////////
+
+        Controller.logger.info("GOT MESSAGE: {}",xitem);
         if (item.from != null)
             controller = item.from.startsWith("crosstalk");
 
