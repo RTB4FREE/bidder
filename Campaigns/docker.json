@@ -242,6 +242,10 @@
     "name" : "admedia",
     "id" : "admedia-id",
     "bid" : "/rtb/bids/admedia=com.jacamars.dsp.rtb.exchanges.Generic&!usesEncodedAdm"
+  },{
+    "name" : "mobfox",
+    "id" : "mobfox-id",
+    "bid" : "/rtb/bids/mobfox=com.jacamars.dsp.rtb.exchanges.Generic&!usesEncodedAdm"
   }, {
     "name" : "bidswitch",
     "id" : "$BIDSWITCH_ID",

@@ -1,6 +1,5 @@
 [{
 	"isAdx": false,
-	"owner": "ben",
 	"adId": "bidswitch-test",
 	"adomain": "originator.com",
 	"attributes": [{
@@ -76,7 +75,6 @@
 	}
 },{
 	"isAdx": false,
-	"owner": "ben",
 	"adId": "bidswitch-test",
 	"adomain": "originator.com",
 	"attributes": [{
@@ -109,7 +107,6 @@
 	}
 },{
   "isAdx": false,
-  "owner": "ben",
   "adId": "block-test",
   "adomain": "originator.com",
   "attributes": [{
@@ -142,7 +139,6 @@
   }
 }, {
   "isAdx": false,
-  "owner": "ben",
   "adId": "smaato-test",
   "adomain": "originator.com",
   "attributes": [],
@@ -185,7 +181,6 @@
   "assignedSpendRate": 16667
 }, {
   "isAdx": false,
-  "owner": "ben",
   "adId": "ben:fyber",
   "adomain": "originator.com",
   "attributes": [{
@@ -219,7 +214,6 @@
   "assignedSpendRate": 16667
 }, {
   "isAdx": true,
-  "owner": "ben",
   "adId": "ben:junk",
   "name": "campaign-1-full-test",
   "adomain": "originator.com",
@@ -272,7 +266,6 @@
   "assignedSpendRate": 16667
 }, {
   "isAdx": false,
-  "owner": "ben",
   "adId": "ben:payday",
   "adomain": "originator.com",
   "attributes": [{
@@ -662,7 +655,6 @@
   "assignedSpendRate": 16667
 }, {
   "isAdx": false,
-  "owner": "ben",
   "adId": "DSP-588",
   "adomain": "originator.com",
   "attributes": [],
@@ -714,7 +706,6 @@
   },
   {
     "isAdx": false,
-    "owner": "ben",
     "adId": "ROTATING",
     "adomain": "originator.com",
     "attributes": [],

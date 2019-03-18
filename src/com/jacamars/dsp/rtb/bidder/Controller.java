@@ -1,12 +1,10 @@
 package com.jacamars.dsp.rtb.bidder;
 
-import java.net.InetAddress;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 
 
 import java.util.ArrayList;
-import java.util.Date;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -1162,9 +1160,17 @@ public enum Controller {
                 map.put(ExpireKeys.getInstance().getSpecKey(i), f.capKey);
                 map.put(ExpireKeys.getInstance().getExpireKey(i), f.capTimeout);
                 map.put(ExpireKeys.getInstance().getTimeUnitKey(i), f.capTimeUnit);
+                
+                /* try {
+					System.out.println("*** F:" + DbTools.mapper.writeValueAsString(map));
+				} catch (JsonProcessingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} */
             }
         }
         try {
+			// System.out.println("------->" + DbTools.mapper.writeValueAsString(map));
             bidCachePool.hmset(br.oidStr, map, Configuration.getInstance().ttl);
         } catch (Exception e) {
             // TODO Auto-generated catch block
