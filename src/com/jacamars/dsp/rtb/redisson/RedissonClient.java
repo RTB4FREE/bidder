@@ -312,7 +312,12 @@ public class RedissonClient implements EventIF {
             if (obj == null)
                 return null;
         }
-        return (Map) obj;
+        try {
+        	return (Map) obj;
+        } catch (Exception err) {
+        	logger.error("Tried to convert '{}' to a MAP and failed",obj);
+        	throw (RuntimeException)err;
+        }
     }
 
     /**
