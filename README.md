@@ -61,13 +61,13 @@ If you want to modify the code.
    
 5. Make the docker images locally:
 
-   $docker build -t jacamars/zerospike:v1 -f Docker.zerospike .
-   $docker build -t jacamars/rtb4free:v1 -f Docker.bidder .
+   $docker build -t jacamars/zerospike:pd -f Docker.zerospike .
+   $docker build -t jacamars/rtb4free:pd -f Docker.bidder .
    
 6. If you need to push to the repo:
 
-   $docker push jacamars/rtb4free:v1
-   $docker push jacamars/zerospike:v1
+   $docker push jacamars/rtb4free:pd
+   $docker push jacamars/zerospike:pd
    
 Changing Operational Parameters
 -------------------------------------
