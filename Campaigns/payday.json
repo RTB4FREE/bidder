@@ -1,13 +1,13 @@
 {
   "GDPR_MODE": "$GDPR_MODE",
-  "NOfraud" : {
-    "type" : "forensiq",
-    "threshhold" : 0,
-    "ck" : "none",
-    "endpoint" : "",
-    "bidOnError" : false,
-    "db" : "local/GeoIP2-ISP.mmdb",
-    "watchlist" : [ "Hetzner", "Amazon web services", "Linode", "Digital Ocean", "Vultr" ]
+  "fraud" : {
+    "type" : "$FRAUDTYPE",
+    "threshhold" : "$FRAUDTHRESHOLD",
+    "ck" : "$FRAUDKEY",
+    "endpoint" : "$FRAUDENDPOINT",
+    "bidOnError" : "$FRAUDBIDONERROR",
+    "connections": "$FRAUDCONNECTIONS",
+    "watchlist": "$FRAUDWATCHLIST"
   },
   "app" : {
     "concurrency" : "1",
@@ -275,8 +275,8 @@
     "name" : "@ISO2-3",
     "type" : "com.jacamars.dsp.rtb.tools.IsoTwo2Iso3"
   }, {
-    "filename" : "data/METHBOT.txt",
-    "name" : "@CIDR",
+    "filename" : "$MASTERCIDR",
+    "name" : "@MASTERCIDR",
     "type" : "CidrMap"
   }, {
     "filename" : "data/adxgeo.csv",

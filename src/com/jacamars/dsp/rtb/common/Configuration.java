@@ -51,6 +51,7 @@ import com.jacamars.dsp.rtb.blocks.SimpleSet;
 import com.jacamars.dsp.rtb.db.Database;
 import com.jacamars.dsp.rtb.exchanges.adx.AdxGeoCodes;
 import com.jacamars.dsp.rtb.exchanges.appnexus.Appnexus;
+import com.jacamars.dsp.rtb.fraud.AnuraClient;
 import com.jacamars.dsp.rtb.fraud.ForensiqClient;
 import com.jacamars.dsp.rtb.fraud.FraudIF;
 import com.jacamars.dsp.rtb.fraud.MMDBClient;
@@ -185,9 +186,9 @@ public class Configuration {
 
 	/** Test bid request for fraud */
 	public static FraudIF forensiq;
-	
-    /** The master CIDR list */
-    public static volatile NavMap masterCidr = null;
+
+	/** The master CIDR list */
+	public static volatile NavMap masterCidr = null;
 
 	/**
 	 * ZEROMQ LOGGING INFO
@@ -469,18 +470,18 @@ public class Configuration {
 				logger.info("S3 is not configured");
 			}
 		}
-		
+
 		/**
-		 * Check for @MASTERCIDR after the files are loaded, or, duh, it's not there yet.
+		 * Check for @MASTERCIDR after the files are loaded, or, duh, it's not there
+		 * yet.
 		 */
 		if (LookingGlass.symbols.get("@MASTERCIDR") != null) {
 			Object x = LookingGlass.symbols.get("@MASTERCIDR");
 			if (x != null) {
 				if (x instanceof NavMap) {
-					masterCidr = (NavMap)x;
+					masterCidr = (NavMap) x;
 				} else {
-					logger.error("Master CIDR '@MASTERCIDR' is  the wrong classtype {}",
-							x.getClass().getName());
+					logger.error("Master CIDR '@MASTERCIDR' is  the wrong classtype {}", x.getClass().getName());
 					logger.error("*** Master CIDR blocking is disabled ***");
 				}
 			}
@@ -515,31 +516,44 @@ public class Configuration {
 		}
 
 		/**
-		 * Create forensiq
+		 * Create forensiq, anura or organizational trap in mmdb
 		 */
-		Map fraud = (Map) m.get("fraud");
-		if (fraud != null) {
-			if (m.get("forensiq") != null) {
+		Map<String, String> fraud = (Map) m.get("fraud");
+		if (fraud != null && !fraud.get("type").equals("")) {
+			if (fraud.get("type").equalsIgnoreCase("Forensiq")) {
 				logger.info("*** Fraud detection is set to Forensiq");
-				Map f = (Map) m.get("forensiq");
-				String ck = (String) f.get("ck");
-				Integer x = (Integer) f.get("threshhold");
-				if (!(x == 0 || ck == null || ck.equals("none"))) {
-					ForensiqClient fx = ForensiqClient.build(ck);
+				ForensiqClient.key = fraud.get("ck");
+				if (!fraud.get("threshhold").equals(""))
+					ForensiqClient.threshhold = Integer.parseInt(fraud.get("threshhold"));
 
-					if (fraud.get("endpoint") != null) {
-						fx.endpoint = (String) fraud.get("endpoint");
-					}
-					if (fraud.get("bidOnError") != null) {
-						fx.bidOnError = (Boolean) fraud.get("bidOnError");
-					}
-					if (f.get("connections") != null)
-						ForensiqClient.getInstance().connections = (int) (Integer) fraud.get("connections");
-					forensiq = fx;
-				}
-			} else {
+				if (!fraud.get("endpoint").equals(""))
+					ForensiqClient.endpoint = fraud.get("endpoint");
+
+				if (!fraud.get("bidOnError").equals(""))
+					ForensiqClient.bidOnError = Boolean.parseBoolean(fraud.get("bidOnError"));
+				if (!fraud.get("connections").equals(""))
+					ForensiqClient.getInstance().connections = Integer.parseInt(fraud.get("connections"));
+
+				forensiq = ForensiqClient.build();
+			} else if (fraud.get("type").equalsIgnoreCase("Anura")) {
+				logger.info("*** Fraud detection is set to Anura");
+				AnuraClient.key = fraud.get("ck");
+				if (!fraud.get("threshhold").equals(""))
+					AnuraClient.threshhold = Integer.parseInt(fraud.get("threshhold"));
+
+				if (!fraud.get("endpoint").equals(""))
+					AnuraClient.endpoint = fraud.get("endpoint");
+
+				if (!fraud.get("bidOnError").equals(""))
+					AnuraClient.bidOnError = Boolean.parseBoolean(fraud.get("bidOnError"));
+
+				if (!fraud.get("connections").equals(""))
+					AnuraClient.getInstance().connections = Integer.parseInt(fraud.get("connections"));
+
+				forensiq = AnuraClient.build();
+			} else if (fraud.get("type").equalsIgnoreCase("MMDB")) {
 				logger.info("*** Fraud detection is set to MMDB");
-				String db = (String) fraud.get("db");
+				String db = (String) fraud.get("endpoint");
 				if (db == null) {
 					throw new Exception("No fraud db specified for MMDB");
 				}
@@ -549,11 +563,11 @@ public class Configuration {
 				} catch (Error error) {
 					throw error;
 				}
-				if (fraud.get("bidOnError") != null) {
-					fy.bidOnError = (Boolean) fraud.get("bidOnError");
+				if (!fraud.get("bidOnError").equals("")) {
+					fy.bidOnError = Boolean.parseBoolean(fraud.get("bidOnError"));
 				}
-				if (fraud.get("watchlist") != null) {
-					fy.setWatchlist((List<String>) fraud.get("watchlist"));
+				if (!fraud.get("watchlist").equals("")) {
+					fy.setWatchlist(fraud.get("watchlist"));
 				}
 				forensiq = fy;
 			}
@@ -867,9 +881,25 @@ public class Configuration {
 
 		if (address == null)
 			return address;
-		
-		while(address.contains("$BIDSWITCH_ID"))
-			address = GetEnvironmentVariable(address,"$BIDSWITCH_ID","bidswitch-id");
+
+		while (address.contains("$MASTERCIDR"))
+			address = GetEnvironmentVariable(address, "$MASTERCIDR", "");
+
+		while (address.contains("$FRAUDTYPE"))
+			address = GetEnvironmentVariable(address, "$FRAUDTYPE", "");
+		while (address.contains("$FRAUDTHRESHOLD"))
+			address = GetEnvironmentVariable(address, "$FRAUDTHRESHOLD", "100");
+		while (address.contains("$FRAUDKEY"))
+			address = GetEnvironmentVariable(address, "$FRAUDKEY", "");
+		while (address.contains("$FRAUDENDPOINT"))
+			address = GetEnvironmentVariable(address, "$FRAUDENDPOINT", "");
+		while (address.contains("$FRAUDCONNECTIONS"))
+			address = GetEnvironmentVariable(address, "$FRAUDCONNECTIONS", "100");
+		while (address.contains("$FRAUDWATCHLIST"))
+			address = GetEnvironmentVariable(address, "$FRAUDWATCHLIST", "");
+
+		while (address.contains("$BIDSWITCH_ID"))
+			address = GetEnvironmentVariable(address, "$BIDSWITCH_ID", "bidswitch-id");
 
 		while (address.contains("$S3REGION"))
 			address = GetEnvironmentVariable(address, "$S3REGION", "");
@@ -1300,25 +1330,27 @@ public class Configuration {
 	public void initializeLookingGlass(List<Map> list) throws Exception {
 		for (Map m : list) {
 			String fileName = (String) m.get("filename");
-			String name = (String) m.get("name");
-			String type = (String) m.get("type");
-			if (name.startsWith("@") == false)
-				name = "@" + name;
-			if (type.contains("NavMap") || type.contains("RangeMap")) {
-				new NavMap(name, fileName, false); // file uses ranges
-			} else if (type.contains("CidrMap")) { // file uses CIDR blocks
-				new NavMap(name, fileName, true);
-			} else if (type.contains("AdxGeoCodes")) {
-				new AdxGeoCodes(name, fileName);
-			} else if (type.contains("LookingGlass")) {
-				new LookingGlass(name, fileName);
-			} else {
-				// Ok, load it by class name
-				Class cl = Class.forName(type);
-				Constructor<?> cons = cl.getConstructor(String.class, String.class);
-				cons.newInstance(name, fileName);
+			if (!fileName.equals("")) {
+				String name = (String) m.get("name");
+				String type = (String) m.get("type");
+				if (name.startsWith("@") == false)
+					name = "@" + name;
+				if (type.contains("NavMap") || type.contains("RangeMap")) {
+					new NavMap(name, fileName, false); // file uses ranges
+				} else if (type.contains("CidrMap")) { // file uses CIDR blocks
+					new NavMap(name, fileName, true);
+				} else if (type.contains("AdxGeoCodes")) {
+					new AdxGeoCodes(name, fileName);
+				} else if (type.contains("LookingGlass")) {
+					new LookingGlass(name, fileName);
+				} else {
+					// Ok, load it by class name
+					Class cl = Class.forName(type);
+					Constructor<?> cons = cl.getConstructor(String.class, String.class);
+					cons.newInstance(name, fileName);
+				}
+				logger.info("*** Configuration Initialized {} with {}", name, fileName);
 			}
-			logger.info("*** Configuration Initialized {} with {}", name, fileName);
 		}
 	}
 

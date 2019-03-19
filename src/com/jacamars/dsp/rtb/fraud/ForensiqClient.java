@@ -49,7 +49,7 @@ public enum  ForensiqClient implements FraudIF {
 	/** Default threshhold for non bidding */
 	public static int threshhold = 64;
 	/** If the forensiq site throws an error or is not available, bid anyway? */
-	public boolean bidOnError = false;
+	public static boolean bidOnError = false;
 	/** connection pool size */
 	public static int connections = 100;
 	

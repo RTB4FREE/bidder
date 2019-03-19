@@ -41,6 +41,10 @@ public class Bloom extends LookingGlass {
 		symbols.put(name, bloomFilter);
 	}
 	
+	public Bloom(long size, double error) {
+		bloomFilter = BloomFilter.create(Funnels.stringFunnel(Charset.forName("UTF-8")), size,error);
+	}
+	
 	/**
 	 * Constructor for the S3 version of the Bloom filter.
 	 * @param name String. The name of the object.
