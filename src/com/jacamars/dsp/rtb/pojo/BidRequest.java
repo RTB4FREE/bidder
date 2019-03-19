@@ -1153,6 +1153,22 @@ public class BidRequest {
 	public static Boolean usesMultibids(String exchange) {
 		return multibids.contains(exchange);
 	}
+	
+	/**
+	 * Check the device.ip is NOT in the master cidr list. 
+	 * Returns true if the ip address is in the cidr list (means block it
+	 */
+	
+	public boolean enforceMasterCIDR() {
+		if (Configuration.getInstance().masterCidr == null)
+			return false;
+		
+		String ip = findValue(this, "device.ip");
+		if (ip == null)
+			return true;
+		
+		return Configuration.getInstance().masterCidr.contains(ip);
+	}
 
 	/**
 	 * Implement GDPR Compliance

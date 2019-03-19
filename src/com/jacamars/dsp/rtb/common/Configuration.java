@@ -185,6 +185,9 @@ public class Configuration {
 
 	/** Test bid request for fraud */
 	public static FraudIF forensiq;
+	
+    /** The master CIDR list */
+    public static volatile NavMap masterCidr = null;
 
 	/**
 	 * ZEROMQ LOGGING INFO
@@ -466,10 +469,25 @@ public class Configuration {
 				logger.info("S3 is not configured");
 			}
 		}
+		
+		/**
+		 * Check for @MASTERCIDR after the files are loaded, or, duh, it's not there yet.
+		 */
+		if (LookingGlass.symbols.get("@MASTERCIDR") != null) {
+			Object x = LookingGlass.symbols.get("@MASTERCIDR");
+			if (x != null) {
+				if (x instanceof NavMap) {
+					masterCidr = (NavMap)x;
+				} else {
+					logger.error("Master CIDR '@MASTERCIDR' is  the wrong classtype {}",
+							x.getClass().getName());
+					logger.error("*** Master CIDR blocking is disabled ***");
+				}
+			}
+		}
 		/**
 		 * SSL
 		 */
-
 		if (m.get("ssl") != null) {
 			Map x = (Map) m.get("ssl");
 			ssl = new SSL();

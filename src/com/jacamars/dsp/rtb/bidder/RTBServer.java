@@ -65,7 +65,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A JAVA based RTB2.2 server.<br>
+ * A JAVA based RTB2.5 server.<br>
  * This is the RTB Bidder's main class. It is a Jetty based http server that
  * encapsulates the Jetty server. The class is Runnable, with the Jetty server
  * joining in the run method. This allows other parts of the bidder to interact
@@ -206,6 +206,11 @@ public class RTBServer implements Runnable {
      * Fraud counter
      */
     public volatile static long fraud = 0;
+    
+    /**
+     * CIDR blocked counter
+     */
+    public volatile static long cidrblocked = 0;
     /**
      * xtime counter
      */
@@ -281,6 +286,8 @@ public class RTBServer implements Runnable {
     
     /** Trace stuff coming in to the bidder */
     public static volatile boolean trace = false;
+    
+
 
     /**
      * This is the entry point for the RTB server.
@@ -418,19 +425,6 @@ public class RTBServer implements Runnable {
         startedLatch = new CountDownLatch(1);
         me = new Thread(this);
         me.start();
-   /*     try {
-            startedLatch.await();
-            Thread.sleep(2000);
-            Configuration.getInstance().testWinUrlWithCache2k();
-        } catch (Exception error) {
-            try {
-                logger.error("Win Url/Cache2k problem: RTBServer, Fatal error: {}", error.toString());
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                System.out.println("Fatal error: " + error.toString());
-            }
-            me.interrupt();
-        } */
     }
 
     /**
@@ -785,7 +779,7 @@ public class RTBServer implements Runnable {
                             + "%, threads=" + threads + ", low-on-threads= " + server.getThreadPool().isLowOnThreads()
                             + ", qps=" + sqps + ", avgBidTime=" + savgbidtime + "ms, avgNoBidTime=" + savgnobidtime
                             + "ms, total=" + handled + ", requests=" + request + ", bids=" + bid + ", nobids=" + nobid
-                            + ", fraud=" + fraud + ", wins=" + win + ", pixels=" + pixels + ", clicks=" + clicks
+                            + ", fraud=" + fraud + ", cidrblocked=" + cidrblocked + ", wins=" + win + ", pixels=" + pixels + ", clicks=" + clicks
                             + ", exchanges= " + exchangeCounts + ", stopped=" + stopped + ", campaigns="
                             + Configuration.getInstance().getCampaignsList().size();
                     Map m = new HashMap();
@@ -813,6 +807,7 @@ public class RTBServer implements Runnable {
                     m.put("requests", request);
                     m.put("nobid", nobid);
                     m.put("fraud", fraud);
+                    m.put("cidrblocked", cidrblocked);
                     m.put("wins", win);
                     m.put("pixels", pixels);
                     m.put("clicks", clicks);
@@ -1119,6 +1114,14 @@ class Handler extends AbstractHandler {
                     br.incrementRequests();
                     if (RTBServer.GDPR_MODE)
                     	br.enforceGDPR();
+                    
+                    if (!br.enforceMasterCIDR()==false) {
+                    	response.setStatus(br.returnNoBidCode());
+                        response.setContentType(br.returnContentType());
+                        baseRequest.setHandled(true);
+                        RTBServer.cidrblocked++;
+                        return;
+                    }
 
                     id = br.getId();
 
