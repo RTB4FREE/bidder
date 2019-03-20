@@ -4,9 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -14,8 +12,7 @@ import org.eclipse.jetty.util.ConcurrentHashSet;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jacamars.dsp.rtb.blocks.CIDRUtils;
-import com.jacamars.dsp.rtb.blocks.XRange;
+
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.model.IspResponse;
 

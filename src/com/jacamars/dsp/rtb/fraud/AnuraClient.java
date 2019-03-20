@@ -3,6 +3,7 @@ package com.jacamars.dsp.rtb.fraud;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -65,7 +66,7 @@ public enum AnuraClient implements FraudIF {
 
 	static volatile BasicHttpContext context = new BasicHttpContext();
 
-	static volatile Map<String, String> backing = new HashMap();
+	static volatile Map<String, String> backing = new ConcurrentHashMap();
 
 	/** The precompiled preamble */
 	@JsonIgnore
@@ -193,6 +194,10 @@ public enum AnuraClient implements FraudIF {
 			}
 			result = rootNode.get("result").asText("error: does not conform");
 			backing.put(ip, result);
+			if (backing.size()>500000) {
+				int x = rand.nextInt(500000);
+				backing.remove(backing.keySet().iterator().next());
+			}
 		}
 		
 		xtime = System.currentTimeMillis() - xtime;
