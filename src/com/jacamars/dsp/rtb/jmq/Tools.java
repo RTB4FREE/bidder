@@ -118,6 +118,7 @@ public class Tools {
 				obj = mapper.readValue(contents, Class.forName(name));
 			} catch (ClassNotFoundException | IOException e) {
 				// TODO Auto-generated catch block
+				System.out.println("=========>"+o);
 				e.printStackTrace();
 			}
 		} else 

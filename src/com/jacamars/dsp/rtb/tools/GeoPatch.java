@@ -1,4 +1,5 @@
 package com.jacamars.dsp.rtb.tools;
+
 import java.io.File;
 import java.net.InetAddress;
 
@@ -22,6 +23,7 @@ import com.maxmind.geoip2.record.Location;
 
 /**
  * A singleton that adds geo information to a device, if IP is available.
+ * 
  * @author Ben M. Faul
  *
  */
@@ -36,7 +38,7 @@ public enum GeoPatch {
 		GeoPatch.getInstance("/home/ben/GeoLite2-City.mmdb");
 		Atomx br = new Atomx("SampleBids/nogeo.txt");
 	}
-	
+
 	public static GeoPatch getInstance(String fileName) throws Exception {
 		reader = new DatabaseReader.Builder(new File(fileName)).build();
 		isoMap = (IsoTwo2Iso3) LookingGlass.symbols.get("@ISO2-3");
@@ -44,167 +46,166 @@ public enum GeoPatch {
 		reader.city(ipAddress);
 		return GEOPATCH;
 	}
-	
+
 	public static GeoPatch getInstance() {
 		return GEOPATCH;
 	}
-	
-	public void patch(JsonNode idev) throws Exception {
-		
-		//long timer = System.currentTimeMillis();
-		/**
-		 * No patch if not initialized
-		 */
-		if (reader == null || idev == null || idev instanceof MissingNode)
-			return;
-		
-		ObjectNode device = (ObjectNode)idev;
-		/**
-		 * Make sure iso2 to 3 converter is available.
-		 */
-		if (isoMap == null) 
-			isoMap = (IsoTwo2Iso3) LookingGlass.symbols.get("@ISO2-3");
-		
-		String ip = device.get("ip").asText("");
-		if (ip.equals(""))
-			return;
-		
-		InetAddress ipAddress = InetAddress.getByName(ip);
-		CityResponse response = null;
-		City city = null;
-		Country country = null;
-		Subdivision subdivision = null;
-		Postal postal = null;
-		Location location = null;
-		
-		/**
-		 * Make a geo node if necessary
-		 */
-		ObjectNode geo = (ObjectNode)device.get("geo");
-		if (geo == null) {
-			geo = factory.objectNode();
-			device.set("geo", geo);
-			response = reader.city(ipAddress);
-			city = response.getCity();
-			country = response.getCountry();
-			subdivision = response.getMostSpecificSubdivision();
-			postal = response.getPostal();
-			location = response.getLocation();
+
+	public void patch(JsonNode idev) {
+
+		try {
+			// long timer = System.currentTimeMillis();
+			/**
+			 * No patch if not initialized
+			 */
+			if (reader == null || idev == null || idev instanceof MissingNode)
+				return;
+
+			ObjectNode device = (ObjectNode) idev;
+			/**
+			 * Make sure iso2 to 3 converter is available.
+			 */
+			if (isoMap == null)
+				isoMap = (IsoTwo2Iso3) LookingGlass.symbols.get("@ISO2-3");
+
+			String ip = device.get("ip").asText("");
+			if (ip.equals(""))
+				return;
+
+			InetAddress ipAddress = InetAddress.getByName(ip);
+			CityResponse response = null;
+			City city = null;
+			Country country = null;
+			Subdivision subdivision = null;
+			Postal postal = null;
+			Location location = null;
+
+			/**
+			 * Make a geo node if necessary
+			 */
+			ObjectNode geo = (ObjectNode) device.get("geo");
+			if (geo == null) {
+				geo = factory.objectNode();
+				device.set("geo", geo);
+				response = reader.city(ipAddress);
+				city = response.getCity();
+				country = response.getCountry();
+				subdivision = response.getMostSpecificSubdivision();
+				postal = response.getPostal();
+				location = response.getLocation();
+
+				device.set("geo", geo);
+			}
+
+			/**
+			 * Add country, convert iso2 to iso3
+			 */
+			if (geo.get("country") == null) {
+				if (response == null)
+					response = reader.city(ipAddress);
+				if (city == null)
+					city = response.getCity();
+				if (country == null)
+					country = response.getCountry();
+				if (subdivision == null)
+					subdivision = response.getMostSpecificSubdivision();
+				if (postal == null)
+					postal = response.getPostal();
+				if (location == null)
+					location = response.getLocation();
+				String iso = country.getIsoCode();
+				if (iso.length() == 2 && isoMap != null) {
+					iso = isoMap.query(iso);
+				}
+				geo.put("country", iso);
+			}
+
+			/**
+			 * Add city
+			 */
+			if (geo.get("city") == null) {
+				if (response == null)
+					response = reader.city(ipAddress);
+				if (city == null)
+					city = response.getCity();
+				if (country == null)
+					country = response.getCountry();
+				if (subdivision == null)
+					subdivision = response.getMostSpecificSubdivision();
+				if (postal == null)
+					postal = response.getPostal();
+				if (location == null)
+					location = response.getLocation();
+				String scity = city.getName();
+				if (scity != null)
+					geo.put("city", city.getName());
+			}
+
+			/**
+			 * Add state/region
+			 */
+			if (geo.get("region") == null) {
+				if (response == null)
+					response = reader.city(ipAddress);
+				if (city == null)
+					city = response.getCity();
+				if (country == null)
+					country = response.getCountry();
+				if (subdivision == null)
+					subdivision = response.getMostSpecificSubdivision();
+				if (postal == null)
+					postal = response.getPostal();
+				if (location == null)
+					location = response.getLocation();
+				String sregion = subdivision.getIsoCode();
+				if (sregion != null)
+					geo.put("region", sregion);
+			}
+			if (geo.get("zip") == null) {
+				if (response == null)
+					response = reader.city(ipAddress);
+				if (city == null)
+					city = response.getCity();
+				if (country == null)
+					country = response.getCountry();
+				if (subdivision == null)
+					subdivision = response.getMostSpecificSubdivision();
+				if (postal == null)
+					postal = response.getPostal();
+				if (location == null)
+					location = response.getLocation();
+				String szip = postal.getCode();
+				if (szip != null)
+					geo.put("zip", szip);
+			}
+
+			/**
+			 * Add latitude and longitude
+			 */
+			if (geo.get("lat") == null) {
+				if (response == null)
+					response = reader.city(ipAddress);
+				if (city == null)
+					city = response.getCity();
+				if (country == null)
+					country = response.getCountry();
+				if (subdivision == null)
+					subdivision = response.getMostSpecificSubdivision();
+				if (postal == null)
+					postal = response.getPostal();
+				if (location == null)
+					location = response.getLocation();
+				if (location != null) {
+					geo.put("lat", location.getLatitude());
+					geo.put("lon", location.getLatitude());
+				}
+			}
+		} catch (Exception error) {
+			// don't crap out on database errors when ip is not found.
 		}
-		
-		/**
-		 * Add country, convert iso2 to iso3
-		 */
-		JsonNode x = null;
-		if ((x = geo.get("country"))==null) {
-			if (x == null) {
-				if (response == null)
-					response = reader.city(ipAddress);
-				if (city == null)
-					city = response.getCity();
-				if (country == null)
-					country = response.getCountry();
-				if (subdivision == null)
-					subdivision = response.getMostSpecificSubdivision();
-				if (postal == null)
-					postal = response.getPostal();
-				if (location == null)
-					location = response.getLocation();
-			}
-			String iso = country.getIsoCode();
-			if (iso.length()==2 && isoMap != null) {
-				iso = isoMap.query(iso);
-			}
-			geo.set("country", new TextNode(iso));
-		}	
-		
-		/**
-		 * Add city
-		 */
-		x = null;
-		if ((x = geo.get("city"))==null) {
-			if (x == null) {
-				if (response == null)
-					response = reader.city(ipAddress);
-				if (city == null)
-					city = response.getCity();
-				if (country == null)
-					country = response.getCountry();
-				if (subdivision == null)
-					subdivision = response.getMostSpecificSubdivision();
-				if (postal == null)
-					postal = response.getPostal();
-				if (location == null)
-					location = response.getLocation();
-			}
-			geo.set("city", new TextNode(city.getName()));
-		}
-		
-		/**
-		 * Add state/region
-		 */
-		x = null;;
-		if ((x = geo.get("region"))==null) {
-			if (x == null) {
-				if (response == null)
-					response = reader.city(ipAddress);
-				if (city == null)
-					city = response.getCity();
-				if (country == null)
-					country = response.getCountry();
-				if (subdivision == null)
-					subdivision = response.getMostSpecificSubdivision();
-				if (postal == null)
-					postal = response.getPostal();
-				if (location == null)
-					location = response.getLocation();
-			}
-			geo.set("state",new TextNode(subdivision.getIsoCode()));
-		}	
-		x = null;;
-		if ((x = geo.get("zipcode"))==null) {
-			if (x == null) {
-				if (response == null)
-					response = reader.city(ipAddress);
-				if (city == null)
-					city = response.getCity();
-				if (country == null)
-					country = response.getCountry();
-				if (subdivision == null)
-					subdivision = response.getMostSpecificSubdivision();
-				if (postal == null)
-					postal = response.getPostal();
-				if (location == null)
-					location = response.getLocation();
-			}
-			geo.set("zip", new TextNode(postal.getCode()));
-		}
-		
-		/**
-		 * Add latitude and longitude
-		 */
-		x = null;;
-		if ((x = geo.get("lat"))==null) {
-			if (x == null) {
-				if (response == null)
-					response = reader.city(ipAddress);
-				if (city == null)
-					city = response.getCity();
-				if (country == null)
-					country = response.getCountry();
-				if (subdivision == null)
-					subdivision = response.getMostSpecificSubdivision();
-				if (postal == null)
-					postal = response.getPostal();
-				if (location == null)
-					location = response.getLocation();
-			}
-			geo.set("lat", new DoubleNode(location.getLatitude()));
-			geo.set("lon", new DoubleNode(location.getLatitude()));
-		}
-		
-		//timer = System.currentTimeMillis() - timer;
-		//System.out.println(timer);
+
+		// timer = System.currentTimeMillis() - timer;
+		// System.out.println(timer);
 	}
-	
+
 }

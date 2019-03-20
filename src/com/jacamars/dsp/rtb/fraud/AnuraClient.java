@@ -77,6 +77,7 @@ public enum AnuraClient implements FraudIF {
 	transient ObjectMapper mapper = new ObjectMapper();
 
 	public static void main(String[] args) throws Exception {
+		AnuraClient.endpoint = "http://direct.us-central.anura.io";
 		AnuraClient q = AnuraClient.build(args[0]);
 		FraudLog f = null;
 		printxtime = true;
