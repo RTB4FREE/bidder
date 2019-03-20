@@ -480,12 +480,14 @@ public class Configuration {
 			if (x != null) {
 				if (x instanceof NavMap) {
 					masterCidr = (NavMap) x;
+					logger.info("*** Master Blacklist is set to: {}",x);
 				} else {
-					logger.error("Master CIDR '@MASTERCIDR' is  the wrong classtype {}", x.getClass().getName());
+					logger.error("*** Master CIDR '@MASTERCIDR' is  the wrong classtype {}", x.getClass().getName());
 					logger.error("*** Master CIDR blocking is disabled ***");
 				}
 			}
-		}
+		} else
+			logger.info("*** Master Blacklist is not set");
 		/**
 		 * SSL
 		 */
@@ -579,6 +581,16 @@ public class Configuration {
 		 * Deal with the app object
 		 */
 		m = (Map) m.get("app");
+		
+		if (m.get("geopatch") != null) {
+			String fileName = (String)m.get("geopatch");
+			if (!fileName.equals("")) {
+				GeoPatch.getInstance(fileName);
+				logger.info("*** GEOPATCH DB set to: {} ",fileName);
+			} else
+				logger.info("*** GEOPATCH DB IS NOT SET");
+		} else
+			logger.info("*** GEOPATCH DB IS NOT SET");
 
 		if (m.get("indexPage") != null)
 			indexPage = (String) m.get("indexPage");
@@ -882,6 +894,9 @@ public class Configuration {
 		if (address == null)
 			return address;
 
+		while (address.contains("$GEOPATCH"))
+			address = GetEnvironmentVariable(address, "$GEOPATCH", "");
+		
 		while (address.contains("$MASTERCIDR"))
 			address = GetEnvironmentVariable(address, "$MASTERCIDR", "");
 

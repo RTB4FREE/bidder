@@ -10,6 +10,7 @@
     "watchlist": "$FRAUDWATCHLIST"
   },
   "app" : {
+    "geopatch": "$GEOPATCH",
     "concurrency" : "1",
     "NOdeadmanswitch":"accountingsystem",
     "threads": "128",

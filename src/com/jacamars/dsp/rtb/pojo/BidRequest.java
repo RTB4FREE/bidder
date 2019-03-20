@@ -23,6 +23,7 @@ import com.jacamars.dsp.rtb.exchanges.adx.AdxBidRequest;
 import com.jacamars.dsp.rtb.fraud.FraudLog;
 import com.jacamars.dsp.rtb.geo.Solution;
 import com.jacamars.dsp.rtb.tools.AmalgamatedKey;
+import com.jacamars.dsp.rtb.tools.GeoPatch;
 import com.jacamars.dsp.rtb.tools.HexDump;
 import com.jacamars.dsp.rtb.tools.IsoTwo2Iso3;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -473,6 +474,7 @@ public class BidRequest {
 			}
 
 			makeSynthKey();
+			GeoPatch.getInstance().patch(rootNode.get("device"));
 
 			// ///////////////
 			if (siteDomain != null && blackList != null) {

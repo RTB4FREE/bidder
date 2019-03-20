@@ -1113,6 +1113,8 @@ function fillInSeats(data) {
 
 function fillInInits(data) {
 	var inits = data.initials;
+	if (typeof inits === "undefined")
+		return;
 	initLoadsDyno.clear();
 	for (var i=0; i<inits.length;i++) {
 		var camp = inits[i];

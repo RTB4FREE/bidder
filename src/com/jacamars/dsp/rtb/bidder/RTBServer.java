@@ -1155,7 +1155,6 @@ class Handler extends AbstractHandler {
                         Controller.getInstance().sendRequest(br, false);
                         return;
                     }
-
                     // Some exchanges like Appnexus send other endpoints, so
                     // they are handled here.
                     if (br.notABidRequest()) {
@@ -1167,8 +1166,7 @@ class Handler extends AbstractHandler {
                         RTBServer.request--;
                         return;
                     }
-
-                    if (Configuration.getInstance().getCampaignsList().size() == 0) {
+                    if (Configuration.getInstance().getCampaignsList().size() == 0) {                  	
                         logger.debug("No campaigns loaded");
                         json = br.returnNoBid("No campaigns loaded");
                         code = RTBServer.NOBID_CODE;
@@ -1194,6 +1192,7 @@ class Handler extends AbstractHandler {
                             json = br.returnNoBid("No matching campaign");
                             code = RTBServer.NOBID_CODE;
                             RTBServer.nobid++;
+                            
                             Controller.getInstance().sendRequest(br, false);
                             Controller.getInstance().sendNobid(new NobidResponse(br.id, br.getExchange()));
                         } else {
