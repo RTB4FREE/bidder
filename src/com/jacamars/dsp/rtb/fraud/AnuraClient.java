@@ -47,7 +47,7 @@ public enum AnuraClient implements FraudIF {
 	public static AtomicLong forensiqCount = new AtomicLong(0);
 
 	/** Endpoint of the forensiq api */
-	public static String endpoint = "https://direct.anura.io/direct.json"; // "http://api.forensiq.com/check";
+	public static String endpoint = "https://direct.anura.io"; // "http://api.forensiq.com/check";
 	/** Your Forensiq key */
 	public static String key = "yourkeygoeshere";
 	/** Default threshhold for non bidding */
@@ -96,7 +96,7 @@ public enum AnuraClient implements FraudIF {
 	 * Default constructor
 	 */
 	public static AnuraClient build() {
-		preamble = endpoint + "?instance=" + key + "&";
+		preamble = endpoint + "/direct.json?instance=" + key + "&";
 		setup();
 		return ANURACLIENT;
 	}
@@ -109,7 +109,7 @@ public enum AnuraClient implements FraudIF {
 	 */
 	public static AnuraClient build(String ck) {
 		key = ck;
-		preamble = endpoint + "?instance=" + key + "&";
+		preamble = endpoint + "/direct.json?instance=" + key + "&";
 		setup();
 		return ANURACLIENT;
 	}
