@@ -46,8 +46,8 @@ public enum AnuraClient implements FraudIF {
 	/** forensiq count */
 	public static AtomicLong forensiqCount = new AtomicLong(0);
 
-	/** Endpoint of the forensiq api */
-	public static String endpoint = "https://direct.anura.io"; // "http://api.forensiq.com/check";
+	/** Endpoint of the ANURA api */
+	public static String endpoint = "http://direct.us-central.anura.io"; // "http://api.forensiq.com/check";
 	/** Your Forensiq key */
 	public static String key = "yourkeygoeshere";
 	/** Default threshhold for non bidding */
@@ -66,8 +66,6 @@ public enum AnuraClient implements FraudIF {
 
 	static volatile BasicHttpContext context = new BasicHttpContext();
 
-	static volatile Map<String, String> backing = new ConcurrentHashMap();
-
 	/** The precompiled preamble */
 	@JsonIgnore
 	transient public static String preamble;
@@ -77,7 +75,7 @@ public enum AnuraClient implements FraudIF {
 	transient ObjectMapper mapper = new ObjectMapper();
 
 	public static void main(String[] args) throws Exception {
-		AnuraClient.endpoint = "http://direct.us-central.anura.io";
+		/// "https://direct.anura.io"
 		AnuraClient q = AnuraClient.build(args[0]);
 		FraudLog f = null;
 		printxtime = true;
@@ -138,74 +136,68 @@ public enum AnuraClient implements FraudIF {
 
 	/**
 	 * Should I bid, or not?
-	 * @param rt String. The type, always "display".
-	 * @param ip String. The IP address of the user.
-	 * @param url String. The URL of the publisher.
-	 * @param ua String. The user agent.
+	 * 
+	 * @param rt     String. The type, always "display".
+	 * @param ip     String. The IP address of the user.
+	 * @param url    String. The URL of the publisher.
+	 * @param ua     String. The user agent.
 	 * @param seller String. The seller's domain.
-	 * @param crid String. The creative id
-	 * @return boolean. If it returns true, good to bid. Or, false if it fails the confidence test.
+	 * @param crid   String. The creative id
+	 * @return boolean. If it returns true, good to bid. Or, false if it fails the
+	 *         confidence test.
 	 * @throws Exception on missing rwquired fields - seller and IP.
 	 */
 	public FraudLog bid(String rt, String ip, String url, String ua, String seller, String crid) throws Exception {
 		byte[] bytes = null;
 		String content;
-		
+
 		long xtime = System.currentTimeMillis();
-		if (checkPercentage()==false)
+		if (checkPercentage() == false)
 			return null;
-		
+
 		String result = null;
-		if ((result=backing.get(ip))!= null) {
-			
-		} else {
-			StringBuilder sb = new StringBuilder(preamble);
-			JsonNode rootNode = null;		
 
-			if (httpclient == null) {
-				return null;
-			}
-		
-			if (ip == null) {
-				if (bidOnError)
-					return null;
-				else
-					throw new Exception("Required field ip is missing");
-			}
-		
-			sb.append("ip=").append(ip);
-		
-			HttpGet httpget = new HttpGet(sb.toString());
-		
-			try {
-				xtime = System.currentTimeMillis();
-				CloseableHttpResponse response = httpclient.execute(httpget, context);
+		StringBuilder sb = new StringBuilder(preamble);
+		JsonNode rootNode = null;
 
-				HttpEntity entity = response.getEntity();
-				if (entity != null) {
-					bytes = EntityUtils.toByteArray(entity);
-				}
-				response.close();
-				content = new String(bytes);
-				rootNode = mapper.readTree(content);
-			} catch (Exception e) {
-					logger.error("{}",e.getMessage());
-			} finally {
-
-			}
-			result = rootNode.get("result").asText("error: does not conform");
-			backing.put(ip, result);
-			if (backing.size()>500000) {
-				int x = rand.nextInt(500000);
-				backing.remove(backing.keySet().iterator().next());
-			}
+		if (httpclient == null) {
+			return null;
 		}
-		
+
+		if (ip == null) {
+			if (bidOnError)
+				return null;
+			else
+				throw new Exception("Required field ip is missing");
+		}
+
+		sb.append("ip=").append(ip);
+
+		HttpGet httpget = new HttpGet(sb.toString());
+
+		try {
+			xtime = System.currentTimeMillis();
+			CloseableHttpResponse response = httpclient.execute(httpget, context);
+
+			HttpEntity entity = response.getEntity();
+			if (entity != null) {
+				bytes = EntityUtils.toByteArray(entity);
+			}
+			response.close();
+			content = new String(bytes);
+			rootNode = mapper.readTree(content);
+		} catch (Exception e) {
+			logger.error("{}", e.getMessage());
+		} finally {
+
+		}
+		result = rootNode.get("result").asText("error: does not conform");
+
 		xtime = System.currentTimeMillis() - xtime;
-			
+
 		if (printxtime)
 			System.out.println("XTIME: " + xtime);
-			
+
 		forensiqXtime.addAndGet(xtime);
 		forensiqCount.incrementAndGet();
 
@@ -220,7 +212,7 @@ public enum AnuraClient implements FraudIF {
 			m.xtime = xtime;
 			return m;
 		}
-			
+
 		return null;
 	}
 
