@@ -38,7 +38,7 @@ public class TestAccounting {
 	// static String HOST = "btsoomrtb";
 	// static String HOST = "54.175.237.122";
 	// static String HOST = "rtb4free.com";
-	static String winnah = "__COST__/__LAT__/__LON__/__ADID__/__CRID__/__BIDID__/http://__HOST__:8080/contact.html?99201&adid=__ADID__&crid=__CRID__/http://__HOST__:8080/images/320x50.jpg?adid=__ADID__&__BIDID__";
+	static String winnah = "__COST__/__LAT__/__LON__/__ADID__/__CRID__/__BIDID__";
 
 	static String pixel = "/pixel/__EXCHANGE__/__ADID__/__CRID__/__BIDID__/__COST__/__LAT__/__LON__";
 
@@ -157,8 +157,9 @@ public class TestAccounting {
 				BigDecimal wc = new BigDecimal(str);
 				winCost = winCost.add(wc);
 				rets.put("uuid", uuid);
-				String theWin = makeWin(map, theBid, rets, wc.doubleValue());
-				String rc = post.sendGet(thisWinUrl + theWin, 5000, 5000);
+				String xwin = (String)theBid.get("nurl");
+				String theWin = makeWin2(map,xwin,rets,wc.doubleValue());
+				String rc = post.sendGet(theWin, 5000, 5000);
 				if (rc == null || rc.length() == 0)
 					System.err.println("Bad Win return");
 			}
@@ -200,6 +201,58 @@ public class TestAccounting {
 
 	}
 
+	public static String makeWin2(Map bid, String xwin, Map r, double dcost) {
+		String[] parts = xwin.split("http");
+		String pre = xwin.substring(0,xwin.indexOf(":"));
+		String lat = null;
+		String lon = null;
+		String uuid;
+		String forward = "http:" + parts[1];
+		parts = parts[1].split("/");
+		
+		parts[8] = "" + dcost;
+		
+		if (COUNT_MODE) {
+			lat = "" + (double) r.get("lat");
+			lon = "" + (double) r.get("lon");
+			uuid = (String) r.get("uuid");
+		} else {
+			Map device = (Map) bid.get("device");
+			if (device != null) {
+				Map geo = (Map) device.get("geo");
+				if (geo != null) {
+					Double x = (Double) geo.get("lat");
+					if (x != null) {
+						lat = "" + x;
+						x = (Double) geo.get("lon");
+						lon = "" + x;
+					}
+				}
+			}
+			uuid = (String) bid.get("id");
+		}
+
+		/**
+		 * Random cost
+		 */
+		Random rand = new Random();
+		int Low = 760;
+		int High = 1000;
+		double Result = .001 * (rand.nextInt(High - Low) + Low);
+		// cost = "" + Result * COST;
+
+		parts[9] = lat;
+		parts[10] = lon;
+		parts[13] = uuid;
+		
+
+		String str = pre + ":/";
+		for (int i=2; i<parts.length;i++) {
+			str = str + "/" + parts[i];
+		}
+		return str;
+
+	}
 	public static String makeWin(Map bid, Map theBid, Map r, double dcost) {
 		String str = winnah;
 		String lat = "NA";
