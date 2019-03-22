@@ -1401,7 +1401,8 @@ public class Configuration {
 	 * @param fname String. The file name of the database.
 	 * @throws Exception on file or cache2k errors.
 	 */
-	private static void readDatabaseIntoCache(String fname) throws Exception {
+	private static void readDatabaseIntoCache(String fname) {
+		try {
 		String content = new String(Files.readAllBytes(Paths.get(fname)), StandardCharsets.UTF_8);
 		content = substitute(content);
 
@@ -1411,6 +1412,10 @@ public class Configuration {
 		List<Campaign> list = DbTools.mapper.readValue(content,
 				DbTools.mapper.getTypeFactory().constructCollectionType(List.class, Campaign.class));
 		db.update(list);
+		} catch (Exception error) {
+			logger.warn("Initial database {} not read, error: {}", fname, error.getMessage());
+		}
+		
 	}
 
 	/**
