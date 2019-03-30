@@ -1,12 +1,19 @@
-OpenRTB Bidder
-=====================
-This is a JAVA 1.8 based openRTB bidding system.
+[home](https://github.com/RTB4FREE/rtb4free/README.md) |
+[campaign manager](https://github.com/RTB4FREE/campaignmanager/README.md) |
+bidder |
+[crosstalk](https://github.com/RTB4FREE/crosstalk/README.md) |
 
 
-DOCKER BASED RTB BIdder
-=======================
+RTB4FREE Bidder
+===============
 
-These are the Docker instructions for working with Bidder, Crosstalk, Zerospike, Kafka and Zookeeper.
+This is the bidder component to the RTB4FREE open source DSP.  The bidder is a JAVA 1.8 based openRTB bidding system, scalable to 25K+ QPS per node.
+
+
+Docker Based
+============
+
+The instructions below are for deploying the bidder component.  To deploy the full RTB4FREE system, please refer to the documentation in the [RTB4FREE/rtb4free](https://github.com/RTB4FREE/rtb4free/README.md) repo.  The bidder relies on the [Crosstalk](https://github.com/RTB4FREE/crosstalk/README.md),[Zerospike](https://github.com/RTB4FREE/zerospike/README.md), Kafka, and Zookeeper projects.
 
 No Source Deployments
 ===========================
