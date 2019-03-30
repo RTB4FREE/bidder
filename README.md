@@ -29,16 +29,19 @@ cd bidder
 cp sampledb.json database.json
 ```
 
-**Step 3: Run maven**
+**Step 3: Run Maven**
 
 ```
 mvn assembly:assembly -DdescriptorId=jar-with-dependencies  -Dmaven.test.skip=true
 ```
 
+*Note: Remember to submit changes back to this project via a [pull request](https://github.com/RTB4FREE/bidder/pulls)!*
+
+
 Building Docker images
 ----------------------
 
-Make the docker images locally:
+To make the Docker images locally:
 
 ```
 docker build -t jacamars/zerospike:v1 -f Docker.zerospike .
