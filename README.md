@@ -3,7 +3,9 @@
 bidder |
 [crosstalk](https://github.com/RTB4FREE/crosstalk/README.md) |
 
-
+<img src="https://github.com/RTB4FREE/rtb4free/blob/master/rtb4free-logo.png"
+ alt="RTB4FREE logo" title="RTB4FREE" align="right" />
+ 
 RTB4FREE Bidder
 ===============
 
