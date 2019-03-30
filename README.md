@@ -11,14 +11,52 @@ RTB4FREE Bidder
 
 This is the bidder component to the RTB4FREE open source DSP.  The bidder is a JAVA 1.8 based openRTB bidding system, scalable to 25K+ QPS per node.
 
+Working with Source Code
+------------------------
 
+If you want to modify the code:
+
+**Step 1:  Clone this Github repo**
+
+```
+git clone git@github.com:RTB4FREE/bidder.git
+cd bidder
+```
+
+**Step 2: Make sure you have a sample database for use with QA tests**
+
+```
+cp sampledb.json database.json
+```
+
+**Step 3: Run maven**
+
+```
+mvn assembly:assembly -DdescriptorId=jar-with-dependencies  -Dmaven.test.skip=true
+```
+
+Building Docker Images
+----------------------
+
+Make the docker images locally:
+
+```
+docker build -t jacamars/zerospike:v1 -f Docker.zerospike .
+docker build -t jacamars/rtb4free:v1 -f Docker.bidder .
+```
+
+6. If you need to push to the repo:
+
+   $docker push jacamars/rtb4free:v1
+   $docker push jacamars/zerospike:v1
+   
 Docker Based
 ============
 
-The instructions below are for deploying the bidder component.  To deploy the full RTB4FREE system, please refer to the documentation in the [RTB4FREE/rtb4free](https://github.com/RTB4FREE/rtb4free/README.md) repo.  The bidder relies on the [Crosstalk](https://github.com/RTB4FREE/crosstalk/README.md),[Zerospike](https://github.com/RTB4FREE/zerospike/README.md), Kafka, and Zookeeper projects.
+The instructions below are for deploying the bidder component.  To deploy the full RTB4FREE system, please refer to the documentation in the [RTB4FREE/rtb4free](https://github.com/RTB4FREE/rtb4free/README.md) repo.  The bidder relies on the [Crosstalk](https://github.com/RTB4FREE/crosstalk/README.md), [Zerospike](https://github.com/RTB4FREE/zerospike/README.md), Kafka, and Zookeeper projects.
 
 No Source Deployments
-===========================
+======================
 
 Docker Swarm
 ---------------------------
@@ -52,32 +90,7 @@ Use Docker Compose to run Crosstalk, Bidder, Zerospike, Kafka and Zookeeper in a
 
    $docker-compose up 
    
-Working with Source
----------------------------------
-If you want to modify the code.
 
-1. GIT clone, cd to the cloned directory.
-
-2. Make your changes...
-
-3. Make sure you have a sample database for use with qa tests:
-
-   $cp sampledb.json database.json
-   
-4. Run maven:
-
-   $mvn assembly:assembly -DdescriptorId=jar-with-dependencies  -Dmaven.test.skip=true
-   
-5. Make the docker images locally:
-
-   $docker build -t jacamars/zerospike:v1 -f Docker.zerospike .
-   $docker build -t jacamars/rtb4free:v1 -f Docker.bidder .
-   
-6. If you need to push to the repo:
-
-   $docker push jacamars/rtb4free:v1
-   $docker push jacamars/zerospike:v1
-   
 Changing Operational Parameters
 -------------------------------------
 The bidder uses a container based file in Campaigns/payday.json. If you need to change the parameters within it
