@@ -11,7 +11,7 @@ RTB4FREE Bidder
 
 This is the bidder component to the RTB4FREE open source DSP.  The bidder is a JAVA 1.8 based openRTB bidding system, scalable to 25K+ QPS per node.
 
-Working with Source Code
+Working with source code
 ------------------------
 
 If you want to modify the code:
@@ -35,7 +35,7 @@ cp sampledb.json database.json
 mvn assembly:assembly -DdescriptorId=jar-with-dependencies  -Dmaven.test.skip=true
 ```
 
-Building Docker Images
+Building Docker images
 ----------------------
 
 Make the docker images locally:
@@ -140,41 +140,6 @@ using the volumes command. Example, suppose you wanted to use the file mycache.d
 Changing port assignments is not encouraged. Stick to the defaults to keep from losing your mind. There are 
 a lot of interdependencies.
 
-HANDY DOCKER ACTIVITIES
-=====================================
-
-Running Containers
---------------------------------------
-
-    $docker ps
-    
-Attach to a Container
----------------------------------------
-Do a docker ps and then use the container-id or name:
-
-    $docker exec -it <id-or-name> /bin/bash
-    
-Attach to the log
----------------------------------------
-Do a docker ps and then use the container-id or name:
-
-    $docker logs -f <id-or-name>
-    
-Delete an image
-----------------------------------------
-Do a docker ls firsr
-
-    $docker image ls
-    
-Find the container id
-
-    $docker image rm <image-id> --force
-    
-Correct Checksum Error
------------------------------------------
-If docker-compose complains about a checksum after you delete a container do this:
-
-    $docker-compose rm
 
 Connect Intellij Debugger to Bidder, Crosstalk or Zerospike
 -----------------------------------------
