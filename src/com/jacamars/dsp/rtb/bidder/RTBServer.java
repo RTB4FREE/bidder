@@ -152,7 +152,7 @@ public class RTBServer implements Runnable {
     /**
      * number of threads in the jetty thread pool
      */
-    public static int threads = 1024;
+    public static int threads = 2048;
 
     /**
      * a counter for the number of requests the bidder has received and
@@ -199,6 +199,7 @@ public class RTBServer implements Runnable {
      * The average time
      */
     public volatile static long avgBidTime;
+    public volatile static String  savgbidtime = "0";
     public volatile static long avgNoBidTime;
 
     public volatile static long throttleTime = 0;
@@ -536,7 +537,7 @@ public class RTBServer implements Runnable {
             return;
         }
 
-        QueuedThreadPool threadPool = new QueuedThreadPool(threads, 50);
+        QueuedThreadPool threadPool = new QueuedThreadPool(threads, 128);
         server = new Server(threadPool);
         ServerConnector connector = null;
 
@@ -649,7 +650,7 @@ public class RTBServer implements Runnable {
     void startSeparateAdminServer() throws Exception {
         SSL ssl = Configuration.getInstance().ssl;
 
-        QueuedThreadPool threadPool = new QueuedThreadPool(threads, 50);
+        QueuedThreadPool threadPool = new QueuedThreadPool(threads, 128);
         Server server = new Server(threadPool);
         ServerConnector connector;
 
@@ -752,7 +753,7 @@ public class RTBServer implements Runnable {
                     davgNoBidTime /= nowindow;
 
                     String sqps = String.format("%.2f", qps);
-                    String savgbidtime = String.format("%.2f", davgBidTime);
+                    savgbidtime = String.format("%.2f", davgBidTime);
                     String savgnobidtime = String.format("%.2f", davgNoBidTime);
 
                     long a = ForensiqClient.forensiqXtime.get();
@@ -1285,9 +1286,12 @@ class Handler extends AbstractHandler {
                 String rs= request.getQueryString();
                 String rtype = request.getParameter("target");
                 if (rtype == null) {
-                    logger.warn("Warning, wrong callback message, params: {}",rs);
-                    response.getWriter().println("");
-                    return;
+                	rtype = request.getParameter("type");
+                	if (rtype == null) {
+                		logger.warn("Warning, wrong callback message, params: {}",rs);
+                		response.getWriter().println("");
+                		return;
+                	}
                 }
                 boolean debug = false;
                 String dbg = request.getParameter("debug");

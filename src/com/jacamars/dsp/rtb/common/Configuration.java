@@ -396,20 +396,11 @@ public class Configuration {
 		 * USE ZOOKEEPER, AEROSPIKE OR FILE CONFIG
 		 *********************************************/
 		String str = null;
-		if (path.startsWith("zookeeper")) {
-			String parts[] = path.split(":");
-			logger.info("Zookeeper: {}", "" + parts);
-			zk = new ZkConnect(parts[1]);
-			zk.join(parts[2], "bidders", instanceName);
-			str = zk.readConfig(parts[2] + "/bidders");
-		} else {
-			byte[] encoded = Files.readAllBytes(Paths.get(path));
-			str = Charset.defaultCharset().decode(ByteBuffer.wrap(encoded)).toString();
+		byte[] encoded = Files.readAllBytes(Paths.get(path));
+		str = Charset.defaultCharset().decode(ByteBuffer.wrap(encoded)).toString();
 
-			str = Configuration.substitute(str);
-
-			System.out.println(str);
-		}
+		str = Configuration.substitute(str);
+		System.out.println("AFTER SUBSTITUTIONS, CONFIGURATION:\n" + str);
 
 		Map<?, ?> m = DbTools.mapper.readValue(str, Map.class);
 		/*******************************************************************************/
