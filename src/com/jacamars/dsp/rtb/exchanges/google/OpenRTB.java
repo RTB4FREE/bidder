@@ -41,8 +41,13 @@ public class OpenRTB extends GoogleBidRequest {
 	 * @throws Exception on stream reading errors
 	 */
 	@Override
-	public OpenRTB copy(InputStream in) throws Exception  {
-		return new OpenRTB(in);
+	public OpenRTB copy(InputStream in)  {
+		try {
+			return new OpenRTB(in);
+		} catch (Exception error) {
+			logger.debug("Error copying Google OpenRTB, something is not configured correctly: {}",error.getMessage());
+		}
+		return null;
 	}
 	
 	/**

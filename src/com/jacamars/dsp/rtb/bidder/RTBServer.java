@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.zip.GZIPInputStream;
@@ -486,6 +487,29 @@ public class RTBServer implements Runnable {
 
         // QPS the exchanges
         BidRequest.getExchangeCounts();
+    }
+    
+    static volatile Map<String,Long> spurious = new ConcurrentHashMap();
+    /**
+     * Track chatty errors so we don't bombard the log with spurious output
+     * @param key String. The key of the error message.
+     * @param value int. The frequency which to track the error (seconds)
+     * @return boolean. Returns true if this is spurious, else false (ok to log).
+     */
+    public static boolean spurious(String key, int value) {
+    	Long v = null;
+    	if ((v=spurious.get(key))==null) {
+    		spurious.put(key,System.currentTimeMillis());
+    		return false;
+    	}
+    	
+    	v = System.currentTimeMillis() - v;
+    	v /= 1000;
+    	if (v > value) {
+    		spurious.put(key,System.currentTimeMillis());
+    		return false;
+    	} 
+    	return true;
     }
 
     /**
@@ -1095,7 +1119,7 @@ class Handler extends AbstractHandler {
                     code = RTBServer.NOBID_CODE;
                     RTBServer.logger.warn("Handler error: {}", json);
                     RTBServer.error++;
-                    logger.warn("=============> Wrong target: {} is not configured.", target);
+                    logger.warn("=============> Wrong target: {} is not configured correctly.", target);
                     baseRequest.setHandled(true);
                     response.setStatus(code);
                     response.setHeader("X-REASON", json);
@@ -1112,6 +1136,18 @@ class Handler extends AbstractHandler {
                         body = new GZIPInputStream(body);
 
                     br = x.copy(body);
+                    if (br == null) {
+                    	code = RTBServer.NOBID_CODE;
+                    	RTBServer.error++;
+                    	if (! RTBServer.spurious("RTBServer.misconfigured",300))
+                    		logger.warn("Target: {} is not configured correctly.", target);
+                    	baseRequest.setHandled(true);
+                    	response.setStatus(code);
+                    	response.getWriter().println("{}");
+                    	RTBServer.request--;
+                    	return;
+                    }
+                    
                     br.incrementRequests();
                     if (RTBServer.GDPR_MODE)
                     	br.enforceGDPR();

@@ -48,8 +48,13 @@ public class DoubleClick extends AdxBidRequest {
 	 * @throws Exception on stream reading errors
 	 */
 	@Override
-	public DoubleClick copy(InputStream in) throws Exception  {
-		return new DoubleClick(in);
+	public DoubleClick copy(InputStream in)    {
+		try {
+			return new DoubleClick(in);
+		} catch (Exception error) {
+			logger.debug("Error copying Google DoubleClick, something is not configured correctly: {}",error.getMessage());
+		}
+		return null;
 	}
 	
 	/**
