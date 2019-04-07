@@ -74,8 +74,10 @@ public class Zerospike implements Runnable {
         boolean trace = false;
         String strace = null;
         String db = null;
+        
         String kafka = "kafka://[$BROKERLIST]&topic=status";
         int i = 0;
+        
         while (i < args.length) {
             switch (args[i]) {
                 case "-p":

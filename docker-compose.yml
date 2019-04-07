@@ -45,14 +45,34 @@ services:
     image: "jacamars/rtb4free:v1"
     environment:
       GDPR_MODE: "false"
+      
+      BIDSCHANNEL: "$BIDSCHANNEL"
+      WINSCHANNEL: "$WINSCHANNEL"
+      REQUESTSCHANNEL: "$REQUESTSCHANNEL"
+      CLICKSCHANNEL: "$CLICKSCHANNEL"
+      PIXELSCHANNEL: "$PIXELSCHANNEL"
+      VIDEOEVENTSCHANNEL: "$VIDEOEVENTSCHANNEL"
+      POSTBACKEVENTSCHANNEL: "$POSTBACKEVENTSCHANNEL"
+      STATUSCHANNEL: "$STATUSCHANNEL"
+      REASONSCHANNEL: "$REASONSCHANNEL"  
+      LOGCHANNEL: "$LOGCHANNEL"
+         
       BROKERLIST: "kafka:9092"
+      
       PUBSUB: "zerospike"
       EXTERNAL: "http://localhost:8080"
       ACCOUNTING: "NONE"
       S3BUCKET: ""
+      
+      S3BUCKET: ""
       S3REGION: ""
       S3SECRETKEY: ""
       S3ACCESSKEY: ""
+      
+      AWSACCESSKEY: ""
+      AWSSECRETKEY: ""
+      AWSREGION: ""
+      
       GOOGLE_EKEY: ""
       GOOGLE_IKEY: ""
       OPENX_EKEY: ""

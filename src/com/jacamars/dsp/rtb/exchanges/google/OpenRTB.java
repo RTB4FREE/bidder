@@ -41,7 +41,7 @@ public class OpenRTB extends GoogleBidRequest {
 	 * @throws Exception on stream reading errors
 	 */
 	@Override
-	public OpenRTB copy(InputStream in)  {
+	public OpenRTB copy(InputStream in) throws Exception  {
 		try {
 			return new OpenRTB(in);
 		} catch (Exception error) {

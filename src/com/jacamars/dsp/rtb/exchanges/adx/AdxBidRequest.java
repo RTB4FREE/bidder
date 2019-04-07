@@ -39,7 +39,7 @@ import com.jacamars.dsp.rtb.pojo.Impression;
 import com.jacamars.dsp.rtb.pojo.Video;
 
 interface Command {
-	void runCommand(BidRequest br, RealtimeBidding.BidRequest x, ObjectNode root, Map db, String key);
+	void runCommand(BidRequest br, RealtimeBidding.BidRequest x, ObjectNode root, Map db, String key) throws Exception;
 }
 
 public class AdxBidRequest extends BidRequest {
@@ -54,7 +54,7 @@ public class AdxBidRequest extends BidRequest {
 	static {
 
 		methodMap.put("device", new Command() {
-			public void runCommand(BidRequest br, RealtimeBidding.BidRequest x, ObjectNode root, Map d, String key) {
+			public void runCommand(BidRequest br, RealtimeBidding.BidRequest x, ObjectNode root, Map d, String key) throws Exception {
 				String ip = AdxBidRequest.convertIp(x.getIp());
 				String ua = x.getUserAgent();
 
@@ -97,12 +97,15 @@ public class AdxBidRequest extends BidRequest {
 
 					if (m.hasEncryptedAdvertisingId()) {
 						ByteString bs = m.getEncryptedAdvertisingId();
+						byte[] barry = bs.toByteArray();
 						String id;
 						try {
-							id = AdxWinObject.decryptAdvertisingId(bs.toByteArray());
+							id = AdxWinObject.decryptAdvertisingId(barry);
 							device.put("ifa", id);
 						} catch (Exception e) {
-							e.printStackTrace();
+							if (! RTBServer.spurious("AdxBidRequest.encryptedadid", 60)) {
+								e.printStackTrace();
+							}
 						}
 					}
 
@@ -876,7 +879,7 @@ public class AdxBidRequest extends BidRequest {
 		} 
 	}
 
-	void internalSetup() {
+	void internalSetup() throws Exception {
 
 		List<String> beenThere = new ArrayList<String>();
 		for (int i = 0; i < keys.size(); i++) {

@@ -266,9 +266,9 @@
     "bid" : "/rtb/bids/bidswitch=com.jacamars.dsp.rtb.exchanges.bidswitch.Bidswitch&!usesEncodedAdm"
   }],
   "s3" : {
-    "access_key_id" : "$S3ACCESSKEY",
-    "secret_access_key" : "$S3SECRETKEY",
-    "region" : "$S3REGION",
+    "access_key_id" : "$AWSACCESSKEY",
+    "secret_access_key" : "$AWSSECRETKEY",
+    "region" : "$AWSREGION",
     "bucket" : "$S3BUCKET"
   },
   "lists" : [ {

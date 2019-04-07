@@ -21,6 +21,7 @@ services:
     image: "jacamars/zerospike:v1"
     environment:
       BROKERLIST: "kafka:9092"
+      STATUSCHANNEL: "$STATUSCHANNEL"
     #ports:
      # - "6000:6000"
      #- "6001:6001"

@@ -884,6 +884,32 @@ public class Configuration {
 
 		if (address == null)
 			return address;
+		
+		///////////////////////////////////////////////////////////////////////////////////////////////////
+		
+		 while (address.contains("$BIDSCHANNEL"))
+			address = GetEnvironmentVariable(address, "$BIDSCHANNEL", "kafka://[$BROKERLIST]&topic=bids");
+		 while (address.contains("$WINSCHANNEL"))
+			address = GetEnvironmentVariable(address, "$WINSCHANNEL", "kafka://[$BROKERLIST]&topic=wins");
+		 while (address.contains("$REQUESTSCHANNEL"))
+			address = GetEnvironmentVariable(address, "$REQUESTSCHANNEL", "kafka://[$BROKERLIST]&topic=requests");
+		 while (address.contains("$CLICKSCHANNEL"))
+			address = GetEnvironmentVariable(address, "$CLICKSCHANNEL", "kafka://[$BROKERLIST]&topic=clicks");
+		 while (address.contains("$PIXELSCHANNEL"))
+			address = GetEnvironmentVariable(address, "$PIXELSCHANNEL", "kafka://[$BROKERLIST]&topic=pixels");
+		 while (address.contains("$VIDEOEVENTSCHANNEL"))
+			address = GetEnvironmentVariable(address, "$VIDEOEVENTSCHANNEL", "kafka://[$BROKERLIST]&topic=videoevents");
+		 while (address.contains("$POSTBACKEVENTSCHANNEL"))
+			address = GetEnvironmentVariable(address, "$POSTBACKEVENTSCHANNEL", "kafka://[$BROKERLIST]&topic=postbackevents");
+		 while (address.contains("$STATUSCHANNEL"))
+			address = GetEnvironmentVariable(address, "$STATUSCHANNEL", "kafka://[$BROKERLIST]&topic=status");
+		 while (address.contains("$REASONSCHANNEL"))
+			address = GetEnvironmentVariable(address, "$REASONSCHANNEL", "kafka://[$BROKERLIST]&topic=reasons");
+		 while (address.contains("$LOGCHANNEL"))
+				address = GetEnvironmentVariable(address, "$LOGCHANNEL", "kafka://[$BROKERLIST]&topic=reasons");
+		 kafka://[$BROKERLIST]&topic=logs
+		 
+		 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		while (address.contains("$GEOPATCH"))
 			address = GetEnvironmentVariable(address, "$GEOPATCH", "");
@@ -907,14 +933,37 @@ public class Configuration {
 		while (address.contains("$BIDSWITCH_ID"))
 			address = GetEnvironmentVariable(address, "$BIDSWITCH_ID", "bidswitch-id");
 
-		while (address.contains("$S3REGION"))
-			address = GetEnvironmentVariable(address, "$S3REGION", "");
-		while (address.contains("$S3BUCKET"))
-			address = GetEnvironmentVariable(address, "$S3BUCKET", "");
-		while (address.contains("$S3ACCESSKEY"))
-			address = GetEnvironmentVariable(address, "$S3ACCESSKEY", "");
-		while (address.contains("$S3SECRETKEY"))
-			address = GetEnvironmentVariable(address, "$S3SECRETKEY", "");
+		/////////////////////////////////////////////////////////////////////////////
+		
+		while(address.contains("$S3BUCKET"))
+	        address = GetEnvironmentVariable(address,"$S3BUCKET", "");
+		
+		while(address.contains("$AWSACCESSKEY"))
+	            address = GetEnvironmentVariable(address,"$AWSACCESSKEY", "");
+
+	    while(address.contains("$AWSSECRETKEY"))
+	            address = GetEnvironmentVariable(address,"$AWSSECRETKEY", "");
+
+	    while(address.contains("$AWSREGION"))
+	            address = GetEnvironmentVariable(address,"$AWSREGION", Regions.US_EAST_1.getName());
+	
+        while(address.contains("$AWSKINESIS_STREAM"))
+            address = GetEnvironmentVariable(address,"$AWS_KINESIS_STREAM", "");
+
+        while(address.contains("$AWSKINESIS_PARTITION"))
+            address = GetEnvironmentVariable(address,"$AWS_KINESESIS_PARTITION", "part-1");
+
+        while(address.contains("AWSKINESIS_SHARD"))
+            address = GetEnvironmentVariable(address,"$AWS_KINESIS_SHARD", "shardId-000000000000");
+
+        while(address.contains("AWS_KINESIS_ITERATOR"))
+            address = GetEnvironmentVariable(address,"$AWS_KENESIS_ITERATOR", "LATEST");
+
+        while(address.contains("AWSKINESIS_RECORDS"))
+            address = GetEnvironmentVariable(address,"$AWS_KENSIS_RECORDS", "1");
+		
+		/////////////////////////////////////////////////////////////////////////////
+		
 
 		while (address.contains("$FREQGOV"))
 			address = GetEnvironmentVariable(address, "$FREQGOV", "true");
@@ -1006,7 +1055,7 @@ public class Configuration {
 	 */
 	public static String GetEnvironmentVariable(String address, String varName, String altName) {
 		String test = GetEnvironmentVariable(address, varName);
-		if (test == null) {
+		if (test == null && altName != null) {
 			test = address.replace(varName, altName);
 		}
 		return test;
