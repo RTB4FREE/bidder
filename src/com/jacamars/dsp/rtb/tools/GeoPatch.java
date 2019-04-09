@@ -197,7 +197,7 @@ public enum GeoPatch {
 					location = response.getLocation();
 				if (location != null) {
 					geo.put("lat", location.getLatitude());
-					geo.put("lon", location.getLatitude());
+					geo.put("lon", location.getLongitude());
 				}
 			}
 		} catch (Exception error) {

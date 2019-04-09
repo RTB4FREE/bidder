@@ -37,6 +37,7 @@ import com.jacamars.dsp.rtb.pojo.BidRequest;
 import com.jacamars.dsp.rtb.pojo.BidResponse;
 import com.jacamars.dsp.rtb.pojo.Impression;
 import com.jacamars.dsp.rtb.pojo.Video;
+import com.jacamars.dsp.rtb.tools.GeoPatch;
 
 interface Command {
 	void runCommand(BidRequest br, RealtimeBidding.BidRequest x, ObjectNode root, Map db, String key) throws Exception;
@@ -49,7 +50,7 @@ public class AdxBidRequest extends BidRequest {
 
 	static Map<String, Command> methodMap = new HashMap<String, Command>();
 
-	static AdxGeoCodes lookingGlass = (AdxGeoCodes) LookingGlass.symbols.get("@ADXGEO");
+	public static AdxGeoCodes lookingGlass = (AdxGeoCodes) LookingGlass.symbols.get("@ADXGEO");
 
 	static {
 
@@ -173,15 +174,19 @@ public class AdxBidRequest extends BidRequest {
 					AdxGeoCode item = lookingGlass.query(geoKey);
 					if (item != null) {
 						String type = item.type.toLowerCase();
-						if (type.equals("city") == false) {
+						if (type.equals("city")) {
 							LookingGlass cz = (LookingGlass) LookingGlass.symbols.get("@ZIPCODES");
 
-							if (cz != null) {
+							if (cz != null && postal != null) {
 								String[] parts = (String[]) cz.query(postal);
 								if (parts != null) {
 									geo.put("city", parts[3]);
 									geo.put("state", parts[4]);
-									geo.put("county", parts[5]);
+									geo.put("region", parts[5]);
+								}
+							} else {
+								if (GeoPatch.getInstance() != null) {
+									GeoPatch.getInstance().patch(device);
 								}
 							}
 						} else {
@@ -199,6 +204,15 @@ public class AdxBidRequest extends BidRequest {
 							}
 						}
 						geo.put("country", item.iso3);
+						if (geo.get("city")==null) {
+							if (GeoPatch.getInstance() != null) {
+								GeoPatch.getInstance().patch(device);
+							}
+						}
+					}
+				} else {
+					if (GeoPatch.getInstance() != null) {
+						GeoPatch.getInstance().patch(device);
 					}
 				}
 
@@ -939,6 +953,11 @@ public class AdxBidRequest extends BidRequest {
 		}
 		return sb.toString();
 	}
+	
+	public static void setCrypto(String ekey, String ikey) {
+		AdxWinObject.encryptionKeyBytes = e_key = javax.xml.bind.DatatypeConverter.parseBase64Binary(ekey);
+		AdxWinObject.integrityKeyBytes = i_key = javax.xml.bind.DatatypeConverter.parseBase64Binary(ikey);
+	}
 
 	@Override
 	public void handleConfigExtensions(Map extension)  {
@@ -950,7 +969,6 @@ public class AdxBidRequest extends BidRequest {
         }
 		
 		AdxWinObject.encryptionKeyBytes = e_key = javax.xml.bind.DatatypeConverter.parseBase64Binary(ekey);
-
 		AdxWinObject.integrityKeyBytes = i_key = javax.xml.bind.DatatypeConverter.parseBase64Binary(ikey);
 	}
 

@@ -756,13 +756,14 @@ public class Configuration {
 				requstLogStrategy = REQUEST_STRATEGY_BIDS;
 			else if (strategy.equalsIgnoreCase("WINS"))
 				requstLogStrategy = REQUEST_STRATEGY_WINS;
-		} else {
-			if (strategy.contains(".") == false) {
-				int n = Integer.parseInt(strategy);
-				ExchangeLogLevel.getInstance().setStdLevel(n);
-			} else {
-				Double perc = Double.parseDouble(strategy);
-				ExchangeLogLevel.getInstance().setStdLevel(perc.intValue());
+			else {
+				if (strategy.contains(".") == false) {
+					int n = Integer.parseInt(strategy);
+					ExchangeLogLevel.getInstance().setStdLevel(n);
+				} else {
+					Double perc = Double.parseDouble(strategy);
+					ExchangeLogLevel.getInstance().setStdLevel(perc.intValue());
+				}
 			}
 		}
 		/********************************************************************/
@@ -906,8 +907,7 @@ public class Configuration {
 		 while (address.contains("$REASONSCHANNEL"))
 			address = GetEnvironmentVariable(address, "$REASONSCHANNEL", "kafka://[$BROKERLIST]&topic=reasons");
 		 while (address.contains("$LOGCHANNEL"))
-				address = GetEnvironmentVariable(address, "$LOGCHANNEL", "kafka://[$BROKERLIST]&topic=reasons");
-		 kafka://[$BROKERLIST]&topic=logs
+				address = GetEnvironmentVariable(address, "$LOGCHANNEL", "kafka://[$BROKERLIST]&topic=logs");
 		 
 		 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 

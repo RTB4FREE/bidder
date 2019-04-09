@@ -471,7 +471,7 @@ public class ZPublisher implements Runnable, Callback {
             try {
                 if ((msg = queue.poll()) != null) {
                     i = 1;
-                    PutRecordsRequest putRecordsRequest = null;
+                    PutRecordsRequest putRecordsRequest = new PutRecordsRequest();
                     while(msg != null) {
                         str = serialize(msg);
                         byte [] bytes = str.getBytes();
@@ -486,6 +486,7 @@ public class ZPublisher implements Runnable, Callback {
                             msg = queue.poll();
                     }
                     putRecordsRequest.setRecords(putRecordsRequestEntryList);
+                    putRecordsRequest.setStreamName(kinesis.getStream());
                     PutRecordsResult putRecordsResult  = kinesis.getKinesis().putRecords(putRecordsRequest);
                     putRecordsRequestEntryList.clear();
                 }

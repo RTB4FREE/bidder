@@ -75,7 +75,7 @@ public class Zerospike implements Runnable {
         String strace = null;
         String db = null;
         
-        String kafka = "kafka://[$BROKERLIST]&topic=status";
+        String kafka = "$STATUSCHANNEL";
         int i = 0;
         
         while (i < args.length) {
@@ -118,7 +118,14 @@ public class Zerospike implements Runnable {
 
         }
 
+        System.out.println("KAFKA="+kafka);
         kafka = Configuration.substitute(kafka);
+        System.out.println("AFTER="+kafka);
+        
+        // Do the final substitutions in case we are embedding variables in the connection string.
+        kafka = Configuration.substitute(kafka);
+        
+        System.out.println("FINAL="+kafka);
 
         if (ct == 0) {
             String value = Configuration.GetEnvironmentVariable("$THREADS", "$THREADS", "1");
