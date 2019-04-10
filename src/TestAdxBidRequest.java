@@ -14,7 +14,7 @@ import com.jacamars.dsp.rtb.pojo.BidRequest;
 import com.jacamars.dsp.rtb.tools.GeoPatch;
 import com.jacamars.dsp.rtb.tools.IsoTwo2Iso3;
 
-public class TestAdx {
+public class TestAdxBidRequest {
 
 	public static ObjectMapper mapper = new ObjectMapper();
 	static {
