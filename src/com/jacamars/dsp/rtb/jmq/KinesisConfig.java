@@ -5,6 +5,10 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.kinesis.AmazonKinesis;
 import com.amazonaws.services.kinesis.AmazonKinesisClientBuilder;
+import com.amazonaws.services.kinesis.model.CreateStreamRequest;
+import com.amazonaws.services.kinesis.model.DescribeStreamRequest;
+import com.amazonaws.services.kinesis.model.DescribeStreamResult;
+import com.amazonaws.services.kinesis.model.ResourceNotFoundException;
 import com.jacamars.dsp.rtb.common.Configuration;
 
 
@@ -25,6 +29,7 @@ public class KinesisConfig {
 
     public KinesisConfig(String address) throws Exception {
 
+    	boolean create = true;
         // Chop off kineses://
         address = address.substring(10);
 
@@ -65,6 +70,9 @@ public class KinesisConfig {
                 case "sleep_time":
                     sleep_time = Integer.parseInt(t[1].trim());
                     break;
+                case "create":
+                    create = Boolean.parseBoolean(t[1].trim());
+                    break;
             }
         }
 
@@ -83,6 +91,62 @@ public class KinesisConfig {
                 .standard().withRegion(Regions.fromName(aws_region))
                 .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
                 .build();
+        
+        if (create) {
+            createTopicIfNotActive(stream);
+        }
+    }
+    
+    public void createTopicIfNotActive(String name) {
+        DescribeStreamRequest describeStreamRequest = new DescribeStreamRequest();
+        describeStreamRequest.setStreamName( name );
+
+        CreateStreamRequest createStreamRequest = null;
+
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + ( 10 * 60 * 1000 );
+        boolean active = false;
+        while ( System.currentTimeMillis() < endTime ) {
+            try {
+                DescribeStreamResult describeStreamResponse = amazonKinesis.describeStream( describeStreamRequest );
+                String streamStatus = describeStreamResponse.getStreamDescription().getStreamStatus();
+                if ( streamStatus.equals( "ACTIVE" ) ) {
+                    active = true;
+                    break;
+                }
+                //
+                // sleep for one second
+                //
+                try {
+
+                    if (createStreamRequest == null) {
+                        createStreamRequest = new CreateStreamRequest();
+                        createStreamRequest.setStreamName( name );
+                        createStreamRequest.setShardCount( 1 );
+                        amazonKinesis.createStream( createStreamRequest );
+                    }
+                }
+                catch ( Exception e ) {
+                    e.printStackTrace();
+                }
+            }
+            catch ( ResourceNotFoundException e ) {
+                if (createStreamRequest == null) {
+                    createStreamRequest = new CreateStreamRequest();
+                    createStreamRequest.setStreamName( name );
+                    createStreamRequest.setShardCount( 1 );
+                    amazonKinesis.createStream( createStreamRequest );
+                }
+            }
+            try {
+                Thread.sleep(20 * 1000);
+            }
+            catch ( Exception e ) {}
+
+        }
+        if (!active) {
+            throw new RuntimeException( "Stream " + name + " never went active" );
+        }
     }
 
     public AmazonKinesis getKinesis() {
