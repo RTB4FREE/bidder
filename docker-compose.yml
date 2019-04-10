@@ -60,8 +60,6 @@ services:
       REASONSCHANNEL: "$REASONSCHANNEL"  
       LOGCHANNEL: "$LOGCHANNEL"
          
-      BROKERLIST: "kafka:9092"
-      
       PUBSUB: "zerospike"
       EXTERNAL: "http://localhost:8080"
       ACCOUNTING: "NONE"
