@@ -38,18 +38,7 @@
       "postbackevents": "$POSTBACKEVENTSCHANNEL",
       "status" : "$STATUSCHANNEL",
       "reasons" : "$REASONSCHANNEL",
-    
-    
-      "bidchannel" : "kafka://[$BROKERLIST]&topic=bids",
-      "winchannel" : "kafka://[$BROKERLIST]&topic=wins",
-      "requests" : "kafka://[$BROKERLIST]&topic=requests",
-      "clicks" : "kafka://[$BROKERLIST]&topic=clicks",
-      "pixels" : "kafka://[$BROKERLIST]&topic=pixels",
-      "videoevents": "kafka://[$BROKERLIST]&topic=videoevents",
-      "postbackevents": "kafka://[$BROKERLIST]&topic=postbackevents",
-      "status" : "kafka://[$BROKERLIST]&topic=status",
-      "reasons" : "kafka://[$BROKERLIST]&topic=reasons",
-
+   
       "commands": "tcp://$PUBSUB:6001&commands",
       "responses": "tcp://$PUBSUB:6000&responses",
       "xfrport": "6002",
