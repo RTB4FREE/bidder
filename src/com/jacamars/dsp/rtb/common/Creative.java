@@ -303,6 +303,14 @@ public class Creative {
 				}
 			}
 		}
+		
+		/**
+		 * Always contain these!
+		 */
+		if (!macros.contains("{pixel_url}"))
+			macros.add("{pixel_url}");
+		if (!macros.contains("{win_url}"))
+			macros.add("{win_url}");
 	}
 
 	/**
