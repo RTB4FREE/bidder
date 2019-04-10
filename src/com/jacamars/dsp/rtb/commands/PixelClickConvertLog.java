@@ -253,7 +253,7 @@ public class PixelClickConvertLog {
             } catch (Exception error) {
                 error.printStackTrace();
             }
-        }
+        } 
     }
 
     /**
