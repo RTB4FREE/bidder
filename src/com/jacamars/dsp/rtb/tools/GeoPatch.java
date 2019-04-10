@@ -51,15 +51,20 @@ public enum GeoPatch {
 		return GEOPATCH;
 	}
 
-	public void patch(JsonNode idev) {
+	public double[] patch(JsonNode idev) {
 
+		double lat = 0;
+		double lon = 0;
+		double[] rc = new double[2];
+		rc[0] = lat;
+		rc[1] = lon;
 		try {
 			// long timer = System.currentTimeMillis();
 			/**
 			 * No patch if not initialized
 			 */
 			if (reader == null || idev == null || idev instanceof MissingNode)
-				return;
+				return rc;
 
 			ObjectNode device = (ObjectNode) idev;
 			/**
@@ -70,7 +75,7 @@ public enum GeoPatch {
 
 			String ip = device.get("ip").asText("");
 			if (ip.equals(""))
-				return;
+				return rc;
 
 			InetAddress ipAddress = InetAddress.getByName(ip);
 			CityResponse response = null;
@@ -196,13 +201,18 @@ public enum GeoPatch {
 				if (location == null)
 					location = response.getLocation();
 				if (location != null) {
-					geo.put("lat", location.getLatitude());
-					geo.put("lon", location.getLongitude());
+					lat = location.getLatitude();
+					lon = location.getLongitude();
+					geo.put("lat", lat);
+					geo.put("lon", lon);
+					rc[0] = lat;
+					rc[1] = lon;
 				}
 			}
 		} catch (Exception error) {
 			// don't crap out on database errors when ip is not found.
 		}
+		return rc;
 
 		// timer = System.currentTimeMillis() - timer;
 		// System.out.println(timer);
