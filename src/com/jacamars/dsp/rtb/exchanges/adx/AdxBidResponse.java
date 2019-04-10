@@ -193,11 +193,20 @@ public class AdxBidResponse extends BidResponse {
 		this.height = height;
 	}
 	
+	/**
+	 * Return the internal stream of the Adx Bid response as a string.
+	 * @return String. The returned bid as a string, using Adx-eze.
+	 */
+	public String getInternalAsString() {
+		return internal.toString();
+	}
+	
 	public com.jacamars.dsp.rtb.exchanges.adx.RealtimeBidding.BidResponse getInternal() {
 		return internal;
 	}
 	
 	/////////////////////////////////////////
+	
 	
 	@Override
 	public String toString()  {

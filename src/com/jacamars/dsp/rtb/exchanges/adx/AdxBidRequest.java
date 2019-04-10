@@ -206,13 +206,17 @@ public class AdxBidRequest extends BidRequest {
 						geo.put("country", item.iso3);
 						if (geo.get("city")==null) {
 							if (GeoPatch.getInstance() != null) {
-								GeoPatch.getInstance().patch(device);
+								double [] rc = GeoPatch.getInstance().patch(device);
+								br.lat = rc[0];
+								br.lon = rc[1];
 							}
 						}
 					}
 				} else {
 					if (GeoPatch.getInstance() != null) {
-						GeoPatch.getInstance().patch(device);
+						double [] rc = GeoPatch.getInstance().patch(device);
+						br.lat = rc[0];
+						br.lon = rc[1];
 					}
 				}
 
