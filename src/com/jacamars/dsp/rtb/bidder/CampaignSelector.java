@@ -193,8 +193,10 @@ public class CampaignSelector {
                 logger.info("Selected winner {}/{}", cr.campaign.adId, cr.creative.impid);
             }
         }
-        if (RTBServer.frequencyGoverner != null)
-            RTBServer.frequencyGoverner.add(winner.camp.adId,br);
+        if (RTBServer.frequencyGoverner != null) {
+        	if (winner != null && winner.camp != null && winner.camp.adId != null)
+        		RTBServer.frequencyGoverner.add(winner.camp.adId,br);
+        }
 
         if (xtest) {
         	logger.info("Selected winner in " + xtime + " ms");
