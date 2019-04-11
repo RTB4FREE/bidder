@@ -158,7 +158,7 @@ public class WinObject {
 			try {
 				Long value = AdxWinObject.decrypt(price, System.currentTimeMillis());
 				dv = new Double(value);
-				dv /= 1000000;
+				dv /= 1000;
 			} catch (Exception error) {
 				try {
 					dv = Double.parseDouble(price);
@@ -259,8 +259,11 @@ public class WinObject {
 		} catch (Exception error) {
 			logger.error("Failed to delete bid from cache on exchange: {}, id: {}, error: {}", pubId, hash, error.toString());
 		}
-		String adtype = Configuration.getInstance().getAdType(adId,cridId);
-		Controller.getInstance().sendWin(hash, cost, lat, lon, adId, cridId, pubId, image, forward, price, adm, adtype, domain, bidType);
+		String adtype = "undefined";
+		if (Configuration.getInstance() != null) {
+			adtype = Configuration.getInstance().getAdType(adId,cridId);
+			Controller.getInstance().sendWin(hash, cost, lat, lon, adId, cridId, pubId, image, forward, price, adm, adtype, domain, bidType);
+		}
 
 		try {
 			double value = Double.parseDouble(price);
