@@ -623,20 +623,16 @@ public class AdxBidRequest extends BidRequest {
 		
 		//System.out.println("=============> COST: " + price);
 		
-		long cost = cost = Math.round(price);
-		//if (price < 0) {
-		//	price = this.bidFloor * Math.abs(price);
-		//	cost = Math.round(price);
-		//}
+		price *= 1000000;
+		long cost = (long)price;
 
-		
 		response.slotSetMaxCpmMicros(cost);
 
-		if (imp.h != null) {
-			response.adSetHeight(imp.h);
-			response.adSetWidth(imp.w);
-			response.width = imp.w;
-			response.height = imp.h;
+		if (creat.w != null) {
+			response.adSetHeight(creat.h);
+			response.adSetWidth(creat.w);
+			response.width = creat.w;
+			response.height = creat.h;
 		}
 		
 		response.adAddAgencyId(1);
@@ -967,13 +963,7 @@ public class AdxBidRequest extends BidRequest {
 	public void handleConfigExtensions(Map extension)  {
 		String ekey = (String) extension.get("e_key");
 		String ikey = (String) extension.get("i_key");
-        if (ekey == null || ekey.length()==0) {
-        	logger.warn("Adx ekey and ikeys are not set");
-        	return;
-        }
-		
-		AdxWinObject.encryptionKeyBytes = e_key = javax.xml.bind.DatatypeConverter.parseBase64Binary(ekey);
-		AdxWinObject.integrityKeyBytes = i_key = javax.xml.bind.DatatypeConverter.parseBase64Binary(ikey);
+		setCrypto(ekey,ikey);
 	}
 
 }
