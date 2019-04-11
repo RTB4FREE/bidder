@@ -1017,6 +1017,19 @@ public class Configuration {
 
 		while (address.contains("$TRACKER"))
 			address = GetEnvironmentVariable(address, "$TRACKER", "localhost:8080");
+		
+		while (address.contains("$ADX_EKEY"))
+			address = GetEnvironmentVariable(address, "$ADX_EKEY", "");
+		while (address.contains("$ADX_IKEY"))
+			address = GetEnvironmentVariable(address, "$ADX_IKEY", "");
+		while (address.contains("$OPENX_EKEY"))
+			address = GetEnvironmentVariable(address, "$OPENX_EKEY", "");
+		while (address.contains("$OPENX_IKEY"))
+			address = GetEnvironmentVariable(address, "$OPENX_IKEY", "");
+		while (address.contains("$GOOGLE_EKEY"))
+			address = GetEnvironmentVariable(address, "$GOOGLE_EKEY", "");
+		while (address.contains("$GOOGLE_IKEY"))
+			address = GetEnvironmentVariable(address, "$GOOGLE_IKEY", "");
 
 		address = GetEnvironmentVariable(address, "$TRACE", "false");
 
@@ -1243,8 +1256,9 @@ public class Configuration {
 			}
 
 			Map extension = (Map) x.get("extension");
-			if (extension != null)
+			if (extension != null) {
 				br.handleConfigExtensions(extension);
+			}
 
 			RTBServer.exchanges.put(uri, br);
 
