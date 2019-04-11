@@ -1160,7 +1160,6 @@ public class BidRequest {
 	 * Check the device.ip is NOT in the master cidr list. 
 	 * Returns true if the ip address is in the cidr list (means block it
 	 */
-	
 	public boolean enforceMasterCIDR() {
 		if (Configuration.getInstance().masterCidr == null)
 			return false;
