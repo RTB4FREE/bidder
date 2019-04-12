@@ -23,6 +23,7 @@ import com.jacamars.dsp.rtb.exchanges.adx.AdxBidRequest;
 import com.jacamars.dsp.rtb.fraud.FraudLog;
 import com.jacamars.dsp.rtb.geo.Solution;
 import com.jacamars.dsp.rtb.tools.AmalgamatedKey;
+import com.jacamars.dsp.rtb.tools.GeoPatch;
 import com.jacamars.dsp.rtb.tools.HexDump;
 import com.jacamars.dsp.rtb.tools.IsoTwo2Iso3;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -473,6 +474,7 @@ public class BidRequest {
 			}
 
 			makeSynthKey();
+			GeoPatch.getInstance().patch(rootNode.get("device"));
 
 			// ///////////////
 			if (siteDomain != null && blackList != null) {
@@ -1152,6 +1154,21 @@ public class BidRequest {
 	 */
 	public static Boolean usesMultibids(String exchange) {
 		return multibids.contains(exchange);
+	}
+	
+	/**
+	 * Check the device.ip is NOT in the master cidr list. 
+	 * Returns true if the ip address is in the cidr list (means block it
+	 */
+	public boolean enforceMasterCIDR() {
+		if (Configuration.getInstance().masterCidr == null)
+			return false;
+		
+		String ip = findValue(this, "device.ip");
+		if (ip == null)
+			return true;
+		
+		return Configuration.getInstance().masterCidr.contains(ip);
 	}
 
 	/**

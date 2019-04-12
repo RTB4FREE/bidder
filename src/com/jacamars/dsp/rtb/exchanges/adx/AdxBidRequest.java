@@ -37,9 +37,10 @@ import com.jacamars.dsp.rtb.pojo.BidRequest;
 import com.jacamars.dsp.rtb.pojo.BidResponse;
 import com.jacamars.dsp.rtb.pojo.Impression;
 import com.jacamars.dsp.rtb.pojo.Video;
+import com.jacamars.dsp.rtb.tools.GeoPatch;
 
 interface Command {
-	void runCommand(BidRequest br, RealtimeBidding.BidRequest x, ObjectNode root, Map db, String key);
+	void runCommand(BidRequest br, RealtimeBidding.BidRequest x, ObjectNode root, Map db, String key) throws Exception;
 }
 
 public class AdxBidRequest extends BidRequest {
@@ -49,12 +50,12 @@ public class AdxBidRequest extends BidRequest {
 
 	static Map<String, Command> methodMap = new HashMap<String, Command>();
 
-	static AdxGeoCodes lookingGlass = (AdxGeoCodes) LookingGlass.symbols.get("@ADXGEO");
+	public static AdxGeoCodes lookingGlass = (AdxGeoCodes) LookingGlass.symbols.get("@ADXGEO");
 
 	static {
 
 		methodMap.put("device", new Command() {
-			public void runCommand(BidRequest br, RealtimeBidding.BidRequest x, ObjectNode root, Map d, String key) {
+			public void runCommand(BidRequest br, RealtimeBidding.BidRequest x, ObjectNode root, Map d, String key) throws Exception {
 				String ip = AdxBidRequest.convertIp(x.getIp());
 				String ua = x.getUserAgent();
 
@@ -97,12 +98,15 @@ public class AdxBidRequest extends BidRequest {
 
 					if (m.hasEncryptedAdvertisingId()) {
 						ByteString bs = m.getEncryptedAdvertisingId();
+						byte[] barry = bs.toByteArray();
 						String id;
 						try {
-							id = AdxWinObject.decryptAdvertisingId(bs.toByteArray());
+							id = AdxWinObject.decryptAdvertisingId(barry);
 							device.put("ifa", id);
 						} catch (Exception e) {
-							e.printStackTrace();
+							if (! RTBServer.spurious("AdxBidRequest.encryptedadid", 60)) {
+								e.printStackTrace();
+							}
 						}
 					}
 
@@ -170,15 +174,19 @@ public class AdxBidRequest extends BidRequest {
 					AdxGeoCode item = lookingGlass.query(geoKey);
 					if (item != null) {
 						String type = item.type.toLowerCase();
-						if (type.equals("city") == false) {
+						if (type.equals("city")) {
 							LookingGlass cz = (LookingGlass) LookingGlass.symbols.get("@ZIPCODES");
 
-							if (cz != null) {
+							if (cz != null && postal != null) {
 								String[] parts = (String[]) cz.query(postal);
 								if (parts != null) {
 									geo.put("city", parts[3]);
 									geo.put("state", parts[4]);
-									geo.put("county", parts[5]);
+									geo.put("region", parts[5]);
+								}
+							} else {
+								if (GeoPatch.getInstance() != null) {
+									GeoPatch.getInstance().patch(device);
 								}
 							}
 						} else {
@@ -196,6 +204,19 @@ public class AdxBidRequest extends BidRequest {
 							}
 						}
 						geo.put("country", item.iso3);
+						if (geo.get("city")==null) {
+							if (GeoPatch.getInstance() != null) {
+								double [] rc = GeoPatch.getInstance().patch(device);
+								br.lat = rc[0];
+								br.lon = rc[1];
+							}
+						}
+					}
+				} else {
+					if (GeoPatch.getInstance() != null) {
+						double [] rc = GeoPatch.getInstance().patch(device);
+						br.lat = rc[0];
+						br.lon = rc[1];
 					}
 				}
 
@@ -602,20 +623,16 @@ public class AdxBidRequest extends BidRequest {
 		
 		//System.out.println("=============> COST: " + price);
 		
-		long cost = cost = Math.round(price);
-		//if (price < 0) {
-		//	price = this.bidFloor * Math.abs(price);
-		//	cost = Math.round(price);
-		//}
+		price *= 1000000;
+		long cost = (long)price;
 
-		
 		response.slotSetMaxCpmMicros(cost);
 
-		if (imp.h != null) {
-			response.adSetHeight(imp.h);
-			response.adSetWidth(imp.w);
-			response.width = imp.w;
-			response.height = imp.h;
+		if (creat.w != null) {
+			response.adSetHeight(creat.h);
+			response.adSetWidth(creat.w);
+			response.width = creat.w;
+			response.height = creat.h;
 		}
 		
 		response.adAddAgencyId(1);
@@ -876,7 +893,7 @@ public class AdxBidRequest extends BidRequest {
 		} 
 	}
 
-	void internalSetup() {
+	void internalSetup() throws Exception {
 
 		List<String> beenThere = new ArrayList<String>();
 		for (int i = 0; i < keys.size(); i++) {
@@ -936,19 +953,17 @@ public class AdxBidRequest extends BidRequest {
 		}
 		return sb.toString();
 	}
+	
+	public static void setCrypto(String ekey, String ikey) {
+		AdxWinObject.encryptionKeyBytes = e_key = javax.xml.bind.DatatypeConverter.parseBase64Binary(ekey);
+		AdxWinObject.integrityKeyBytes = i_key = javax.xml.bind.DatatypeConverter.parseBase64Binary(ikey);
+	}
 
 	@Override
 	public void handleConfigExtensions(Map extension)  {
 		String ekey = (String) extension.get("e_key");
 		String ikey = (String) extension.get("i_key");
-        if (ekey == null || ekey.length()==0) {
-        	logger.warn("Adx ekey and ikeys are not set");
-        	return;
-        }
-		
-		AdxWinObject.encryptionKeyBytes = e_key = javax.xml.bind.DatatypeConverter.parseBase64Binary(ekey);
-
-		AdxWinObject.integrityKeyBytes = i_key = javax.xml.bind.DatatypeConverter.parseBase64Binary(ikey);
+		setCrypto(ekey,ikey);
 	}
 
 }

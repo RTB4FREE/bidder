@@ -1,0 +1,23 @@
+import java.io.InputStream;
+
+import javax.xml.bind.DatatypeConverter;
+
+import com.google.common.io.ByteSource;
+import com.jacamars.dsp.rtb.exchanges.adx.AdxBidResponse;
+
+public class PrintAdxBidResponse {
+	
+	public static String proto = "EqkFCsQDPGEgaHJlZj0nZ29vZ2xlPSclJUNMSUNLX1VSTF9VTkVTQyUlaHR0cDovL3J0YjEucGxhdGZvcm0uc2Nhbm5lZC10cmFmZmljLmNvbTo4MDgwL2NhbGxiYWNrP3R5cGU9cmVkaXJlY3QmZXhjaGFuZ2U9YWR4JmFkX2lkPTMmY3JlYXRpdmVfaWQ9MTQmbGF0PTAuMCZsb249MC4wJmJpZF9pZD01Y2FjYzUxNjBiN2RkZWFjMTc2YzkxZGQ1ODcxJmlwPTEwNy43Ny4yMTYuMCZzaXRlX2RvbWFpbj11bmRlZmluZWQmdXJsPWh0dHBzOi8vYXBpLnBsYXRmb3JtLmZyYXVkZnJlZS5uZXQvdHJhY2tpbmcvcmVkaXJlY3QvNWM5YTcwMWM4YTQxOTM1NzcxMjdlNDU2Jz48aW1nIHNyYz0naHR0cHM6Ly9jcmVhdGl2ZS1hZHMuczMudXMtZWFzdC0yLmFtYXpvbmF3cy5jb20vNWM5YTY1ODA4YTQxOTM1NzcxMjdlNDJkLzVjOWE3MDFjOGE0MTkzNTc3MTI3ZTQ1Ni5wbmcnIGJvcmRlcj0nMCcgYWx0ID0gJycgPjwvYT4aBAgBEAQiTWh0dHBzOi8vYXBpLnBsYXRmb3JtLmZyYXVkZnJlZS5uZXQvdHJhY2tpbmcvcmVkaXJlY3QvNWM5YTcwMWM4YTQxOTM1NzcxMjdlNDU2KAAwFTgAUgQzOjE0gAEBmgF7e3BpeGVsX3VybH0mZXhjaGFuZ2U9YWR4JmFkX2lkPTMmY3JlYXRpdmVfaWQ9MTQmYmlkX2lkPTVjYWNjNTE2MGI3ZGRlYWMxNzZjOTFkZDU4NzEmcHJpY2U9JSVXSU5OSU5HX1BSSUNFJSUmbGF0PTAuMCZsb249MC4wIBQ=";
+
+	public static void main(String [] args) throws Exception {
+		if (args.length > 0)
+			proto = args[0];
+		
+		byte[] data = DatatypeConverter.parseBase64Binary(proto);
+		InputStream in = ByteSource.wrap(data).openStream();
+		
+		AdxBidResponse br = new AdxBidResponse(data);
+		
+		System.out.println(br.getInternalAsString());
+	}
+}

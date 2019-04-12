@@ -42,7 +42,12 @@ public class OpenRTB extends GoogleBidRequest {
 	 */
 	@Override
 	public OpenRTB copy(InputStream in) throws Exception  {
-		return new OpenRTB(in);
+		try {
+			return new OpenRTB(in);
+		} catch (Exception error) {
+			logger.debug("Error copying Google OpenRTB, something is not configured correctly: {}",error.getMessage());
+		}
+		return null;
 	}
 	
 	/**

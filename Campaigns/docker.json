@@ -1,15 +1,16 @@
 {
   "GDPR_MODE": "$GDPR_MODE",
-  "NOfraud" : {
-    "type" : "forensiq",
-    "threshhold" : 0,
-    "ck" : "none",
-    "endpoint" : "",
-    "bidOnError" : false,
-    "db" : "local/GeoIP2-ISP.mmdb",
-    "watchlist" : [ "Hetzner", "Amazon web services", "Linode", "Digital Ocean", "Vultr" ]
+  "fraud" : {
+    "type" : "$FRAUDTYPE",
+    "threshhold" : "$FRAUDTHRESHOLD",
+    "ck" : "$FRAUDKEY",
+    "endpoint" : "$FRAUDENDPOINT",
+    "bidOnError" : "$FRAUDBIDONERROR",
+    "connections": "$FRAUDCONNECTIONS",
+    "watchlist": "$FRAUDWATCHLIST"
   },
   "app" : {
+    "geopatch": "$GEOPATCH",
     "indexPage": "$INDEXPAGE",
     "concurrency" : "3",
     "threads": "2000",
@@ -26,17 +27,18 @@
     "adminPort" : "$ADMINPORT",
     "adminSSL" : false,
     "password" : "startrekisbetterthanstarwars",
+    
     "zeromq" : {
-      "bidchannel" : "kafka://[$BROKERLIST]&topic=bids",
-      "winchannel" : "kafka://[$BROKERLIST]&topic=wins",
-      "requests" : "kafka://[$BROKERLIST]&topic=requests",
-      "clicks" : "kafka://[$BROKERLIST]&topic=clicks",
-      "pixels" : "kafka://[$BROKERLIST]&topic=pixels",
-      "videoevents": "kafka://[$BROKERLIST]&topic=videoevents",
-      "postbackevents": "kafka://[$BROKERLIST]&topic=postbackevents",
-      "status" : "kafka://[$BROKERLIST]&topic=status",
-      "reasons" : "kafka://[$BROKERLIST]&topic=reasons",
-
+      "bidchannel" : "$BIDSCHANNEL",
+      "winchannel" : "$WINSCHANNEL",
+      "requests" : "$REQUESTSCHANNEL",
+      "clicks" : "$CLICKSCHANNEL",
+      "pixels" : "$PIXELSCHANNEL",
+      "videoevents": "$VIDEOEVENTSCHANNEL",
+      "postbackevents": "$POSTBACKEVENTSCHANNEL",
+      "status" : "$STATUSCHANNEL",
+      "reasons" : "$REASONSCHANNEL",
+   
       "commands": "tcp://$PUBSUB:6001&commands",
       "responses": "tcp://$PUBSUB:6000&responses",
       "xfrport": "6002",
@@ -48,7 +50,7 @@
     "template" : {
       "default" : "{creative_forward_url}",
       "exchange" : {
-        "adx" : "<a href='$EXTERNAL/rtb/win/{pub_id}/%%WINNING_PRICE%%/{lat}/{lon}/{ad_id}/{creative_id}/{bid_id}'}'></a><a href='%%CLICK_URL_UNESC%%{redirect_url}></a>{creative_forward_url}",
+        "adx" : "{creative_forward_url}",
         "mopub" : "<a href='mopub template here' </a>",
         "mobclix" : "<a href='mobclix template here' </a>",
         "nexage" : "<a href='{redirect_url}/exchange={pub}/ad_id={ad_id}/creative_id={creative_id}/price=${AUCTION_PRICE}/lat={lat}/lon={lon}/bid_id={bid_id}?url={creative_forward_url}'><img src='{creative_image_url}' height='{creative_ad_height}' width='{creative_ad_width}'></a><img src='{pixel_url}/exchange={pub}/ad_id={ad_id}/creative_id={creative_id}/{bid_id}/price=${AUCTION_PRICE}/lat={lat}/lon={lon}/bid_id={bid_id}' height='1' width='1'>",
@@ -96,7 +98,7 @@
   }, {
     "name" : "adx",
     "id" : "adx-seat-id",
-    "bid" : "/rtb/bids/adx=com.jacamars.dsp.rtb.exchanges.adx.DoubleClick",
+    "bid" : "/rtb/bids/adx=com.jacamars.dsp.rtb.exchanges.adx.DoubleClick&usesPiggyBackWins",
     "extension" : {
       "e_key" : "$ADX_EKEY",
       "i_key" : "$ADX_IKEY"
@@ -250,20 +252,20 @@
     "name" : "bidswitch",
     "id" : "$BIDSWITCH_ID",
     "bid" : "/rtb/bids/bidswitch=com.jacamars.dsp.rtb.exchanges.bidswitch.Bidswitch&!usesEncodedAdm"
-  }],
+  }],  
   "s3" : {
-    "access_key_id" : "$S3ACCESSKEY",
-    "secret_access_key" : "$S3SECRETKEY",
-    "region" : "$S3REGION",
-    "bucket" : "$SEBUCKET"
+    "access_key_id" : "$AWSACCESSKEY",
+    "secret_access_key" : "$AWSSECRETKEY",
+    "region" : "$AWSREGION",
+    "bucket" : "$S3BUCKET"
   },
   "lists" : [ {
     "filename" : "data/adxgeo.csv",
     "name" : "@ISO2-3",
     "type" : "com.jacamars.dsp.rtb.tools.IsoTwo2Iso3"
   }, {
-    "filename" : "data/METHBOT.txt",
-    "name" : "@CIDR",
+    "filename" : "$MASTERCIDR",
+    "name" : "@MASTERCIDR",
     "type" : "CidrMap"
   }, {
     "filename" : "data/zip_codes_states.csv",

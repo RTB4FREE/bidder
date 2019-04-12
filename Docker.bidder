@@ -41,7 +41,7 @@ COPY web/* /web/
 COPY log4j.properties /
 COPY SampleBids /SampleBids
 
-COPY database.json /
+#COPY database.json /
 
 COPY Campaigns/docker.json Campaigns/payday.json
 

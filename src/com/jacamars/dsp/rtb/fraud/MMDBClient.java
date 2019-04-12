@@ -1,17 +1,18 @@
 package com.jacamars.dsp.rtb.fraud;
 
+import java.io.BufferedReader;
 import java.io.File;
-
-
+import java.io.FileReader;
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.eclipse.jetty.util.ConcurrentHashSet;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.model.IspResponse;
 
@@ -36,10 +37,8 @@ public enum MMDBClient implements FraudIF {
 	public static String file;
 	
 	/** The Set of things to key on to mark as possible bot */
-	static Set<String> watchlist = new HashSet();
-	
-	/** The set of things to filter on */
-	static List<String> filterList = new ArrayList<String>();
+	public static Set<String> watchlist = new ConcurrentHashSet<String>();
+
 	
 	/** The object mapper for converting the return from forensiq */
 	@JsonIgnore
@@ -83,23 +82,18 @@ public enum MMDBClient implements FraudIF {
 	
 	/**
 	 * Initialize the watch list from the configuration file.
-	 * @param theList List. The list of entities to block.
+	 * @param file String. The file that has the list of entities to block.
 	 */
-	public static void setWatchlist(List<String> theList) {
-		for (String s : theList) {
-			watchlist.add(s.trim().toLowerCase());
+	public static void setWatchlist(String file) throws Exception {
+		BufferedReader br = new BufferedReader(new FileReader(file));
+		for (String line; (line = br.readLine()) != null;) {
+			if (!(line.startsWith("#") || line.length() < 10)) {
+				watchlist.add(line.trim().toLowerCase());
+			}
 		}
+
 	}
-	
-	/**
-	 * Initialize the filter list from the configuration file.
-	 * @param theList theList. The list of entries to filter out.
-	 */
-	public static void setFilterList(List<String> theList) {
-		for (String s : theList) {
-			filterList.add(s.trim().toLowerCase());
-		}	
-	}
+
 	
 	/**
 	 * Should I bid, or not?
@@ -157,21 +151,6 @@ public enum MMDBClient implements FraudIF {
 					m.xtime = xtime;
 					return m;
 				}
-			for (int i=0;i<filterList.size();i++) {
-				String s = filterList.get(i);
-				if (test.contains(s)) {
-					FraudLog m = new FraudLog();
-					m.source = "MMDB";
-					m.ip = ip;
-					m.url = url;
-					m.ua = ua;
-					m.seller = seller;
-					m.risk = 1;
-					m.organization = test;
-					m.xtime = xtime;
-					return m;
-				}
-			} 
 			
 		} catch (Exception e) {
 			FraudLog m = new FraudLog();

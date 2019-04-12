@@ -90,7 +90,7 @@ public class SharedObject implements EventIF {
             Object[] obj = Tools.deSerialize(mapper, msg);
             handler.handleMessage(obj[1]);
         } catch (Exception error) {
-            System.out.println(error);
+            System.out.println("SharedObject.handleMessage: id:" + id + ", msg: " + msg + ", error: " + error);
         }
     }
 

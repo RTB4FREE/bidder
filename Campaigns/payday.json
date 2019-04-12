@@ -1,15 +1,16 @@
 {
   "GDPR_MODE": "$GDPR_MODE",
-  "NOfraud" : {
-    "type" : "forensiq",
-    "threshhold" : 0,
-    "ck" : "none",
-    "endpoint" : "",
-    "bidOnError" : false,
-    "db" : "local/GeoIP2-ISP.mmdb",
-    "watchlist" : [ "Hetzner", "Amazon web services", "Linode", "Digital Ocean", "Vultr" ]
+  "fraud" : {
+    "type" : "$FRAUDTYPE",
+    "threshhold" : "$FRAUDTHRESHOLD",
+    "ck" : "$FRAUDKEY",
+    "endpoint" : "$FRAUDENDPOINT",
+    "bidOnError" : "$FRAUDBIDONERROR",
+    "connections": "$FRAUDCONNECTIONS",
+    "watchlist": "$FRAUDWATCHLIST"
   },
   "app" : {
+    "geopatch": "$GEOPATCH",
     "concurrency" : "1",
     "NOdeadmanswitch":"accountingsystem",
     "threads": "128",
@@ -265,9 +266,9 @@
     "bid" : "/rtb/bids/bidswitch=com.jacamars.dsp.rtb.exchanges.bidswitch.Bidswitch&!usesEncodedAdm"
   }],
   "s3" : {
-    "access_key_id" : "$S3ACCESSKEY",
-    "secret_access_key" : "$S3SECRETKEY",
-    "region" : "$S3REGION",
+    "access_key_id" : "$AWSACCESSKEY",
+    "secret_access_key" : "$AWSSECRETKEY",
+    "region" : "$AWSREGION",
     "bucket" : "$S3BUCKET"
   },
   "lists" : [ {
@@ -275,8 +276,8 @@
     "name" : "@ISO2-3",
     "type" : "com.jacamars.dsp.rtb.tools.IsoTwo2Iso3"
   }, {
-    "filename" : "data/METHBOT.txt",
-    "name" : "@CIDR",
+    "filename" : "$MASTERCIDR",
+    "name" : "@MASTERCIDR",
     "type" : "CidrMap"
   }, {
     "filename" : "data/adxgeo.csv",

@@ -958,7 +958,8 @@ public enum Controller {
      */
 
     public boolean sendRequest(BidRequest br, boolean override) throws Exception {
-        if (br.notABidRequest())
+   
+    	if (br.notABidRequest())
             return false;
 
         if (!override) {
@@ -986,7 +987,6 @@ public enum Controller {
             }
             original.put("logtype", "requests");
             requestQueue.addString(original.toString());
-
         }
 
         return true;

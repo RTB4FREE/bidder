@@ -1113,6 +1113,8 @@ function fillInSeats(data) {
 
 function fillInInits(data) {
 	var inits = data.initials;
+	if (typeof inits === "undefined")
+		return;
 	initLoadsDyno.clear();
 	for (var i=0; i<inits.length;i++) {
 		var camp = inits[i];
@@ -1221,7 +1223,7 @@ function fillInStatus(data) {
 	   				 	 total_qps += qps;
 	   				  	 sqps = Number(qps).toFixed(2);
 	   				  }
-	   				  systemDyno.add([e.name, v.total,v.request,v.fraud,v.bid,v.nobid,v.win,v.pixels,v.clicks,v.errors,pbid,pwin,ppix,pclc,percFraud,spnd,sqps,Number(v.avgx).toFixed(6)]);
+	   				  systemDyno.add([e.name, v.total,v.request,v.fraud,v.bid,v.nobid,v.win,v.pixels,v.clicks,v.errors,pbid,pwin,ppix,pclc,percFraud,spnd,sqps,v.avgx]);
 	   				  total += v.total;
 	   				  bid += v.bid;
 	   				  nobid += v.nobid;
@@ -2052,7 +2054,7 @@ function updateStatus(running) {
  	listsDyno = new DynamicTable("addlists",listCells);
     
  systemCells = [];
- 	systemCells.push("<input type='text' id='SUB_ID' size='30' readonly value=''/>");
+ 	systemCells.push("<input type='text' id='SUB_ID' size='20' readonly value=''/>");
  	systemCells.push("<input type='text' id='SUB_ID' size='8'  readonly value=''  style='text-align:right;'/>");
  	systemCells.push("<input type='text' id='SUB_ID' size='8'  readonly value=''  style='text-align:right;'/>");
  	systemCells.push("<input type='text' id='SUB_ID' size='8'  readonly value=''  style='text-align:right;'/>");

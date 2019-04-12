@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.zip.GZIPInputStream;
@@ -65,7 +66,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A JAVA based RTB2.2 server.<br>
+ * A JAVA based RTB2.5 server.<br>
  * This is the RTB Bidder's main class. It is a Jetty based http server that
  * encapsulates the Jetty server. The class is Runnable, with the Jetty server
  * joining in the run method. This allows other parts of the bidder to interact
@@ -152,7 +153,7 @@ public class RTBServer implements Runnable {
     /**
      * number of threads in the jetty thread pool
      */
-    public static int threads = 1024;
+    public static int threads = 2048;
 
     /**
      * a counter for the number of requests the bidder has received and
@@ -199,6 +200,7 @@ public class RTBServer implements Runnable {
      * The average time
      */
     public volatile static long avgBidTime;
+    public volatile static String  savgbidtime = "0";
     public volatile static long avgNoBidTime;
 
     public volatile static long throttleTime = 0;
@@ -206,6 +208,11 @@ public class RTBServer implements Runnable {
      * Fraud counter
      */
     public volatile static long fraud = 0;
+    
+    /**
+     * CIDR blocked counter
+     */
+    public volatile static long cidrblocked = 0;
     /**
      * xtime counter
      */
@@ -281,6 +288,8 @@ public class RTBServer implements Runnable {
     
     /** Trace stuff coming in to the bidder */
     public static volatile boolean trace = false;
+    
+
 
     /**
      * This is the entry point for the RTB server.
@@ -418,19 +427,6 @@ public class RTBServer implements Runnable {
         startedLatch = new CountDownLatch(1);
         me = new Thread(this);
         me.start();
-   /*     try {
-            startedLatch.await();
-            Thread.sleep(2000);
-            Configuration.getInstance().testWinUrlWithCache2k();
-        } catch (Exception error) {
-            try {
-                logger.error("Win Url/Cache2k problem: RTBServer, Fatal error: {}", error.toString());
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                System.out.println("Fatal error: " + error.toString());
-            }
-            me.interrupt();
-        } */
     }
 
     /**
@@ -492,6 +488,29 @@ public class RTBServer implements Runnable {
         // QPS the exchanges
         BidRequest.getExchangeCounts();
     }
+    
+    static volatile Map<String,Long> spurious = new ConcurrentHashMap();
+    /**
+     * Track chatty errors so we don't bombard the log with spurious output
+     * @param key String. The key of the error message.
+     * @param value int. The frequency which to track the error (seconds)
+     * @return boolean. Returns true if this is spurious, else false (ok to log).
+     */
+    public static boolean spurious(String key, int value) {
+    	Long v = null;
+    	if ((v=spurious.get(key))==null) {
+    		spurious.put(key,System.currentTimeMillis());
+    		return false;
+    	}
+    	
+    	v = System.currentTimeMillis() - v;
+    	v /= 1000;
+    	if (v > value) {
+    		spurious.put(key,System.currentTimeMillis());
+    		return false;
+    	} 
+    	return true;
+    }
 
     /**
      * Retrieve a summary of activity.
@@ -542,7 +561,7 @@ public class RTBServer implements Runnable {
             return;
         }
 
-        QueuedThreadPool threadPool = new QueuedThreadPool(threads, 50);
+        QueuedThreadPool threadPool = new QueuedThreadPool(threads, 128);
         server = new Server(threadPool);
         ServerConnector connector = null;
 
@@ -655,7 +674,7 @@ public class RTBServer implements Runnable {
     void startSeparateAdminServer() throws Exception {
         SSL ssl = Configuration.getInstance().ssl;
 
-        QueuedThreadPool threadPool = new QueuedThreadPool(threads, 50);
+        QueuedThreadPool threadPool = new QueuedThreadPool(threads, 128);
         Server server = new Server(threadPool);
         ServerConnector connector;
 
@@ -758,7 +777,7 @@ public class RTBServer implements Runnable {
                     davgNoBidTime /= nowindow;
 
                     String sqps = String.format("%.2f", qps);
-                    String savgbidtime = String.format("%.2f", davgBidTime);
+                    savgbidtime = String.format("%.2f", davgBidTime);
                     String savgnobidtime = String.format("%.2f", davgNoBidTime);
 
                     long a = ForensiqClient.forensiqXtime.get();
@@ -785,7 +804,7 @@ public class RTBServer implements Runnable {
                             + "%, threads=" + threads + ", low-on-threads= " + server.getThreadPool().isLowOnThreads()
                             + ", qps=" + sqps + ", avgBidTime=" + savgbidtime + "ms, avgNoBidTime=" + savgnobidtime
                             + "ms, total=" + handled + ", requests=" + request + ", bids=" + bid + ", nobids=" + nobid
-                            + ", fraud=" + fraud + ", wins=" + win + ", pixels=" + pixels + ", clicks=" + clicks
+                            + ", fraud=" + fraud + ", cidrblocked=" + cidrblocked + ", wins=" + win + ", pixels=" + pixels + ", clicks=" + clicks
                             + ", exchanges= " + exchangeCounts + ", stopped=" + stopped + ", campaigns="
                             + Configuration.getInstance().getCampaignsList().size();
                     Map m = new HashMap();
@@ -813,6 +832,7 @@ public class RTBServer implements Runnable {
                     m.put("requests", request);
                     m.put("nobid", nobid);
                     m.put("fraud", fraud);
+                    m.put("cidrblocked", cidrblocked);
                     m.put("wins", win);
                     m.put("pixels", pixels);
                     m.put("clicks", clicks);
@@ -1099,7 +1119,7 @@ class Handler extends AbstractHandler {
                     code = RTBServer.NOBID_CODE;
                     RTBServer.logger.warn("Handler error: {}", json);
                     RTBServer.error++;
-                    logger.warn("=============> Wrong target: {} is not configured.", target);
+                    logger.warn("=============> Wrong target: {} is not configured correctly.", target);
                     baseRequest.setHandled(true);
                     response.setStatus(code);
                     response.setHeader("X-REASON", json);
@@ -1116,9 +1136,29 @@ class Handler extends AbstractHandler {
                         body = new GZIPInputStream(body);
 
                     br = x.copy(body);
+                    if (br == null) {
+                    	code = RTBServer.NOBID_CODE;
+                    	RTBServer.error++;
+                    	if (! RTBServer.spurious("RTBServer.misconfigured",300))
+                    		logger.warn("Target: {} is not configured correctly.", target);
+                    	baseRequest.setHandled(true);
+                    	response.setStatus(code);
+                    	response.getWriter().println("{}");
+                    	RTBServer.request--;
+                    	return;
+                    }
+                    
                     br.incrementRequests();
                     if (RTBServer.GDPR_MODE)
                     	br.enforceGDPR();
+                    
+                    if (!br.enforceMasterCIDR()==false) {
+                    	response.setStatus(br.returnNoBidCode());
+                        response.setContentType(br.returnContentType());
+                        baseRequest.setHandled(true);
+                        RTBServer.cidrblocked++;
+                        return;
+                    }
 
                     id = br.getId();
 
@@ -1152,7 +1192,6 @@ class Handler extends AbstractHandler {
                         Controller.getInstance().sendRequest(br, false);
                         return;
                     }
-
                     // Some exchanges like Appnexus send other endpoints, so
                     // they are handled here.
                     if (br.notABidRequest()) {
@@ -1164,8 +1203,7 @@ class Handler extends AbstractHandler {
                         RTBServer.request--;
                         return;
                     }
-
-                    if (Configuration.getInstance().getCampaignsList().size() == 0) {
+                    if (Configuration.getInstance().getCampaignsList().size() == 0) {                  	
                         logger.debug("No campaigns loaded");
                         json = br.returnNoBid("No campaigns loaded");
                         code = RTBServer.NOBID_CODE;
@@ -1191,6 +1229,7 @@ class Handler extends AbstractHandler {
                             json = br.returnNoBid("No matching campaign");
                             code = RTBServer.NOBID_CODE;
                             RTBServer.nobid++;
+                            
                             Controller.getInstance().sendRequest(br, false);
                             Controller.getInstance().sendNobid(new NobidResponse(br.id, br.getExchange()));
                         } else {
@@ -1283,9 +1322,12 @@ class Handler extends AbstractHandler {
                 String rs= request.getQueryString();
                 String rtype = request.getParameter("target");
                 if (rtype == null) {
-                    logger.warn("Warning, wrong callback message, params: {}",rs);
-                    response.getWriter().println("");
-                    return;
+                	rtype = request.getParameter("type");
+                	if (rtype == null) {
+                		logger.warn("Warning, wrong callback message, params: {}",rs);
+                		response.getWriter().println("");
+                		return;
+                	}
                 }
                 boolean debug = false;
                 String dbg = request.getParameter("debug");

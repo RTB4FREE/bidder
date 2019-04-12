@@ -28,8 +28,7 @@ public class TestFraud  {
 	@BeforeClass
 	  public static void testSetup() {		
 		try {
-			Config.setup();
-			System.out.println("******************  TestForensiq");
+		
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -109,9 +108,9 @@ public class TestFraud  {
 		
 	  }
 	  
-	//  @Test
+	 @Test
 	  public void testMMDBGood() throws Exception {
-		  MMDBClient forensiq =  MMDBClient.build("local/GeoIP2-ISP.mmdb");
+		  MMDBClient forensiq =  MMDBClient.build("data/GeoIP2-ISP.mmdb");
 		  String rt = "display";
 			String ip = "123.254.33.4";
 			String url = "http%3A%2F%2Fwww.myheretrtrtouse.com%2Fsections%2Fliving%3Fa%3D3%20";
@@ -122,9 +121,7 @@ public class TestFraud  {
 			FraudLog m = forensiq.bid(rt, ip, url, ua, seller, crid);
 			assertNull(m);
 			
-			List<String> test = new ArrayList();
-			test.add("st");
-			forensiq.setWatchlist(test);
+			forensiq.watchlist.add("st");
 			m = forensiq.bid(rt, ip, url, ua, seller, crid);
 			m.exchange = "smaato";
 			m.id = "32092930293020020";

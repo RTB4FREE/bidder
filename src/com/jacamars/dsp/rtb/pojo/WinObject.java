@@ -154,9 +154,18 @@ public class WinObject {
 
 		// This is synthetic, because in reality, adx has no win notification, this is a fake pixel fire that does the work.
 		if (pubId.equals(AdxBidRequest.ADX)) {
-			Long value = AdxWinObject.decrypt(price, System.currentTimeMillis());
-			Double dv = new Double(value);
-			dv /= 1000000;
+			Double dv = new Double(0);
+			try {
+				Long value = AdxWinObject.decrypt(price, System.currentTimeMillis());
+				dv = new Double(value);
+				dv /= 1000;
+			} catch (Exception error) {
+				try {
+					dv = Double.parseDouble(price);
+				} catch (Exception err) {
+					logger.warn("Error parsing price from {}", target);
+				}
+			}
 			convertBidToWin(hash, cost, lat, lon, adId, cridId, pubId, image, forward, dv.toString(), pubId, domain, bidType);
 			BidRequest.incrementWins(pubId);
 			return adm;
@@ -250,8 +259,11 @@ public class WinObject {
 		} catch (Exception error) {
 			logger.error("Failed to delete bid from cache on exchange: {}, id: {}, error: {}", pubId, hash, error.toString());
 		}
-		String adtype = Configuration.getInstance().getAdType(adId,cridId);
-		Controller.getInstance().sendWin(hash, cost, lat, lon, adId, cridId, pubId, image, forward, price, adm, adtype, domain, bidType);
+		String adtype = "undefined";
+		if (Configuration.getInstance() != null) {
+			adtype = Configuration.getInstance().getAdType(adId,cridId);
+			Controller.getInstance().sendWin(hash, cost, lat, lon, adId, cridId, pubId, image, forward, price, adm, adtype, domain, bidType);
+		}
 
 		try {
 			double value = Double.parseDouble(price);

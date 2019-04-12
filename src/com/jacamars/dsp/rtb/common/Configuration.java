@@ -51,6 +51,7 @@ import com.jacamars.dsp.rtb.blocks.SimpleSet;
 import com.jacamars.dsp.rtb.db.Database;
 import com.jacamars.dsp.rtb.exchanges.adx.AdxGeoCodes;
 import com.jacamars.dsp.rtb.exchanges.appnexus.Appnexus;
+import com.jacamars.dsp.rtb.fraud.AnuraClient;
 import com.jacamars.dsp.rtb.fraud.ForensiqClient;
 import com.jacamars.dsp.rtb.fraud.FraudIF;
 import com.jacamars.dsp.rtb.fraud.MMDBClient;
@@ -185,6 +186,9 @@ public class Configuration {
 
 	/** Test bid request for fraud */
 	public static FraudIF forensiq;
+
+	/** The master CIDR list */
+	public static volatile NavMap masterCidr = null;
 
 	/**
 	 * ZEROMQ LOGGING INFO
@@ -392,20 +396,11 @@ public class Configuration {
 		 * USE ZOOKEEPER, AEROSPIKE OR FILE CONFIG
 		 *********************************************/
 		String str = null;
-		if (path.startsWith("zookeeper")) {
-			String parts[] = path.split(":");
-			logger.info("Zookeeper: {}", "" + parts);
-			zk = new ZkConnect(parts[1]);
-			zk.join(parts[2], "bidders", instanceName);
-			str = zk.readConfig(parts[2] + "/bidders");
-		} else {
-			byte[] encoded = Files.readAllBytes(Paths.get(path));
-			str = Charset.defaultCharset().decode(ByteBuffer.wrap(encoded)).toString();
+		byte[] encoded = Files.readAllBytes(Paths.get(path));
+		str = Charset.defaultCharset().decode(ByteBuffer.wrap(encoded)).toString();
 
-			str = Configuration.substitute(str);
-
-			System.out.println(str);
-		}
+		str = Configuration.substitute(str);
+		System.out.println("AFTER SUBSTITUTIONS, CONFIGURATION:\n" + str);
 
 		Map<?, ?> m = DbTools.mapper.readValue(str, Map.class);
 		/*******************************************************************************/
@@ -466,10 +461,27 @@ public class Configuration {
 				logger.info("S3 is not configured");
 			}
 		}
+
+		/**
+		 * Check for @MASTERCIDR after the files are loaded, or, duh, it's not there
+		 * yet.
+		 */
+		if (LookingGlass.symbols.get("@MASTERCIDR") != null) {
+			Object x = LookingGlass.symbols.get("@MASTERCIDR");
+			if (x != null) {
+				if (x instanceof NavMap) {
+					masterCidr = (NavMap) x;
+					logger.info("*** Master Blacklist is set to: {}",x);
+				} else {
+					logger.error("*** Master CIDR '@MASTERCIDR' is  the wrong classtype {}", x.getClass().getName());
+					logger.error("*** Master CIDR blocking is disabled ***");
+				}
+			}
+		} else
+			logger.info("*** Master Blacklist is not set");
 		/**
 		 * SSL
 		 */
-
 		if (m.get("ssl") != null) {
 			Map x = (Map) m.get("ssl");
 			ssl = new SSL();
@@ -497,31 +509,44 @@ public class Configuration {
 		}
 
 		/**
-		 * Create forensiq
+		 * Create forensiq, anura or organizational trap in mmdb
 		 */
-		Map fraud = (Map) m.get("fraud");
-		if (fraud != null) {
-			if (m.get("forensiq") != null) {
+		Map<String, String> fraud = (Map) m.get("fraud");
+		if (fraud != null && !fraud.get("type").equals("")) {
+			if (fraud.get("type").equalsIgnoreCase("Forensiq")) {
 				logger.info("*** Fraud detection is set to Forensiq");
-				Map f = (Map) m.get("forensiq");
-				String ck = (String) f.get("ck");
-				Integer x = (Integer) f.get("threshhold");
-				if (!(x == 0 || ck == null || ck.equals("none"))) {
-					ForensiqClient fx = ForensiqClient.build(ck);
+				ForensiqClient.key = fraud.get("ck");
+				if (!fraud.get("threshhold").equals(""))
+					ForensiqClient.threshhold = Integer.parseInt(fraud.get("threshhold"));
 
-					if (fraud.get("endpoint") != null) {
-						fx.endpoint = (String) fraud.get("endpoint");
-					}
-					if (fraud.get("bidOnError") != null) {
-						fx.bidOnError = (Boolean) fraud.get("bidOnError");
-					}
-					if (f.get("connections") != null)
-						ForensiqClient.getInstance().connections = (int) (Integer) fraud.get("connections");
-					forensiq = fx;
-				}
-			} else {
+				if (!fraud.get("endpoint").equals(""))
+					ForensiqClient.endpoint = fraud.get("endpoint");
+
+				if (!fraud.get("bidOnError").equals(""))
+					ForensiqClient.bidOnError = Boolean.parseBoolean(fraud.get("bidOnError"));
+				if (!fraud.get("connections").equals(""))
+					ForensiqClient.getInstance().connections = Integer.parseInt(fraud.get("connections"));
+
+				forensiq = ForensiqClient.build();
+			} else if (fraud.get("type").equalsIgnoreCase("Anura")) {
+				logger.info("*** Fraud detection is set to Anura");
+				AnuraClient.key = fraud.get("ck");
+				if (!fraud.get("threshhold").equals(""))
+					AnuraClient.threshhold = Integer.parseInt(fraud.get("threshhold"));
+
+				if (!fraud.get("endpoint").equals(""))
+					AnuraClient.endpoint = fraud.get("endpoint");
+
+				if (!fraud.get("bidOnError").equals(""))
+					AnuraClient.bidOnError = Boolean.parseBoolean(fraud.get("bidOnError"));
+
+				if (!fraud.get("connections").equals(""))
+					AnuraClient.getInstance().connections = Integer.parseInt(fraud.get("connections"));
+
+				forensiq = AnuraClient.build();
+			} else if (fraud.get("type").equalsIgnoreCase("MMDB")) {
 				logger.info("*** Fraud detection is set to MMDB");
-				String db = (String) fraud.get("db");
+				String db = (String) fraud.get("endpoint");
 				if (db == null) {
 					throw new Exception("No fraud db specified for MMDB");
 				}
@@ -531,11 +556,11 @@ public class Configuration {
 				} catch (Error error) {
 					throw error;
 				}
-				if (fraud.get("bidOnError") != null) {
-					fy.bidOnError = (Boolean) fraud.get("bidOnError");
+				if (!fraud.get("bidOnError").equals("")) {
+					fy.bidOnError = Boolean.parseBoolean(fraud.get("bidOnError"));
 				}
-				if (fraud.get("watchlist") != null) {
-					fy.setWatchlist((List<String>) fraud.get("watchlist"));
+				if (!fraud.get("watchlist").equals("")) {
+					fy.setWatchlist(fraud.get("watchlist"));
 				}
 				forensiq = fy;
 			}
@@ -547,6 +572,16 @@ public class Configuration {
 		 * Deal with the app object
 		 */
 		m = (Map) m.get("app");
+		
+		if (m.get("geopatch") != null) {
+			String fileName = (String)m.get("geopatch");
+			if (!fileName.equals("")) {
+				GeoPatch.getInstance(fileName);
+				logger.info("*** GEOPATCH DB set to: {} ",fileName);
+			} else
+				logger.info("*** GEOPATCH DB IS NOT SET");
+		} else
+			logger.info("*** GEOPATCH DB IS NOT SET");
 
 		if (m.get("indexPage") != null)
 			indexPage = (String) m.get("indexPage");
@@ -721,13 +756,14 @@ public class Configuration {
 				requstLogStrategy = REQUEST_STRATEGY_BIDS;
 			else if (strategy.equalsIgnoreCase("WINS"))
 				requstLogStrategy = REQUEST_STRATEGY_WINS;
-		} else {
-			if (strategy.contains(".") == false) {
-				int n = Integer.parseInt(strategy);
-				ExchangeLogLevel.getInstance().setStdLevel(n);
-			} else {
-				Double perc = Double.parseDouble(strategy);
-				ExchangeLogLevel.getInstance().setStdLevel(perc.intValue());
+			else {
+				if (strategy.contains(".") == false) {
+					int n = Integer.parseInt(strategy);
+					ExchangeLogLevel.getInstance().setStdLevel(n);
+				} else {
+					Double perc = Double.parseDouble(strategy);
+					ExchangeLogLevel.getInstance().setStdLevel(perc.intValue());
+				}
 			}
 		}
 		/********************************************************************/
@@ -850,17 +886,84 @@ public class Configuration {
 		if (address == null)
 			return address;
 		
-		while(address.contains("$BIDSWITCH_ID"))
-			address = GetEnvironmentVariable(address,"$BIDSWITCH_ID","bidswitch-id");
+		///////////////////////////////////////////////////////////////////////////////////////////////////
+		
+		 while (address.contains("$BIDSCHANNEL"))
+			address = GetEnvironmentVariable(address, "$BIDSCHANNEL", "kafka://[$BROKERLIST]&topic=bids");
+		 while (address.contains("$WINSCHANNEL"))
+			address = GetEnvironmentVariable(address, "$WINSCHANNEL", "kafka://[$BROKERLIST]&topic=wins");
+		 while (address.contains("$REQUESTSCHANNEL"))
+			address = GetEnvironmentVariable(address, "$REQUESTSCHANNEL", "kafka://[$BROKERLIST]&topic=requests");
+		 while (address.contains("$CLICKSCHANNEL"))
+			address = GetEnvironmentVariable(address, "$CLICKSCHANNEL", "kafka://[$BROKERLIST]&topic=clicks");
+		 while (address.contains("$PIXELSCHANNEL"))
+			address = GetEnvironmentVariable(address, "$PIXELSCHANNEL", "kafka://[$BROKERLIST]&topic=pixels");
+		 while (address.contains("$VIDEOEVENTSCHANNEL"))
+			address = GetEnvironmentVariable(address, "$VIDEOEVENTSCHANNEL", "kafka://[$BROKERLIST]&topic=videoevents");
+		 while (address.contains("$POSTBACKEVENTSCHANNEL"))
+			address = GetEnvironmentVariable(address, "$POSTBACKEVENTSCHANNEL", "kafka://[$BROKERLIST]&topic=postbackevents");
+		 while (address.contains("$STATUSCHANNEL"))
+			address = GetEnvironmentVariable(address, "$STATUSCHANNEL", "kafka://[$BROKERLIST]&topic=status");
+		 while (address.contains("$REASONSCHANNEL"))
+			address = GetEnvironmentVariable(address, "$REASONSCHANNEL", "kafka://[$BROKERLIST]&topic=reasons");
+		 while (address.contains("$LOGCHANNEL"))
+				address = GetEnvironmentVariable(address, "$LOGCHANNEL", "kafka://[$BROKERLIST]&topic=logs");
+		 
+		 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		while (address.contains("$S3REGION"))
-			address = GetEnvironmentVariable(address, "$S3REGION", "");
-		while (address.contains("$S3BUCKET"))
-			address = GetEnvironmentVariable(address, "$S3BUCKET", "");
-		while (address.contains("$S3ACCESSKEY"))
-			address = GetEnvironmentVariable(address, "$S3ACCESSKEY", "");
-		while (address.contains("$S3SECRETKEY"))
-			address = GetEnvironmentVariable(address, "$S3SECRETKEY", "");
+		while (address.contains("$GEOPATCH"))
+			address = GetEnvironmentVariable(address, "$GEOPATCH", "");
+		
+		while (address.contains("$MASTERCIDR"))
+			address = GetEnvironmentVariable(address, "$MASTERCIDR", "");
+
+		while (address.contains("$FRAUDTYPE"))
+			address = GetEnvironmentVariable(address, "$FRAUDTYPE", "");
+		while (address.contains("$FRAUDTHRESHOLD"))
+			address = GetEnvironmentVariable(address, "$FRAUDTHRESHOLD", "100");
+		while (address.contains("$FRAUDKEY"))
+			address = GetEnvironmentVariable(address, "$FRAUDKEY", "");
+		while (address.contains("$FRAUDENDPOINT"))
+			address = GetEnvironmentVariable(address, "$FRAUDENDPOINT", "");
+		while (address.contains("$FRAUDCONNECTIONS"))
+			address = GetEnvironmentVariable(address, "$FRAUDCONNECTIONS", "100");
+		while (address.contains("$FRAUDWATCHLIST"))
+			address = GetEnvironmentVariable(address, "$FRAUDWATCHLIST", "");
+
+		while (address.contains("$BIDSWITCH_ID"))
+			address = GetEnvironmentVariable(address, "$BIDSWITCH_ID", "bidswitch-id");
+
+		/////////////////////////////////////////////////////////////////////////////
+		
+		while(address.contains("$S3BUCKET"))
+	        address = GetEnvironmentVariable(address,"$S3BUCKET", "");
+		
+		while(address.contains("$AWSACCESSKEY"))
+	            address = GetEnvironmentVariable(address,"$AWSACCESSKEY", "");
+
+	    while(address.contains("$AWSSECRETKEY"))
+	            address = GetEnvironmentVariable(address,"$AWSSECRETKEY", "");
+
+	    while(address.contains("$AWSREGION"))
+	            address = GetEnvironmentVariable(address,"$AWSREGION", Regions.US_EAST_1.getName());
+	
+        while(address.contains("$AWSKINESIS_STREAM"))
+            address = GetEnvironmentVariable(address,"$AWS_KINESIS_STREAM", "");
+
+        while(address.contains("$AWSKINESIS_PARTITION"))
+            address = GetEnvironmentVariable(address,"$AWS_KINESESIS_PARTITION", "part-1");
+
+        while(address.contains("AWSKINESIS_SHARD"))
+            address = GetEnvironmentVariable(address,"$AWS_KINESIS_SHARD", "shardId-000000000000");
+
+        while(address.contains("AWS_KINESIS_ITERATOR"))
+            address = GetEnvironmentVariable(address,"$AWS_KENESIS_ITERATOR", "LATEST");
+
+        while(address.contains("AWSKINESIS_RECORDS"))
+            address = GetEnvironmentVariable(address,"$AWS_KENSIS_RECORDS", "1");
+		
+		/////////////////////////////////////////////////////////////////////////////
+		
 
 		while (address.contains("$FREQGOV"))
 			address = GetEnvironmentVariable(address, "$FREQGOV", "true");
@@ -914,6 +1017,19 @@ public class Configuration {
 
 		while (address.contains("$TRACKER"))
 			address = GetEnvironmentVariable(address, "$TRACKER", "localhost:8080");
+		
+		while (address.contains("$ADX_EKEY"))
+			address = GetEnvironmentVariable(address, "$ADX_EKEY", "");
+		while (address.contains("$ADX_IKEY"))
+			address = GetEnvironmentVariable(address, "$ADX_IKEY", "");
+		while (address.contains("$OPENX_EKEY"))
+			address = GetEnvironmentVariable(address, "$OPENX_EKEY", "");
+		while (address.contains("$OPENX_IKEY"))
+			address = GetEnvironmentVariable(address, "$OPENX_IKEY", "");
+		while (address.contains("$GOOGLE_EKEY"))
+			address = GetEnvironmentVariable(address, "$GOOGLE_EKEY", "");
+		while (address.contains("$GOOGLE_IKEY"))
+			address = GetEnvironmentVariable(address, "$GOOGLE_IKEY", "");
 
 		address = GetEnvironmentVariable(address, "$TRACE", "false");
 
@@ -952,7 +1068,7 @@ public class Configuration {
 	 */
 	public static String GetEnvironmentVariable(String address, String varName, String altName) {
 		String test = GetEnvironmentVariable(address, varName);
-		if (test == null) {
+		if (test == null && altName != null) {
 			test = address.replace(varName, altName);
 		}
 		return test;
@@ -1140,8 +1256,9 @@ public class Configuration {
 			}
 
 			Map extension = (Map) x.get("extension");
-			if (extension != null)
+			if (extension != null) {
 				br.handleConfigExtensions(extension);
+			}
 
 			RTBServer.exchanges.put(uri, br);
 
@@ -1282,25 +1399,27 @@ public class Configuration {
 	public void initializeLookingGlass(List<Map> list) throws Exception {
 		for (Map m : list) {
 			String fileName = (String) m.get("filename");
-			String name = (String) m.get("name");
-			String type = (String) m.get("type");
-			if (name.startsWith("@") == false)
-				name = "@" + name;
-			if (type.contains("NavMap") || type.contains("RangeMap")) {
-				new NavMap(name, fileName, false); // file uses ranges
-			} else if (type.contains("CidrMap")) { // file uses CIDR blocks
-				new NavMap(name, fileName, true);
-			} else if (type.contains("AdxGeoCodes")) {
-				new AdxGeoCodes(name, fileName);
-			} else if (type.contains("LookingGlass")) {
-				new LookingGlass(name, fileName);
-			} else {
-				// Ok, load it by class name
-				Class cl = Class.forName(type);
-				Constructor<?> cons = cl.getConstructor(String.class, String.class);
-				cons.newInstance(name, fileName);
+			if (!fileName.equals("")) {
+				String name = (String) m.get("name");
+				String type = (String) m.get("type");
+				if (name.startsWith("@") == false)
+					name = "@" + name;
+				if (type.contains("NavMap") || type.contains("RangeMap")) {
+					new NavMap(name, fileName, false); // file uses ranges
+				} else if (type.contains("CidrMap")) { // file uses CIDR blocks
+					new NavMap(name, fileName, true);
+				} else if (type.contains("AdxGeoCodes")) {
+					new AdxGeoCodes(name, fileName);
+				} else if (type.contains("LookingGlass")) {
+					new LookingGlass(name, fileName);
+				} else {
+					// Ok, load it by class name
+					Class cl = Class.forName(type);
+					Constructor<?> cons = cl.getConstructor(String.class, String.class);
+					cons.newInstance(name, fileName);
+				}
+				logger.info("*** Configuration Initialized {} with {}", name, fileName);
 			}
-			logger.info("*** Configuration Initialized {} with {}", name, fileName);
 		}
 	}
 
@@ -1336,7 +1455,8 @@ public class Configuration {
 	 * @param fname String. The file name of the database.
 	 * @throws Exception on file or cache2k errors.
 	 */
-	private static void readDatabaseIntoCache(String fname) throws Exception {
+	private static void readDatabaseIntoCache(String fname) {
+		try {
 		String content = new String(Files.readAllBytes(Paths.get(fname)), StandardCharsets.UTF_8);
 		content = substitute(content);
 
@@ -1346,6 +1466,10 @@ public class Configuration {
 		List<Campaign> list = DbTools.mapper.readValue(content,
 				DbTools.mapper.getTypeFactory().constructCollectionType(List.class, Campaign.class));
 		db.update(list);
+		} catch (Exception error) {
+			logger.warn("Initial database {} not read, error: {}", fname, error.getMessage());
+		}
+		
 	}
 
 	/**

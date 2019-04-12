@@ -28,6 +28,7 @@ services:
     image: "jacamars/zerospike:v1"
     environment:
       BROKERLIST: "kafka:9092"
+      STATUSCHANNEL: "kafka://[$$BROKERLIST]&topic=status"
     ports:
       - "6000:6000"
       - "6001:6001"
@@ -39,20 +40,39 @@ services:
       - rtb_net
     depends_on:
       - kafka
-    command: bash -c "./wait-for-it.sh kafka:9092 --t=120 && sleep 1; ./zerospike"
+    command: bash -c "./wait-for-it.sh $$BROKERLIST --t=120 && sleep 1; ./zerospike"
 
   bidder:
     image: "jacamars/rtb4free:v1"
     environment:
       GDPR_MODE: "false"
+      
       BROKERLIST: "kafka:9092"
+      
+      BIDSCHANNEL: "$BIDSCHANNEL"
+      WINSCHANNEL: "$WINSCHANNEL"
+      REQUESTSCHANNEL: "$REQUESTSCHANNEL"
+      CLICKSCHANNEL: "$CLICKSCHANNEL"
+      PIXELSCHANNEL: "$PIXELSCHANNEL"
+      VIDEOEVENTSCHANNEL: "$VIDEOEVENTSCHANNEL"
+      POSTBACKEVENTSCHANNEL: "$POSTBACKEVENTSCHANNEL"
+      STATUSCHANNEL: "$STATUSCHANNEL"
+      REASONSCHANNEL: "$REASONSCHANNEL"  
+      LOGCHANNEL: "$LOGCHANNEL"
+         
       PUBSUB: "zerospike"
       EXTERNAL: "http://localhost:8080"
       ACCOUNTING: "NONE"
+      
       S3BUCKET: ""
       S3REGION: ""
       S3SECRETKEY: ""
       S3ACCESSKEY: ""
+      
+      AWSACCESSKEY: ""
+      AWSSECRETKEY: ""
+      AWSREGION: ""
+      
       GOOGLE_EKEY: ""
       GOOGLE_IKEY: ""
       OPENX_EKEY: ""
@@ -74,7 +94,7 @@ services:
     depends_on:
       - kafka
       - zerospike
-    command: bash -c "./wait-for-it.sh kafka:9092 --t=120 && ./wait-for-it.sh zerospike:6000 --t 120 && sleep 1; ./rtb4free"
+    command: bash -c "./wait-for-it.sh $$BROKERLIST --t=120 && ./wait-for-it.sh zerospike:6000 --t 120 && sleep 1; ./rtb4free"
     #command:  bash -c "./wait-for-it.sh kafka:9092 --timeout=120 && ./wait-for-it.sh zerospike:6000 --timeout 120 && sleep 1; ./rtb4free-jmx"
 
 

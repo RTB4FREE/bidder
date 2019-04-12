@@ -21,6 +21,7 @@ services:
     image: "jacamars/zerospike:v1"
     environment:
       BROKERLIST: "kafka:9092"
+      
     #ports:
      # - "6000:6000"
      #- "6001:6001"
@@ -31,7 +32,7 @@ services:
     #  - "./cache.db:/cache.db"
     depends_on:
       - kafka
-    command: bash -c "sleep 5 && ./wait-for-it.sh kafka:9092 -t 120 && sleep 1; ./zerospike"
+    command: bash -c "sleep 5 && ./wait-for-it.sh $$BROKERLIST -t 120 && sleep 1; ./zerospike"
 
   bidder:
     image: "jacamars/rtb4free:v1"
@@ -57,7 +58,7 @@ services:
     depends_on:
       - kafka
       - zerospike
-    command: bash -c "sleep 5 && ./wait-for-it.sh kafka:9092 -t 120 && ./wait-for-it.sh zerospike:6000 -t 120 && sleep 1; ./rtb4free"
+    command: bash -c "sleep 5 && ./wait-for-it.sh $$BROKERLIST -t 120 && ./wait-for-it.sh zerospike:6000 -t 120 && sleep 1; ./rtb4free"
     #command:  bash -c "sleep 5 && ./wait-for-it.sh kafka:9092 -t 120 && ./wait-for-it.sh zerospike:6000 -t 120 && sleep 1; ./rtb4free-jmx"
 
   simulator:

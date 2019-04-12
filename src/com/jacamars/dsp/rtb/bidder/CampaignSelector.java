@@ -115,7 +115,7 @@ public class CampaignSelector {
         List<Campaign> list = Preshuffle.getInstance().getPreShuffledCampaignList();
 
         if (list == null) {
-            logger.error("No preshuffled campaigns lists");
+            logger.debug("No preshuffled campaigns lists");
             return null;
         }
 
@@ -193,9 +193,14 @@ public class CampaignSelector {
                 logger.info("Selected winner {}/{}", cr.campaign.adId, cr.creative.impid);
             }
         }
-        if (RTBServer.frequencyGoverner != null)
-            RTBServer.frequencyGoverner.add(winner.camp.adId,br);
+        if (RTBServer.frequencyGoverner != null) {
+        	if (winner != null && winner.camp != null && winner.camp.adId != null)
+        		RTBServer.frequencyGoverner.add(winner.camp.adId,br);
+        }
 
+        if (xtest) {
+        	logger.info("Selected winner in " + xtime + " ms");
+        }
         return winner;
     }
 

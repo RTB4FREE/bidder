@@ -4,10 +4,13 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
+import java.nio.ByteBuffer;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
@@ -20,6 +23,9 @@ import org.apache.kafka.clients.producer.*;
 
 import com.jacamars.dsp.rtb.common.Configuration;
 import com.jacamars.dsp.rtb.common.HttpPostGet;
+import com.amazonaws.services.kinesis.model.PutRecordsRequest;
+import com.amazonaws.services.kinesis.model.PutRecordsRequestEntry;
+import com.amazonaws.services.kinesis.model.PutRecordsResult;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -92,6 +98,7 @@ public class ZPublisher implements Runnable, Callback {
 
     boolean isPipe = false;
     PrintWriter pipe;
+    KinesisConfig kinesis;
 
     /**
      * Default constructor
@@ -137,6 +144,9 @@ public class ZPublisher implements Runnable, Callback {
         mapper.setSerializationInclusion(Include.NON_NULL);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
+        if (address.startsWith("kinesis://")) {
+            doKineses(address);
+        } else
         if (address.startsWith("kafka://")) {
             doKafka(address);
         } else
@@ -206,6 +216,10 @@ public class ZPublisher implements Runnable, Callback {
         // If it's not a kafka thingie, then create a pinger.
         if (producer == null && !isPipe)
             ping = new Pinger(this);
+    }
+    
+    void doKineses(String address) throws Exception {
+        kinesis = new KinesisConfig(address);
     }
 
     // kafka://[a:b,b:c]&topic=bids&partition=0
@@ -423,6 +437,9 @@ public class ZPublisher implements Runnable, Callback {
                 runPipeLogger();
             }
 
+            if (kinesis != null) {     // kinesis
+                runKinesisLogger();
+            }
 
             if (producer != null)     // kafka
                 runKafkaLogger();
@@ -441,6 +458,69 @@ public class ZPublisher implements Runnable, Callback {
             error.printStackTrace();
         }
     }
+    
+    /**
+     * Run the kineses logger in a loop
+     */
+    public void runKinesisLogger() {
+        Object msg = null;
+        String str = null;
+        int i;
+        List <PutRecordsRequestEntry> putRecordsRequestEntryList = new ArrayList<>();
+        while (!me.isInterrupted()) {
+            try {
+                if ((msg = queue.poll()) != null) {
+                    i = 1;
+                    PutRecordsRequest putRecordsRequest = new PutRecordsRequest();
+                    while(msg != null) {
+                        str = serialize(msg);
+                        byte [] bytes = str.getBytes();
+                        PutRecordsRequestEntry putRecordsRequestEntry  = new PutRecordsRequestEntry();
+                        putRecordsRequestEntry.setPartitionKey(kinesis.getPartition());
+                        putRecordsRequestEntry.setData(ByteBuffer.wrap(bytes));
+                        putRecordsRequestEntryList.add(putRecordsRequestEntry);
+
+                        if (i++ == 100)
+                            msg = null;
+                        else
+                            msg = queue.poll();
+                    }
+                    putRecordsRequest.setRecords(putRecordsRequestEntryList);
+                    putRecordsRequest.setStreamName(kinesis.getStream());
+                    PutRecordsResult putRecordsResult  = kinesis.getKinesis().putRecords(putRecordsRequest);
+                    putRecordsRequestEntryList.clear();
+                }
+                Thread.sleep(1);
+
+
+                /*while ((msg = queue.poll()) != null) {
+                    str = serialize(msg);
+                    var bytes = str.getBytes();
+                    PutRecordRequest putRecord = new PutRecordRequest();
+                    putRecord.setStreamName(kinesis.getStream());
+                    putRecord.setPartitionKey(kinesis.getPartition());
+                    putRecord.setData(ByteBuffer.wrap(bytes));
+
+                    try {
+                        kinesis.getKinesis().putRecord(putRecord);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                Thread.sleep(1); */
+            } catch (Exception e) {
+                e.printStackTrace();
+                // return;
+            }
+        }
+    }
+    
+    public String serialize(Object msg) {
+        if (msg instanceof String)
+            return (String) msg;
+        return Tools.serialize(mapper, msg);
+    }
+
 
     /**
      * Run the Redis logger in a loop.

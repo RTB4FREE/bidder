@@ -318,7 +318,7 @@ public class MacroProcessing {
                 case "{pixel_url}":
                 case "{pixel_url_enc}":
                 case "%7Bpixel_url%7D":
-                    replaceAll(sb, item, value);
+                    replaceAll(sb, item, config.pixelTrackingUrl);
                     break;
 
                 case "{event_url}":

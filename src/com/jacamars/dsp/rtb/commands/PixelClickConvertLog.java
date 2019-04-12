@@ -1,6 +1,8 @@
 package com.jacamars.dsp.rtb.commands;
 
 import com.jacamars.dsp.rtb.bidder.RTBServer;
+import com.jacamars.dsp.rtb.exchanges.adx.AdxBidRequest;
+import com.jacamars.dsp.rtb.exchanges.adx.AdxWinObject;
 import com.jacamars.dsp.rtb.exchanges.google.GoogleWinObject;
 import com.jacamars.dsp.rtb.exchanges.google.OpenRTB;
 import com.jacamars.dsp.rtb.exchanges.openx.OpenX;
@@ -155,6 +157,15 @@ public class PixelClickConvertLog {
                                 //e.printStackTrace();
                                 price = 0;
                             }
+                        } else if (exchange.equals(AdxBidRequest.ADX)) {
+                        	 try {                    
+								price = AdxWinObject.decrypt(items[1], System.currentTimeMillis());
+							} catch (Exception e) {
+								// TODO Auto-generated catch block
+								System.out.println("Error decrypt: =====>'" + items[1] + "'");
+								e.printStackTrace();
+							}
+                             price /= 1000;
                         } else {
                             try {
                                 price = Double.parseDouble(items[1]);
@@ -253,7 +264,7 @@ public class PixelClickConvertLog {
             } catch (Exception error) {
                 error.printStackTrace();
             }
-        }
+        } 
     }
 
     /**

@@ -874,7 +874,7 @@ public class WebCampaign {
 				values.put("errors", RTBServer.error);
 				values.put("adspend", RTBServer.adspend);
 				values.put("qps", RTBServer.qps);
-				values.put("avgx", RTBServer.avgx);
+				values.put("avgx", RTBServer.savgbidtime);
 				values.put("exchanges", BidRequest.getExchangeCounts());
 				values.put("cperf", CampaignProcessor.probe.getMap());
 			} else {
