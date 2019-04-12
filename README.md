@@ -1,15 +1,65 @@
-OpenRTB Bidder
-=====================
-This is a JAVA 1.8 based openRTB bidding system.
+[home](https://github.com/RTB4FREE/rtb4free/README.md) |
+[campaign manager](https://github.com/RTB4FREE/campaignmanager/README.md) |
+bidder |
+[crosstalk](https://github.com/RTB4FREE/crosstalk/README.md)
+
+<img src="https://github.com/RTB4FREE/rtb4free/blob/master/rtb4free-logo.png"
+ alt="RTB4FREE logo" title="RTB4FREE" align="right" />
+ 
+RTB4FREE Bidder
+===============
+
+This is the bidder component to the RTB4FREE open source DSP.  The bidder is a JAVA 1.8 based openRTB bidding system, scalable to 25K+ QPS per node.
+
+Working with source code
+------------------------
+
+If you want to modify the code:
+
+**Step 1:  Clone this Github repo**
+
+```
+git clone git@github.com:RTB4FREE/bidder.git
+cd bidder
+```
+
+**Step 2: Make sure you have a sample database for use with QA tests**
+
+```
+cp sampledb.json database.json
+```
+
+**Step 3: Run Maven**
+
+```
+mvn assembly:assembly -DdescriptorId=jar-with-dependencies  -Dmaven.test.skip=true
+```
+
+*Note: Remember to submit changes back to this project via a [pull request](https://github.com/RTB4FREE/bidder/pulls)!*
 
 
-DOCKER BASED RTB BIdder
-=======================
+Building Docker images
+----------------------
 
-These are the Docker instructions for working with Bidder, Crosstalk, Zerospike, Kafka and Zookeeper.
+To make the Docker images locally:
+
+```
+docker build -t jacamars/zerospike:v1 -f Docker.zerospike .
+docker build -t jacamars/rtb4free:v1 -f Docker.bidder .
+```
+
+6. If you need to push to the repo:
+
+   $docker push jacamars/rtb4free:v1
+   $docker push jacamars/zerospike:v1
+   
+Docker Based
+============
+
+The instructions below are for deploying the bidder component.  To deploy the full RTB4FREE system, please refer to the documentation in the [RTB4FREE/rtb4free](https://github.com/RTB4FREE/rtb4free/README.md) repo.  The bidder relies on the [Crosstalk](https://github.com/RTB4FREE/crosstalk/README.md), [Zerospike](https://github.com/RTB4FREE/zerospike/README.md), Kafka, and Zookeeper projects.
 
 No Source Deployments
-===========================
+======================
 
 Docker Swarm
 ---------------------------
@@ -43,32 +93,7 @@ Use Docker Compose to run Crosstalk, Bidder, Zerospike, Kafka and Zookeeper in a
 
    $docker-compose up 
    
-Working with Source
----------------------------------
-If you want to modify the code.
 
-1. GIT clone, cd to the cloned directory.
-
-2. Make your changes...
-
-3. Make sure you have a sample database for use with qa tests:
-
-   $cp sampledb.json database.json
-   
-4. Run maven:
-
-   $mvn assembly:assembly -DdescriptorId=jar-with-dependencies  -Dmaven.test.skip=true
-   
-5. Make the docker images locally:
-
-   $docker build -t jacamars/zerospike:v1 -f Docker.zerospike .
-   $docker build -t jacamars/rtb4free:v1 -f Docker.bidder .
-   
-6. If you need to push to the repo:
-
-   $docker push jacamars/rtb4free:v1
-   $docker push jacamars/zerospike:v1
-   
 Changing Operational Parameters
 -------------------------------------
 The bidder uses a container based file in Campaigns/payday.json. If you need to change the parameters within it
@@ -118,41 +143,6 @@ using the volumes command. Example, suppose you wanted to use the file mycache.d
 Changing port assignments is not encouraged. Stick to the defaults to keep from losing your mind. There are 
 a lot of interdependencies.
 
-HANDY DOCKER ACTIVITIES
-=====================================
-
-Running Containers
---------------------------------------
-
-    $docker ps
-    
-Attach to a Container
----------------------------------------
-Do a docker ps and then use the container-id or name:
-
-    $docker exec -it <id-or-name> /bin/bash
-    
-Attach to the log
----------------------------------------
-Do a docker ps and then use the container-id or name:
-
-    $docker logs -f <id-or-name>
-    
-Delete an image
-----------------------------------------
-Do a docker ls firsr
-
-    $docker image ls
-    
-Find the container id
-
-    $docker image rm <image-id> --force
-    
-Correct Checksum Error
------------------------------------------
-If docker-compose complains about a checksum after you delete a container do this:
-
-    $docker-compose rm
 
 Connect Intellij Debugger to Bidder, Crosstalk or Zerospike
 -----------------------------------------
