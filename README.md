@@ -44,8 +44,8 @@ Building Docker images
 To make the Docker images locally:
 
 ```
-docker build -t jacamars/zerospike:v1 -f Docker.zerospike .
-docker build -t jacamars/rtb4free:v1 -f Docker.bidder .
+	$docker build -t jacamars/zerospike:v1 -f Docker.zerospike .
+	$docker build -t jacamars/rtb4free:v1 -f Docker.bidder .
 ```
 
 6. If you need to push to the repo:

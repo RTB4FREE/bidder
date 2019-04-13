@@ -471,7 +471,7 @@ public class Configuration {
 			if (x != null) {
 				if (x instanceof NavMap) {
 					masterCidr = (NavMap) x;
-					logger.info("*** Master Blacklist is set to: {}",x);
+					logger.info("*** Master Blacklist is set to: {}", x);
 				} else {
 					logger.error("*** Master CIDR '@MASTERCIDR' is  the wrong classtype {}", x.getClass().getName());
 					logger.error("*** Master CIDR blocking is disabled ***");
@@ -572,12 +572,12 @@ public class Configuration {
 		 * Deal with the app object
 		 */
 		m = (Map) m.get("app");
-		
+
 		if (m.get("geopatch") != null) {
-			String fileName = (String)m.get("geopatch");
+			String fileName = (String) m.get("geopatch");
 			if (!fileName.equals("")) {
 				GeoPatch.getInstance(fileName);
-				logger.info("*** GEOPATCH DB set to: {} ",fileName);
+				logger.info("*** GEOPATCH DB set to: {} ", fileName);
 			} else
 				logger.info("*** GEOPATCH DB IS NOT SET");
 		} else
@@ -737,7 +737,6 @@ public class Configuration {
 		redisson.setSharedObject(host, listen);
 
 		Database.getInstance(redisson);
-		readDatabaseIntoCache("database.json");
 
 		if ((value = (String) zeromq.get("status")) != null)
 			PERF_CHANNEL = value;
@@ -800,11 +799,15 @@ public class Configuration {
 		if (m.get("ttl") != null) {
 			ttl = (Integer) m.get("ttl");
 		}
-
-		initialLoadlist = (List<String>) m.get("campaigns");
-
-		for (String camp : initialLoadlist) {
-			fastAddCampaign(camp);
+		
+		if (m.get("demodb") != null) {
+			String demodb = (String) m.get("demodb");
+			if (demodb.length() > 0) {
+				initialLoadlist = readDatabaseIntoCache(demodb);
+				for (String camp : initialLoadlist) {
+					fastAddCampaign(camp);
+				}
+			}
 		}
 
 		recompile();
@@ -885,35 +888,36 @@ public class Configuration {
 
 		if (address == null)
 			return address;
-		
+
 		///////////////////////////////////////////////////////////////////////////////////////////////////
-		
-		 while (address.contains("$BIDSCHANNEL"))
+
+		while (address.contains("$BIDSCHANNEL"))
 			address = GetEnvironmentVariable(address, "$BIDSCHANNEL", "kafka://[$BROKERLIST]&topic=bids");
-		 while (address.contains("$WINSCHANNEL"))
+		while (address.contains("$WINSCHANNEL"))
 			address = GetEnvironmentVariable(address, "$WINSCHANNEL", "kafka://[$BROKERLIST]&topic=wins");
-		 while (address.contains("$REQUESTSCHANNEL"))
+		while (address.contains("$REQUESTSCHANNEL"))
 			address = GetEnvironmentVariable(address, "$REQUESTSCHANNEL", "kafka://[$BROKERLIST]&topic=requests");
-		 while (address.contains("$CLICKSCHANNEL"))
+		while (address.contains("$CLICKSCHANNEL"))
 			address = GetEnvironmentVariable(address, "$CLICKSCHANNEL", "kafka://[$BROKERLIST]&topic=clicks");
-		 while (address.contains("$PIXELSCHANNEL"))
+		while (address.contains("$PIXELSCHANNEL"))
 			address = GetEnvironmentVariable(address, "$PIXELSCHANNEL", "kafka://[$BROKERLIST]&topic=pixels");
-		 while (address.contains("$VIDEOEVENTSCHANNEL"))
+		while (address.contains("$VIDEOEVENTSCHANNEL"))
 			address = GetEnvironmentVariable(address, "$VIDEOEVENTSCHANNEL", "kafka://[$BROKERLIST]&topic=videoevents");
-		 while (address.contains("$POSTBACKEVENTSCHANNEL"))
-			address = GetEnvironmentVariable(address, "$POSTBACKEVENTSCHANNEL", "kafka://[$BROKERLIST]&topic=postbackevents");
-		 while (address.contains("$STATUSCHANNEL"))
+		while (address.contains("$POSTBACKEVENTSCHANNEL"))
+			address = GetEnvironmentVariable(address, "$POSTBACKEVENTSCHANNEL",
+					"kafka://[$BROKERLIST]&topic=postbackevents");
+		while (address.contains("$STATUSCHANNEL"))
 			address = GetEnvironmentVariable(address, "$STATUSCHANNEL", "kafka://[$BROKERLIST]&topic=status");
-		 while (address.contains("$REASONSCHANNEL"))
+		while (address.contains("$REASONSCHANNEL"))
 			address = GetEnvironmentVariable(address, "$REASONSCHANNEL", "kafka://[$BROKERLIST]&topic=reasons");
-		 while (address.contains("$LOGCHANNEL"))
-				address = GetEnvironmentVariable(address, "$LOGCHANNEL", "kafka://[$BROKERLIST]&topic=logs");
-		 
-		 //////////////////////////////////////////////////////////////////////////////////////////////////////////
+		while (address.contains("$LOGCHANNEL"))
+			address = GetEnvironmentVariable(address, "$LOGCHANNEL", "kafka://[$BROKERLIST]&topic=logs");
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		while (address.contains("$GEOPATCH"))
 			address = GetEnvironmentVariable(address, "$GEOPATCH", "");
-		
+
 		while (address.contains("$MASTERCIDR"))
 			address = GetEnvironmentVariable(address, "$MASTERCIDR", "");
 
@@ -934,36 +938,35 @@ public class Configuration {
 			address = GetEnvironmentVariable(address, "$BIDSWITCH_ID", "bidswitch-id");
 
 		/////////////////////////////////////////////////////////////////////////////
-		
-		while(address.contains("$S3BUCKET"))
-	        address = GetEnvironmentVariable(address,"$S3BUCKET", "");
-		
-		while(address.contains("$AWSACCESSKEY"))
-	            address = GetEnvironmentVariable(address,"$AWSACCESSKEY", "");
 
-	    while(address.contains("$AWSSECRETKEY"))
-	            address = GetEnvironmentVariable(address,"$AWSSECRETKEY", "");
+		while (address.contains("$S3BUCKET"))
+			address = GetEnvironmentVariable(address, "$S3BUCKET", "");
 
-	    while(address.contains("$AWSREGION"))
-	            address = GetEnvironmentVariable(address,"$AWSREGION", Regions.US_EAST_1.getName());
-	
-        while(address.contains("$AWSKINESIS_STREAM"))
-            address = GetEnvironmentVariable(address,"$AWS_KINESIS_STREAM", "");
+		while (address.contains("$AWSACCESSKEY"))
+			address = GetEnvironmentVariable(address, "$AWSACCESSKEY", "");
 
-        while(address.contains("$AWSKINESIS_PARTITION"))
-            address = GetEnvironmentVariable(address,"$AWS_KINESESIS_PARTITION", "part-1");
+		while (address.contains("$AWSSECRETKEY"))
+			address = GetEnvironmentVariable(address, "$AWSSECRETKEY", "");
 
-        while(address.contains("AWSKINESIS_SHARD"))
-            address = GetEnvironmentVariable(address,"$AWS_KINESIS_SHARD", "shardId-000000000000");
+		while (address.contains("$AWSREGION"))
+			address = GetEnvironmentVariable(address, "$AWSREGION", Regions.US_EAST_1.getName());
 
-        while(address.contains("AWS_KINESIS_ITERATOR"))
-            address = GetEnvironmentVariable(address,"$AWS_KENESIS_ITERATOR", "LATEST");
+		while (address.contains("$AWSKINESIS_STREAM"))
+			address = GetEnvironmentVariable(address, "$AWS_KINESIS_STREAM", "");
 
-        while(address.contains("AWSKINESIS_RECORDS"))
-            address = GetEnvironmentVariable(address,"$AWS_KENSIS_RECORDS", "1");
-		
+		while (address.contains("$AWSKINESIS_PARTITION"))
+			address = GetEnvironmentVariable(address, "$AWS_KINESESIS_PARTITION", "part-1");
+
+		while (address.contains("AWSKINESIS_SHARD"))
+			address = GetEnvironmentVariable(address, "$AWS_KINESIS_SHARD", "shardId-000000000000");
+
+		while (address.contains("AWS_KINESIS_ITERATOR"))
+			address = GetEnvironmentVariable(address, "$AWS_KENESIS_ITERATOR", "LATEST");
+
+		while (address.contains("AWSKINESIS_RECORDS"))
+			address = GetEnvironmentVariable(address, "$AWS_KENSIS_RECORDS", "1");
+
 		/////////////////////////////////////////////////////////////////////////////
-		
 
 		while (address.contains("$FREQGOV"))
 			address = GetEnvironmentVariable(address, "$FREQGOV", "true");
@@ -1017,7 +1020,7 @@ public class Configuration {
 
 		while (address.contains("$TRACKER"))
 			address = GetEnvironmentVariable(address, "$TRACKER", "localhost:8080");
-		
+
 		while (address.contains("$ADX_EKEY"))
 			address = GetEnvironmentVariable(address, "$ADX_EKEY", "");
 		while (address.contains("$ADX_IKEY"))
@@ -1030,6 +1033,9 @@ public class Configuration {
 			address = GetEnvironmentVariable(address, "$GOOGLE_EKEY", "");
 		while (address.contains("$GOOGLE_IKEY"))
 			address = GetEnvironmentVariable(address, "$GOOGLE_IKEY", "");
+
+		while (address.contains("$DEMODB"))
+			address = GetEnvironmentVariable(address, "$DEMODB", "");
 
 		address = GetEnvironmentVariable(address, "$TRACE", "false");
 
@@ -1455,21 +1461,26 @@ public class Configuration {
 	 * @param fname String. The file name of the database.
 	 * @throws Exception on file or cache2k errors.
 	 */
-	private static void readDatabaseIntoCache(String fname) {
+	private List<String> readDatabaseIntoCache(String fname) {
+		List<String> camps = new ArrayList();
 		try {
-		String content = new String(Files.readAllBytes(Paths.get(fname)), StandardCharsets.UTF_8);
-		content = substitute(content);
+			String content = new String(Files.readAllBytes(Paths.get(fname)), StandardCharsets.UTF_8);
+			content = substitute(content);
 
-		logger.debug(content);
-		Database db = Database.getInstance();
+			logger.info("Sample DB: {}", content);
+			Database db = Database.getInstance();
 
-		List<Campaign> list = DbTools.mapper.readValue(content,
-				DbTools.mapper.getTypeFactory().constructCollectionType(List.class, Campaign.class));
-		db.update(list);
+			List<Campaign> list = DbTools.mapper.readValue(content,
+					DbTools.mapper.getTypeFactory().constructCollectionType(List.class, Campaign.class));
+			db.update(list);
+			for (Campaign camp : list) {
+				camps.add(camp.adId);
+			}
 		} catch (Exception error) {
+			error.printStackTrace();
 			logger.warn("Initial database {} not read, error: {}", fname, error.getMessage());
 		}
-		
+		return camps;
 	}
 
 	/**

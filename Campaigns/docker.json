@@ -16,6 +16,7 @@
     "threads": "2000",
     "trace": "$TRACE",
     "stopped" : false,
+    "demodb": "$DEMODB",
     "deadmanswitch": "$ACCOUNTING",
     "ttl" : 300,
     "pixel-tracking-url" : "$EXTERNAL/callback?type=pixel",

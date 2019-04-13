@@ -12,10 +12,12 @@
   "app" : {
     "geopatch": "$GEOPATCH",
     "concurrency" : "1",
+    "demodb": "database.json",
     "NOdeadmanswitch":"accountingsystem",
     "threads": "128",
     "trace": "$TRACE",
     "stopped" : false,
+    "demodb": "database.json",
     "ttl" : 300,
     "pixel-tracking-url" : "$EXTERNAL/pixel",
     "clickurl" : "$EXTERNAL/click",
