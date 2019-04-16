@@ -1365,7 +1365,11 @@ class Handler extends AbstractHandler {
                         if (queryString != null)
                             params = queryString.split("url=");
                         if (params != null) {
-                            response.sendRedirect(URLDecoder.decode(params[1], "UTF-8"));
+                        	try {
+                        		response.sendRedirect(URLDecoder.decode(params[1], "UTF-8"));
+                        	} catch (Exception xxx) {
+                        		xxx.printStackTrace();
+                        	}
                         }
                         RTBServer.clicks++;
                         return;
