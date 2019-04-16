@@ -1,0 +1,35 @@
+[{
+  "isAdx": false,
+  "adId": "zipcode-test",
+  "adomain": "originator.com",
+  "attributes": [{
+	"name": "LATLON",
+	"value": "ZIPCODES, 90505,90506,90507,10000",
+	"op": "INRANGE",
+	"notPresentOk": false,
+	"bidRequestValues": ["device", "geo"]
+}],
+  "creatives": [{
+    "forwardurl": "http://localhost:8080/contact.html?{site_id}&adid={ad_id}&crid={creative_id}",
+    "imageurl": "http://localhost:8080/images/320x50.jpg?adid={ad_id}&bidid={bid_id}",
+    "impid": "blocker",
+    "w": 320,
+    "h": 50,
+    "attributes": [],
+    "currency": "",
+    "cur": "USD",
+    "price": 1.0,
+    "adm_override": false,
+    "status": "active"
+  }],
+  "date": [20130205, 20200101],
+  "category": ["IAB1", "IAB2"],
+  "forensiq": true,
+  "assignedSpendRate": 16667,
+  "frequencyCap": {
+    "capSpecification": ["device.ip"],
+    "capFrequency": 3,
+    "capTimeout": 300
+  }
+}
+]

@@ -142,7 +142,7 @@ public class Node {
 	/** Not in the REGEX */
 	public static final int NOT_REGEX = 21;
 	/** If this node contains geo information, it will be found here */
-	public List<Point> points = new ArrayList<Point>();
+	transient List<Point> points = new ArrayList<Point>();
 	/**
 	 * A convenient map to turn string operator references to their int conterparts
 	 */
