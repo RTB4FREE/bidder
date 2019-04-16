@@ -71,7 +71,7 @@ import redis.clients.jedis.Jedis;
  */
 public class Node {
 	/** Keeps up with overlapping error messages */
-	static volatile Map<String,Long> errors = new ConcurrentHashMap<String,Long>();
+	static volatile Map<String, Long> errors = new ConcurrentHashMap<String, Long>();
 	/** Logging object */
 	protected static final Logger logger = LoggerFactory.getLogger(Node.class);
 
@@ -141,10 +141,10 @@ public class Node {
 	public static final int REGEX = 20;
 	/** Not in the REGEX */
 	public static final int NOT_REGEX = 21;
-
+	/** If this node contains geo information, it will be found here */
+	public List<Point> points = new ArrayList<Point>();
 	/**
-	 * A convenient map to turn string operator references to their int
-	 * conterparts
+	 * A convenient map to turn string operator references to their int conterparts
 	 */
 	public static Map<String, Integer> OPS = new HashMap();
 	static {
@@ -247,35 +247,32 @@ public class Node {
 
 	}
 
-    /**
-     * Get the false count for this node
-     * @return long. The current false count
-     */
+	/**
+	 * Get the false count for this node
+	 * 
+	 * @return long. The current false count
+	 */
 	public long getFalseCount() {
-	    return falseCount.get();
-    }
+		return falseCount.get();
+	}
 
-    /**
-     * Set the false count to 0
-     */
-    public void clearFalseCount() {
-	    falseCount.set(0);
-    }
+	/**
+	 * Set the false count to 0
+	 */
+	public void clearFalseCount() {
+		falseCount.set(0);
+	}
 
 	/**
 	 * Constructor for the campaign Node
 	 * 
-	 * @param name String. The name of this node.
-	 * @param hierarchy
-	 *            String . The hierarchy in the request associated with this
-	 *            node.
-	 * @param operator
-	 *            int. The operator to apply to this operation.
-	 * @param value
-	 *            Object. The constant to test the value of the hierarchy
-	 *            against.
-	 * @throws Exception
-	 *             if the values obejct is not recognized.
+	 * @param name      String. The name of this node.
+	 * @param hierarchy String . The hierarchy in the request associated with this
+	 *                  node.
+	 * @param operator  int. The operator to apply to this operation.
+	 * @param value     Object. The constant to test the value of the hierarchy
+	 *                  against.
+	 * @throws Exception if the values obejct is not recognized.
 	 */
 	public Node(String name, String hierarchy, String operator, Object value) throws Exception {
 
@@ -312,8 +309,7 @@ public class Node {
 	/**
 	 * Sets the values from the this.value object.
 	 * 
-	 * @throws Exception
-	 *             if this.values is not a recognized object.
+	 * @throws Exception if this.values is not a recognized object.
 	 */
 	public void setValues() throws Exception {
 		if (op != null) {
@@ -324,8 +320,8 @@ public class Node {
 		}
 
 		/**
-		 * If its an array, connvert to a list. Passing in arrays screws up
-		 * membership and set operations which expect lists
+		 * If its an array, connvert to a list. Passing in arrays screws up membership
+		 * and set operations which expect lists
 		 */
 
 		if (value instanceof String[] || value instanceof int[] || value instanceof double[]) {
@@ -388,6 +384,63 @@ public class Node {
 			}
 		}
 
+		/////////////////////////////////////// LAT LON STUFF ///////////////////////////////////////////////////
+		if (op != null && (op.equals("INRANGE") || op.equals("NOT_INRANGE"))) {
+			LookingGlass cz = (LookingGlass) LookingGlass.symbols.get("@ZIPCODES");
+			if (value instanceof String) {
+				String ref = (String)value;
+				ref = ref.toUpperCase();
+				String [] parts = ref.split(",");
+				double range = Double.parseDouble(parts[parts.length-1].trim());
+				if (ref.startsWith("LAT")) {
+					for (int i=1; i<parts.length-1;i++) {
+						double x = Double.parseDouble(parts[i].trim());
+						double y = Double.parseDouble(parts[i+1].trim());
+						Point p = new Point(x,y,range);
+						points.add(p);
+					}
+				} else {
+					for (int i=1; i<parts.length-1;i++) {
+						String [] lz = (String[])cz.query(parts[i].trim());
+						double x = Double.parseDouble(lz[1].trim());
+						double y = Double.parseDouble(lz[2].trim());
+						Point p = new Point(x,y,range);
+						points.add(p);
+					}
+				}
+				
+			} else {
+				List<Map> list = (List<Map>) value;
+
+				for (Map q : list) {
+					if (q.get("lat") != null) {
+						Map<String, Double> xy = (Map<String, Double>) q;
+						double xlat = xy.get("lat");
+						double xlon = xy.get("lon");
+						double range = xy.get("range");
+						Point point = new Point(xlat, xlon, range);
+						points.add(point);
+					} else {
+						double range = (Double) q.get("range");
+						String s = (String) q.get("zipcodes");
+						String zips[] = s.split(",");
+
+						for (int j = 0; j < zips.length; j++) {
+							String[] parts = (String[]) cz.query(zips[j]);
+							if (parts != null) {
+								double lat = Double.parseDouble(parts[1].trim());
+								double lon = Double.parseDouble(parts[2].trim());
+								Point point = new Point(lat, lon, range);
+								points.add(point);
+							}
+						}
+					}
+				}
+			}
+		}
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		
 		hierarchy = sh.toString();
 	}
 
@@ -409,8 +462,7 @@ public class Node {
 	/**
 	 * Does this atrribute have this hierarchy
 	 * 
-	 * @param str
-	 *            String. The string to test.
+	 * @param str String. The string to test.
 	 * @return true if the hierarchy matches the string
 	 */
 	public boolean equals(String str) {
@@ -429,17 +481,12 @@ public class Node {
 	/**
 	 * Constructor for campaign node without attached JavaScript code
 	 * 
-	 * @param name
-	 *            String. The name of the node.
-	 * @param heirarchy
-	 *            The dotted notation hierarchy associated with this node.
-	 * @param operator
-	 *            int. The operation to apply to the node.
-	 * @param value
-	 *            Object. The value that the bid request specified by hierarchy
-	 *            will be tested against.
-	 * @throws Exception
-	 *             if the value object is not recognized.
+	 * @param name      String. The name of the node.
+	 * @param heirarchy The dotted notation hierarchy associated with this node.
+	 * @param operator  int. The operation to apply to the node.
+	 * @param value     Object. The value that the bid request specified by
+	 *                  hierarchy will be tested against.
+	 * @throws Exception if the value object is not recognized.
 	 */
 	public Node(String name, String heirarchy, int operator, Object value) throws Exception {
 
@@ -447,30 +494,23 @@ public class Node {
 																// we don't call
 																// recursive
 		this.operator = operator;
-		setValues();
+		// setValues();
 		this.op = OPNAMES.get(operator);
 	}
 
 	/**
 	 * Constructor for the campaign Node with associated JavaScript
 	 * 
-	 * @param name
-	 *            String. The name of this node.
-	 * @param heirarchy
-	 *            String. The hierarchy in the request associated with this
-	 *            node.
-	 * @param operator
-	 *            int. The operator to apply to this operation.
-	 * @param value
-	 *            Object. The constant to test the value of the hierarchy
-	 *            against.
-	 * @param code
-	 *            String. The Java code to execute if node evaluates true.
-	 * @param shell
-	 *            JJS. the encapsulated Nashhorn context to use for this
-	 *            operation.
-	 * @throws Exception
-	 *             if the value object is not recognized.
+	 * @param name      String. The name of this node.
+	 * @param heirarchy String. The hierarchy in the request associated with this
+	 *                  node.
+	 * @param operator  int. The operator to apply to this operation.
+	 * @param value     Object. The constant to test the value of the hierarchy
+	 *                  against.
+	 * @param code      String. The Java code to execute if node evaluates true.
+	 * @param shell     JJS. the encapsulated Nashhorn context to use for this
+	 *                  operation.
+	 * @throws Exception if the value object is not recognized.
 	 */
 	public Node(String name, String heirarchy, String operator, Object value, String code, JJS shell) throws Exception {
 		this(name, heirarchy, operator, value);
@@ -491,31 +531,31 @@ public class Node {
 		}
 	}
 
-    /**
-     * Used by FixedNodes
-     * @param br
-     * @param creative
-     * @return
-     * @throws Exception
-     */
-    public boolean test(BidRequest br, Creative creative, String adId, Impression imp,
-                        StringBuilder errorString, Probe probe, List<Deal> deals) throws Exception {
+	/**
+	 * Used by FixedNodes
+	 * 
+	 * @param br
+	 * @param creative
+	 * @return
+	 * @throws Exception
+	 */
+	public boolean test(BidRequest br, Creative creative, String adId, Impression imp, StringBuilder errorString,
+			Probe probe, List<Deal> deals) throws Exception {
 
-        return test(br, errorString);
-    }
+		return test(br, errorString);
+	}
 
-    public void setFalseCount(int n) {
-        falseCount.set(n);
-    }
+	public void setFalseCount(int n) {
+		falseCount.set(n);
+	}
+
 	/**
 	 * Test the bidrequest against this node
 	 *
-	 * @param br
-	 *            BidRequest. The bid request object to test.
+	 * @param br BidRequest. The bid request object to test.
 	 * @return boolean. Returns true if br-value op value evaluates true. Else
 	 *         false.
-	 * @throws Exception
-	 *             if the request object and the values are not compatible.
+	 * @throws Exception if the request object and the values are not compatible.
 	 */
 	public boolean test(BidRequest br, StringBuilder errorString) throws Exception {
 		boolean test = false;
@@ -583,13 +623,11 @@ public class Node {
 	/**
 	 * Internal version of test() when recursion is required (NOT_* form)
 	 * 
-	 * @param value
-	 *            Object. Converts the value of the bid request field (Jackson)
-	 *            to the appropriate Java object.
+	 * @param value Object. Converts the value of the bid request field (Jackson) to
+	 *              the appropriate Java object.
 	 * @return boolean. Returns true if the operation succeeded.
-	 * @throws Exception
-	 *             if the value is not recognized or is not compatible with
-	 *             this.value.
+	 * @throws Exception if the value is not recognized or is not compatible with
+	 *                   this.value.
 	 */
 	public boolean testInternal(Object value) throws Exception {
 
@@ -699,14 +737,14 @@ public class Node {
 			if (sval != null && (sval.startsWith("@") || sval.startsWith("$"))) {
 				boolean t = false;
 				if (svalue != null && svalue.length() == 0) {
-					t = false;  // Technically "" is a member of any set, but ok, don't let it resolve true.
+					t = false; // Technically "" is a member of any set, but ok, don't let it resolve true.
 				} else {
 					Object x = LookingGlass.get(sval);
 					if (x == null) {
 						Long evalue = errors.get(sval);
 						if (evalue == null || (System.currentTimeMillis() - evalue > 60000)) {
 							logger.error("Failed to retrieve symbol: {}", sval);
-							errors.put(sval,System.currentTimeMillis());
+							errors.put(sval, System.currentTimeMillis());
 						}
 					}
 					if (x instanceof NavMap) {
@@ -721,7 +759,8 @@ public class Node {
 						SimpleSet set = (SimpleSet) x;
 						t = set.getSet().contains(svalue);
 					} else {
-						//System.out.println("Error: ============> " + this.name + " DONT KNOW WHAT THIS IS: " + x);
+						// System.out.println("Error: ============> " + this.name + " DONT KNOW WHAT
+						// THIS IS: " + x);
 						t = false;
 					}
 				}
@@ -803,9 +842,9 @@ public class Node {
 			return !xxx;
 
 		case INRANGE:
-			return computeInRange(mvalue, lval);
+			return computeInRange(mvalue);
 		case NOT_INRANGE:
-			return !computeInRange(mvalue, lval);
+			return !computeInRange(mvalue);
 
 		case DOMAIN:
 			return computeInDomain(nvalue, lval);
@@ -839,18 +878,12 @@ public class Node {
 	 * Processes the relational operators.
 	 * 
 	 * @param operator int. Less than, less than equal, etc...
-	 * @param ival
-	 *            Number. The constant's value if a number.
-	 * @param nvalue
-	 *            Number. The bid request's value if a number,
-	 * @param sval
-	 *            String. the constant's value if a String.
-	 * @param svalue
-	 *            String. The bid request value if a String.
-	 * @param qval
-	 *            Set. The constant's value if it is a Set.
-	 * @param qvalue
-	 *            Set. The bid requests value if it is a Set.
+	 * @param ival     Number. The constant's value if a number.
+	 * @param nvalue   Number. The bid request's value if a number,
+	 * @param sval     String. the constant's value if a String.
+	 * @param svalue   String. The bid request value if a String.
+	 * @param qval     Set. The constant's value if it is a Set.
+	 * @param qvalue   Set. The bid requests value if it is a Set.
 	 * @return boolean. Returns the value of the operation (true or false).
 	 */
 	public boolean processLTE(int operator, Number ival, Number nvalue, String sval, String svalue, Set qval,
@@ -859,16 +892,16 @@ public class Node {
 			return false;
 		switch (operator) {
 		case LESS_THAN:
-			//return ival.doubleValue() < nvalue.doubleValue();
+			// return ival.doubleValue() < nvalue.doubleValue();
 			return nvalue.doubleValue() < ival.doubleValue();
 		case LESS_THAN_EQUALS:
-			//return ival.doubleValue() <= nvalue.doubleValue();
+			// return ival.doubleValue() <= nvalue.doubleValue();
 			return nvalue.doubleValue() <= ival.doubleValue();
 		case GREATER_THAN:
-			//return ival.doubleValue() > nvalue.doubleValue();
+			// return ival.doubleValue() > nvalue.doubleValue();
 			return nvalue.doubleValue() > ival.doubleValue();
 		case GREATER_THAN_EQUALS:
-			//return ival.doubleValue() >= nvalue.doubleValue();
+			// return ival.doubleValue() >= nvalue.doubleValue();
 			return nvalue.doubleValue() >= ival.doubleValue();
 		}
 		return false;
@@ -902,21 +935,15 @@ public class Node {
 	}
 
 	/**
-	 * Determine if the value of this node object equals that of what is found
-	 * in the bid request object.
+	 * Determine if the value of this node object equals that of what is found in
+	 * the bid request object.
 	 * 
-	 * @param ival
-	 *            Number. The constant's value if a number.
-	 * @param nvalue
-	 *            Number. The bid request's value if a number,
-	 * @param sval
-	 *            String. The constant's value if a String.
-	 * @param svalue
-	 *            String. The bid request value if a String.
-	 * @param qval
-	 *            Set. The constant's value if it is a Set.
-	 * @param qvalue
-	 *            Set. The bid requests value if it is a Set.
+	 * @param ival   Number. The constant's value if a number.
+	 * @param nvalue Number. The bid request's value if a number,
+	 * @param sval   String. The constant's value if a String.
+	 * @param svalue String. The bid request value if a String.
+	 * @param qval   Set. The constant's value if it is a Set.
+	 * @param qvalue Set. The bid requests value if it is a Set.
 	 * @return boolean. Returns true if operation is true.
 	 */
 	public boolean processEquals(Number ival, Number nvalue, String sval, String svalue, Set qval, Set qvalue) {
@@ -966,28 +993,22 @@ public class Node {
 	}
 
 	/**
-	 * Compute range in meters from qval (set, lat, lon, meters) against a set
-	 * of
+	 * Compute range in meters from qval (set, lat, lon, meters) against a set of
 	 * 
-	 * @param pos
-	 *            Map. A map of the geo object in the bid request; containing
-	 *            keys "lat","lon","type".
-	 * @param qvalue
-	 *            List. A list of maps defining "lat", "lon","range" for testing
-	 *            against multiple regions. This is the constant value.
+	 * @param pos    Map. A map of the geo object in the bid request; containing
+	 *               keys "lat","lon","type".
+	 * @param qvalue List. A list of maps defining "lat", "lon","range" for testing
+	 *               against multiple regions. This is the constant value.
 	 * @return boolean. Returns true if any of the qvalue regions is in range of
 	 *         pos.
 	 */
-	public boolean computeInRange(Map<String, Double> pos, List<Map> qvalue) {
-		for (int i = 0; i < qvalue.size(); i++) {
-			Map<String, Double> xy = (Map<String, Double>) qvalue.get(i);
-			double xlat = xy.get("lat");
-			double xlon = xy.get("lon");
-
-			double limit = xy.get("range");
-			double range = getRange(xlat, xlon, xlat, xlon);
-
-			if (range < limit)
+	public boolean computeInRange(Map<String, Double> pos) {
+		double plat = pos.get("lat");
+		double plon = pos.get("lon");
+		for (int i = 0; i < points.size(); i++) {
+			Point p = points.get(i);
+			double dist = getRange(p.lat, p.lon, plat, plon);
+			if (dist < p.range)
 				return true;
 		}
 		return false;
@@ -996,14 +1017,10 @@ public class Node {
 	/**
 	 * Compute distance in meters between xlat,xlon and ylat,ylon
 	 * 
-	 * @param xlat
-	 *            - First point's latitude
-	 * @param xlon
-	 *            - First point's longitude
-	 * @param ylat
-	 *            - Second point's latitude
-	 * @param ylon
-	 *            - Second point's longitude
+	 * @param xlat - First point's latitude
+	 * @param xlon - First point's longitude
+	 * @param ylat - Second point's latitude
+	 * @param ylon - Second point's longitude
 	 * @return double. Distance in meters between these 2 points.
 	 */
 	public static double getRange(Number xlat, Number xlon, Number ylat, Number ylon) {
@@ -1037,15 +1054,12 @@ public class Node {
 	/**
 	 * Determine of the value of this node is in the domain of the other node.
 	 * 
-	 * @param ival
-	 *            Number. The value to be tested.
-	 * @param qvalue
-	 *            List. The low and high values to test
+	 * @param ival   Number. The value to be tested.
+	 * @param qvalue List. The low and high values to test
 	 * @return boolean. Returns true of value is in the domain of qvalue, else
 	 *         false;
-	 * @throws Exception
-	 *             if the values being compared are not compatible or not a
-	 *             recognized type.
+	 * @throws Exception if the values being compared are not compatible or not a
+	 *                   recognized type.
 	 */
 	public boolean computeInDomain(Number ival, List qvalue) throws Exception {
 		if (qvalue.size() != 2)
@@ -1060,15 +1074,11 @@ public class Node {
 	}
 
 	/**
-	 * Process membership of scalar value in the list provided in the bid
-	 * request.
+	 * Process membership of scalar value in the list provided in the bid request.
 	 * 
-	 * @param ival
-	 *            Number. The constant's value if a number.
-	 * @param sval
-	 *            String. The constan't value if a string.
-	 * @param qvalue
-	 *            Set. The bid request values.
+	 * @param ival   Number. The constant's value if a number.
+	 * @param sval   String. The constan't value if a string.
+	 * @param qvalue Set. The bid request values.
 	 * @return boolean. Returns true of ival/sval in qvalue.
 	 */
 	boolean processMember(Number ival, String sval, Set qvalue) {
@@ -1082,7 +1092,7 @@ public class Node {
 				ok = qvalue.contains(ival);
 			}
 			if (sval != null) {
-				if (sval.length()==0)
+				if (sval.length() == 0)
 					ok = false;
 				else
 					ok = qvalue.contains(sval);
@@ -1095,13 +1105,11 @@ public class Node {
 	}
 
 	/**
-	 * Process the intersection of the node value and that of the value in the
-	 * bid request.
+	 * Process the intersection of the node value and that of the value in the bid
+	 * request.
 	 * 
-	 * @param qval
-	 *            Set. The set of things from the constant object.
-	 * @param qvalue
-	 *            Set. Te set of things from the bid request.
+	 * @param qval   Set. The set of things from the constant object.
+	 * @param qvalue Set. Te set of things from the bid request.
 	 * @return boolean. Returns true if there is an intersection.
 	 */
 	boolean processIntersects(Set qval, Set qvalue) {
@@ -1112,8 +1120,7 @@ public class Node {
 	/**
 	 * Iterate over a Jackson object and create a Java Map.
 	 * 
-	 * @param node
-	 *            ObjectNode. The Jackson node to set up as a Map.
+	 * @param node ObjectNode. The Jackson node to set up as a Map.
 	 * @return Map. Returns the Map implementation of the Jackson node.
 	 */
 	Map iterateObject(ObjectNode node) {
@@ -1141,8 +1148,7 @@ public class Node {
 	/**
 	 * Traverse an ArrayNode and convert to ArrayList
 	 * 
-	 * @param n ArrayNode.
-	 *            A Jackson ArrayNode.
+	 * @param n ArrayNode. A Jackson ArrayNode.
 	 * @return List. The list that corresponds to the Jackson ArrayNode.
 	 */
 	List traverse(ArrayNode n) {
@@ -1175,8 +1181,8 @@ public class Node {
 	/**
 	 * Returns the value of the interrogate of the bid request.
 	 * 
-	 * @return Object. The value of the bid request derived from the query of
-	 *         the hierarchy.
+	 * @return Object. The value of the bid request derived from the query of the
+	 *         hierarchy.
 	 */
 	@JsonIgnore
 	public Object getBRvalue() {
@@ -1411,3 +1417,19 @@ public class Node {
 
 	}
 }
+
+class Point {
+	public double lat;
+	public double lon;
+	public double range;
+
+	public Point(double lat, double lon, double range) {
+		this.lat = lat;
+		this.lon = lon;
+		this.range = range;
+	}
+	
+	public Point() {
+		
+	}
+};
