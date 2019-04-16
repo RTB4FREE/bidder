@@ -433,6 +433,8 @@ public class BidRequest {
 			throw new Exception("Required field 'id' is missing or wrong type");
 		}
 
+		GeoPatch.getInstance().patch(rootNode.get("device"));
+		
 		IntNode in = null;
 		Object test = null;
 		StringBuilder item = new StringBuilder("id"); // a fast way to keep up
@@ -474,7 +476,6 @@ public class BidRequest {
 			}
 
 			makeSynthKey();
-			GeoPatch.getInstance().patch(rootNode.get("device"));
 
 			// ///////////////
 			if (siteDomain != null && blackList != null) {
