@@ -20,6 +20,7 @@ import com.jacamars.dsp.rtb.bidder.Controller;
 import com.jacamars.dsp.rtb.common.Configuration;
 import com.jacamars.dsp.rtb.common.Node;
 import com.jacamars.dsp.rtb.pojo.BidRequest;
+import com.jacamars.dsp.rtb.tools.DbTools;
 
 /**
  * Test Geo fencing
@@ -57,7 +58,7 @@ public class TestRanges {
 	}  
 	
 	/**
-	 * Test distance calaculations
+	 * Test distance calculations
 	 */
 	@Test 
 	public void testLosAngelesToSF() {
@@ -80,26 +81,42 @@ public class TestRanges {
 		BidRequest br = new BidRequest(is);
 		assertEquals(br.getId(),"K6t8sXXYdM");
 		
-		Map m = new HashMap();
+		String ref = "LATLON,  34.05, -118.25, 600000.0";
+		/*Map m = new HashMap();
 		m.put("lat", 34.05);
 		m.put("lon",-118.25);
 		m.put("range",600000.0);
 		List list = new ArrayList();
-		list.add(m);
+		list.add(m); */
 		
-		Node node = new Node("LATLON","device.geo", Node.INRANGE, list);
-     	node.test(br,null);
+		Node node = new Node("LATLON","device.geo", Node.INRANGE, ref);
+		
+     	boolean b = node.test(br,null);
+		assertTrue(b);
+
+	}
+	
+	@Test
+	public void testzipRangeInBidRequest() throws Exception {
+		InputStream is = Configuration.getInputStream("SampleBids/smaato.json");
+		BidRequest br = new BidRequest(is);
+		assertEquals(br.getId(),"K6t8sXXYdM");
+		
+		Node node = new Node("LATLON","device.geo", Node.INRANGE, "ZIPCODES, 90505,90506,90507,600000");
+		
+		System.out.println(DbTools.mapper.writeValueAsString(node));
+		System.out.println("XXXXXXX");
+		
+     /*	boolean b = node.test(br,null);
 		ObjectNode map = (ObjectNode)node.getBRvalue();
 		assertTrue((Double)map.get("lat").doubleValue()==37.62);
 		assertTrue((Double)map.get("lon").doubleValue()==-122.38);
 		assertTrue((Double)map.get("type").doubleValue()==3);
-		
-		List<Map>test = new ArrayList();
-		test.add(m);
-		node = new Node("LATLON","device.geo", Node.INRANGE, test);
-		node.test(br,null);
+
+		assertTrue(b); */
 
 	}
+
 
 	/**
 	 * When you interrogate "domain", app.domain and site.domain will work for either.
