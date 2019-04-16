@@ -78,7 +78,7 @@ public class Node {
 	public static Map<String, Map> builtinMap = new HashMap();
 
 	/** Counts number of times it has been judged FALSE */
-	AtomicLong falseCount = new AtomicLong(0);
+	transient AtomicLong falseCount = new AtomicLong(0);
 
 	static {
 		Map map = new HashMap();
@@ -252,6 +252,7 @@ public class Node {
 	 * 
 	 * @return long. The current false count
 	 */
+	@JsonIgnore
 	public long getFalseCount() {
 		return falseCount.get();
 	}
