@@ -247,6 +247,16 @@ public class Creative {
 	void encodeUrl() {
 		MacroProcessing.findMacros(macros, forwardurl);
 		MacroProcessing.findMacros(macros, imageurl);
+		
+		/**
+		 * Docker environment variable substitutions too
+		 */
+		try {
+			imageurl = Configuration.getInstance().substitute(imageurl);
+			forwardurl = Configuration.getInstance().substitute(forwardurl);
+		} catch (Exception error) {
+			error.printStackTrace();
+		}
 
 		if (w != null) {
 			if (dimensions == null)
