@@ -61,7 +61,7 @@
         "adx" : "<a href='$BID:8080/rtb/win/{pub_id}/%%WINNING_PRICE%%/{lat}/{lon}/{ad_id}/{creative_id}/{bid_id}'}'></a><a href='%%CLICK_URL_UNESC%%{redirect_url}></a>{creative_forward_url}",
         "mopub" : "<a href='mopub template here' </a>",
         "mobclix" : "<a href='mobclix template here' </a>",
-        "nexage" : "<a href='{redirect_url}/exchange={pub}/ad_id={ad_id}/creative_id={creative_id}/price=${AUCTION_PRICE}/lat={lat}/lon={lon}/bid_id={bid_id}?url={creative_forward_url}'><img src='{creative_image_url}' height='{creative_ad_height}' width='{creative_ad_width}'></a><img src='{pixel_url}/exchange={pub}/ad_id={ad_id}/creative_id={creative_id}/{bid_id}/price=${AUCTION_PRICE}/lat={lat}/lon={lon}/bid_id={bid_id}' height='1' width='1'>",
+        "nexage" : "{creative_forward_url}",
         "smartyads" : "{creative_forward_url}",
         "atomx" : "{creative_forward_url}",
         "bidswitch" : "{creative_forward_url}",
@@ -204,7 +204,7 @@
   }, {
     "name" : "nexage",
     "id" : "99999999",
-    "bid" : "/rtb/bids/nexage=com.jacamars.dsp.rtb.exchanges.Nexage"
+    "bid" : "/rtb/bids/nexage=com.jacamars.dsp.rtb.exchanges.Generic&!usesEncodedAdm"
   }, {
     "name" : "privatex",
     "id" : "5555555",
