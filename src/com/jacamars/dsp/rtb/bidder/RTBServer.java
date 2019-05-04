@@ -1375,7 +1375,7 @@ class Handler extends AbstractHandler {
                         return;
 
                     default:
-                        logger.warn("Undefined command: {}",rs);
+                        logger.warn("Undefined command: {}. query: {}",rtype,rs);
                 }
                 response.getWriter().println("");
                 return;
