@@ -1963,7 +1963,12 @@ class AdminHandler extends Handler {
                 response.setContentType("text/javascript;charset=utf-8");
                 response.setStatus(HttpServletResponse.SC_OK);
                 baseRequest.setHandled(true);
-                String data = WebCampaign.getInstance().handler(request, body);
+                String data = null;
+                try {
+                	data = WebCampaign.getInstance().handler(request, body);
+                } catch (Exception nerror) {
+                	logger.error("Failed to process: {}, error: {}",target,nerror.getMessage());
+                }
                 response.getWriter().println(data);
                 response.flushBuffer();
                 return;
