@@ -206,7 +206,11 @@ public class ZPublisher implements Runnable, Callback {
                 logger = new com.jacamars.dsp.rtb.jmq.Publisher(parts[0], parts[1]);
                 topic = parts[1];
             } catch (Exception e) {
-                clogger.error("Can't open 0MQ channel {}/{} because: {}", parts[0], parts[1], e.toString());
+            	clogger.error("Can't open 0MQ channel to: {}.",address);
+            	if (parts.length == 1)
+            		clogger.error("Can't open 0MQ channel {}/NULL} because: {}", parts[0], e.toString());
+            	else
+            		clogger.error("Can't open 0MQ channel {}/{}} because: {}", parts[0], parts[1], e.toString());
                 throw e;
             }
         }
