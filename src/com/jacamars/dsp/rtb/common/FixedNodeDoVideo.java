@@ -74,6 +74,23 @@ public class FixedNodeDoVideo extends Node {
                     }
                 }
             }
+            
+            if (imp.video.delivery != null) {
+    			if (creative.delivery == null) {
+    				if (errorString != null) {
+    					errorString.append("Impression requires delivery specified but creative doesn't provide one.");
+    				}
+    				probe.process(br.getExchange(),  adId, creative.impid, Probe.VIDEO_MISSING_DELIVERY);
+    				return false;
+    			}
+    			if (imp.video.delivery.contains(creative.delivery)==false) {
+    				if (errorString != null) {
+    					errorString.append("Delivery of the video creative is not supported by the impression");
+    				}
+    				probe.process(br.getExchange(),  adId, creative.impid, Probe.VIDEO_DELIVERY_MISMATCH);
+    				return false;
+    			}
+    		}
         }
 
         return true;

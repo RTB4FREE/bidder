@@ -381,6 +381,16 @@ public class Impression {
 				video.mimeTypes.add(member.textValue());
 			}
 		}
+		
+		test = rvideo.get("delivery");
+		if (test != null && !(test instanceof MissingNode)) {
+			video.delivery = new ArrayList();
+			ArrayNode array = (ArrayNode) test;
+			for (JsonNode member : array) {
+				video.delivery.add(member.intValue());
+			}
+		}
+		
 		nativead = false;
 		
 		getBlockedAttrs(rvideo);
