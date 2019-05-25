@@ -12,7 +12,7 @@
   "app" : {
     "geopatch": "$GEOPATCH",
     "concurrency" : "1",
-    "demodb": "zipcodetest.json",
+    "demodb": "audio.json",
     "NOdeadmanswitch":"accountingsystem",
     "threads": "128",
     "trace": "$TRACE",
@@ -21,6 +21,7 @@
     "pixel-tracking-url" : "$EXTERNAL/pixel",
     "clickurl" : "$EXTERNAL/click",
     "winurl" : "$EXTERNAL/rtb/win",
+    "lossurl": "$EXTERNAL/callback?type=reason&code=${AUCTION_LOSS}&bid={bid_id}&adid={ad_id}&crid={creative_id}",
     "redirect-url" : "$EXTERNAL/redirect",
     "vasturl" : "$EXTERNAL/vast",
     "eventurl" : "$EXTERNAL/track",
@@ -47,7 +48,7 @@
 	  "postbackevents": "kafka://[$BROKERLIST]&topic=postbackevents",
       "status" : "kafka://[$BROKERLIST]&topic=status",
       "reasons" : "kafka://[$BROKERLIST]&topic=reasons",
-
+      "losses": "kafka://[$BROKERLIST]&topic=losses", 
       "commands": "tcp://$PUBSUB:6001&commands",
       "responses": "tcp://$PUBSUB:6000&responses",
       "xfrport": "6002",

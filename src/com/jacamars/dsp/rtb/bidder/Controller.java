@@ -206,6 +206,12 @@ public enum Controller {
      * Queue for sending nobid reasons
      */
     static ZPublisher reasonsQueue;
+    
+    /**
+     * Queue for sending loss notifications
+     */
+    static ZPublisher lossesQueue;
+    
     /**
      * Queue for video events
      */
@@ -275,6 +281,9 @@ public enum Controller {
             }
             if (config.REASONS_CHANNEL != null) {
                 reasonsQueue = new ZPublisher(config.REASONS_CHANNEL);
+            }
+            if (config.LOSSES_CHANNEL != null) {
+                lossesQueue = new ZPublisher(config.LOSSES_CHANNEL);
             }
             if (config.WINS_CHANNEL != null) {
                 winsQueue = new ZPublisher(config.WINS_CHANNEL);
@@ -1089,6 +1098,20 @@ public enum Controller {
                 logger.info("Pixel record: {}",log);
             }
             pixelsQueue.add(log);
+        }
+    }
+    
+    public void publishLoss(String target) {
+        PixelClickConvertLog log = new PixelClickConvertLog();
+        log.create(target);
+        log.type = log.LOSS;
+        if (lossesQueue != null) {
+            if (log.debug) {
+                logger.info("Pixel record: {}",log);
+            }
+            lossesQueue.add(log);
+        } else {
+        	logger.info("Loss record: {}",log);
         }
     }
 

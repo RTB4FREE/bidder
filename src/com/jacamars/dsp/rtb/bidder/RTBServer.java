@@ -1374,6 +1374,10 @@ class Handler extends AbstractHandler {
                         RTBServer.clicks++;
                         return;
 
+                    case "loss":
+                    	Controller.getInstance().publishLoss(rs);
+                    	break;
+                    	
                     default:
                         logger.warn("Undefined command: {}. query: {}",rtype,rs);
                 }
