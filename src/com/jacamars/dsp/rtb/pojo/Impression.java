@@ -2,8 +2,10 @@ package com.jacamars.dsp.rtb.pojo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -57,6 +59,9 @@ public class Impression {
 
 	/** A video object */
 	public Video video = null;
+	
+	/** An audio object */
+	public Audio audio = null;
 
 	/** native ad extension */
 	public transient NativePart nativePart;
@@ -75,6 +80,9 @@ public class Impression {
 
 	/** Optional format objects, found only in banner */
 	public List<Format> format;
+	
+	/** Blocked attributes */
+	public Set<Integer> battr;
 
 	/**
 	 * Compiles the builtin attributes
@@ -134,7 +142,7 @@ public class Impression {
 		this.rnode = rnode;
 
 		JsonNode test;
-
+		
 		if ((test = rnode.get("pmp")) != null) {
 			ObjectNode x = (ObjectNode) test;
 			JsonNode y = x.path("private_auction");
@@ -182,8 +190,120 @@ public class Impression {
 			doBanner();
 		else if (rnode.get("video") != null)
 			doVideo();
-		else
+		else if (rnode.get("native") != null)
 			doNative();
+		else if (rnode.get("audio") != null) 
+			doAudio();
+		else
+			doBanner();
+	}
+	
+	/**
+	 * Handle the audio impression
+	 */
+	void doAudio() {
+		JsonNode test;
+		JsonNode aud = rnode.get("audio");
+		nativead = false;
+		test = aud.get("mimes");
+		if (test != null && !(test instanceof MissingNode)) {
+			audio = new Audio();
+			ArrayNode array = (ArrayNode) test;
+			for (JsonNode member : array) {
+				audio.mimeTypes.add(member.textValue());
+			}
+		}
+		
+		test = aud.get("minduration");
+		if (test != null && !(test instanceof MissingNode)) {
+			audio.minduration = test.get("minduration").intValue();
+		}
+		
+		test = aud.get("maxduration");
+		if (test != null && !(test instanceof MissingNode)) {
+			audio.maxduration = test.intValue();
+		}
+		
+		test = aud.get("protocols");
+		if (test != null && !(test instanceof MissingNode)) {
+			audio.protocols = new ArrayList();
+			ArrayNode array = (ArrayNode) test;
+			for (JsonNode member : array) {
+				audio.protocols.add(member.intValue());
+			}
+		}
+		
+		test = aud.get("startdelay");
+		if (test != null && !(test instanceof MissingNode)) {
+			audio.startdelay = test.intValue();
+		}
+		
+		test = aud.get("maxextended");
+		if (test != null && !(test instanceof MissingNode)) {
+			audio.maxextended = test.intValue();
+		}
+		
+		test = aud.get("minbitrate");
+		if (test != null && !(test instanceof MissingNode)) {
+			audio.minbitrate = test.intValue();
+		}
+		
+		test = aud.get("maxbitrate");
+		if (test != null && !(test instanceof MissingNode)) {
+			audio.maxbitrate = test.intValue();
+		}
+		
+		test = aud.get("delivery");
+		if (test != null && !(test instanceof MissingNode)) {
+			audio.delivery = new ArrayList();
+			ArrayNode array = (ArrayNode) test;
+			for (JsonNode member : array) {
+				audio.delivery.add(member.intValue());
+			}
+		}
+		
+		test = aud.get("maxseq");
+		if (test != null && !(test instanceof MissingNode)) {
+			audio.maxseq = test.intValue();
+		}
+		
+		test = aud.get("feed");
+		if (test != null && !(test instanceof MissingNode)) {
+			audio.feed = test.get("feed").intValue();
+		}
+		
+		test = aud.get("stitched");
+		if (test != null && !(test instanceof MissingNode)) {
+			audio.stitched = test.get("stitched").intValue();
+		}
+		
+		test = aud.get("nvol");
+		if (test != null && !(test instanceof MissingNode)) {
+			audio.nvol = test.get("nvol").intValue();
+		}
+		
+		test = aud.get("api");
+		if (test != null && !(test instanceof MissingNode)) {
+			battr = new HashSet();
+			ArrayNode array = (ArrayNode) test;
+			for (JsonNode member : array) {
+				audio.api.add(member.intValue());
+			}
+		}
+		
+		getBlockedAttrs(aud);
+
+	}
+	
+	void getBlockedAttrs(JsonNode x) {
+		JsonNode test = x.get("battr");
+		if (test != null && !(test instanceof MissingNode)) {
+			battr = new HashSet();
+			ArrayNode array = (ArrayNode) test;
+			for (JsonNode member : array) {
+				battr.add(member.intValue());
+			}
+		}
 	}
 
 	/**
@@ -213,6 +333,8 @@ public class Impression {
 				format.add(f);
 			}
 		}
+		
+		getBlockedAttrs(banner);
 	}
 
 	/**
@@ -260,6 +382,8 @@ public class Impression {
 			}
 		}
 		nativead = false;
+		
+		getBlockedAttrs(rvideo);
 	}
 
 	/**
@@ -267,6 +391,9 @@ public class Impression {
 	 */
 	void doNative() {
 		JsonNode node = rnode.get("native");
+		
+		getBlockedAttrs(node);
+		
 		if (node != null) {
 			JsonNode child = null;
 			nativead = true;

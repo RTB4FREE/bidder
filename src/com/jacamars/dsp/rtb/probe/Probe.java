@@ -51,9 +51,32 @@ public class Probe {
 	public static final String CREATIVE_NOTACTIVE = new String("Creative is not in active state\n");
 	public static final String WRONG_EXCHANGE = new String("Wrong exchange\n");
 	public static final String SPEND_RATE_EXCEEDED = new String("Spend Rate Exceeded\n");
-	public static final String SITE_OR_APP_DOMAIN = new String("site.domain OR app.domain");
-	public static final String FORMAT_NOMATCH = new String("Format in impression does not match any creative size");
-	public static final String GLOBAL = new String("Global");
+	public static final String SITE_OR_APP_DOMAIN = new String("site.domain OR app.domain\n");
+	public static final String FORMAT_NOMATCH = new String("Format in impression does not match any creative size\n");
+	public static final String GLOBAL = new String("Global\n");
+	public static final String MISSING_BATTR = new String("Creative is missing creative attributes, but impression requires it\n");
+	public static final String CREATIVE_BLOCKED_ATTRIBUTES = new String("Creative has blocked attributes in this impression\n");
+	public static final String BID_CREAT_IS_AUDIO = new String("Creative is audio, request is not\n");
+	public static final String AUDIO_MISSING_MIME = new String("Audio creative missing mimeTypes\n");
+	public static final String AUDIO_MIME_MISMATCH = new String("Audio creative mimetype mismatch\n");
+	public static final String AUDIO_MISSING_DURATION = new String("Audio creative missing duration\n");
+	public static final String AUDIO_MINDURATION_MISMATCH = new String("Audio creative duration too short\n");
+	public static final String AUDIO_MAXDURATION_MISMATCH = new String("Audio creative duration too long\n");
+	public static final String AUDIO_MISSING_PROTOCOLS = new String("Audio creative missing protocol\n");
+	public static final String AUDIO_PROTOCOLS_MISMATCH = new String("Audio creative protocol mismatch\n");
+	public static final String AUDIO_MISSING_STARTDELAY = new String("Audio creative missing startdelay\n");
+	public static final String AUDIO_STARTDELAY_MISMATCH = new String("Audio creative startdelay mismatch\n");
+	public static final String AUDIO_MISSING_BITRATE = new String("Audio creative missing bitrate\n");
+	public static final String AUDIO_BITRATE_TOO_SMALL = new String("Audio creative bitrate too low\n");
+	public static final String AUDIO_BIRATE_TOO_LARGE = new String("Audio creative bitrate too high\n");
+	public static final String AUDIO_MISSING_DELIVERY = new String("Audio creative missing delivery\n");
+	public static final String AUDIO_DELIVERY_MISMATCH = new String("Audio creative delivery mismatch\n");
+	public static final String AUDIO_MISSING_API = new String("Audio creative missing api\n");
+	public static final String AUDIO_API_MISMATCH = new String("Audio creative api mismatch\n");
+	public static final String AUDIO_MISSING_FEED = new String("Audio creative missing feed\n");
+	public static final String AUDIO_FEED_MISMATCH = new String("Audio creative feed mismatch\n");
+	public static final String AUDIO_MISSING_STITCHED = new String("Audio creative missing stitched\n");
+	public static final String AUDIO_STITCHED_MISMATCH = new String("Audio creative stitch mismatch\n");
 
 
 	LongAdder total = new LongAdder();

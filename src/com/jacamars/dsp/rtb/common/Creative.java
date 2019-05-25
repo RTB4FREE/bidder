@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.io.JsonStringEncoder;
@@ -104,6 +105,9 @@ public class Creative {
 	// /////////////////////////////////////////////
 	/** Native content assets */
 	public NativeCreative nativead;
+	
+	/** Audio content assets */
+	public AudioCreative audioAd;
 
 	/**
 	 * Don't use the template, use exactly what is in the creative for the ADM
@@ -144,6 +148,8 @@ public class Creative {
 	/** A sorter for the campaign/creative attributes, who is most likely to cause a false will bubble up */
 	private SortNodesFalseCount nodeSorter = new SortNodesFalseCount();
 	
+	/** A list of creative attributes used for describing the creative in rtb 2.5 See table 5.3 */
+	public Set<Integer> creativeAttributes;
 
 	/**
 	 * Empty constructor for creation using json.
@@ -178,6 +184,7 @@ public class Creative {
 		c.imageurl = imageurl;
 		c.dimensions = dimensions;
 		c.categories = categories;
+		c.creativeAttributes = creativeAttributes;
 
 		c.encodeUrl();
 		return c;
@@ -431,6 +438,18 @@ public class Creative {
 	}
 
 	/**
+	 * Determine if this creative is audio or not
+	 * 
+	 * @return boolean. Returns true if video.
+	 */
+	@JsonIgnore
+	public boolean isAudio() {
+		if (this.audioAd != null)
+			return true;
+		return false;
+	}
+	
+	/**
 	 * Determine if this creative is video or not
 	 * 
 	 * @return boolean. Returns true if video.
@@ -462,15 +481,18 @@ public class Creative {
         fixedNodes.add(new FixedNodeNonStandard());
         fixedNodes.add(new FixedNodeExchange());
 
-        // These are impression releated
+        // These are impression related
+        attributes.add(new FixedNodeBlockedAttributes());
 		attributes.add(new FixedNodeRequiresDeal());
 		attributes.add(new FixedNodeNoDealMatch());
 		attributes.add(new FixedNodeIsVideo());
 		attributes.add(new FixedNodeIsNative());
 		attributes.add(new FixedNodeIsBanner());
+		attributes.add(new FixedNodeIsAudio());
 		attributes.add(new FixedNodeDoNative());
         attributes.add(new FixedNodeDoSize());
 		attributes.add(new FixedNodeDoVideo());
+		attributes.add(new FixedNodeDoAudio());
 	}
 
     /**
