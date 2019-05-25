@@ -225,6 +225,10 @@ public class Configuration {
 
 	// Channel that reports reasons
 	public volatile static String REASONS_CHANNEL = null;
+	
+	// RTB2.5 Losses
+	public volatile static String LOSSES_CHANNEL = null;
+	
 	/** Zeromq command port */
 	public volatile static String commandsPort;
 	/** Whether to allow multiple bids per response */
@@ -744,6 +748,8 @@ public class Configuration {
 			MSSP_CHANNEL = value;
 		if ((value = (String) zeromq.get("reasons")) != null)
 			REASONS_CHANNEL = value;
+		if ((value = (String) zeromq.get("losses")) != null)
+			LOSSES_CHANNEL = value;
 
 		/////////////////////////////////////////////////////////////////////
 
@@ -910,6 +916,8 @@ public class Configuration {
 			address = GetEnvironmentVariable(address, "$STATUSCHANNEL", "kafka://[$BROKERLIST]&topic=status");
 		while (address.contains("$REASONSCHANNEL"))
 			address = GetEnvironmentVariable(address, "$REASONSCHANNEL", "kafka://[$BROKERLIST]&topic=reasons");
+		while (address.contains("$LOSSESCHANNEL"))
+			address = GetEnvironmentVariable(address, "$LOSSESCHANNEL", "kafka://[$BROKERLIST]&topic=losses");
 		while (address.contains("$LOGCHANNEL"))
 			address = GetEnvironmentVariable(address, "$LOGCHANNEL", "kafka://[$BROKERLIST]&topic=logs");
 
