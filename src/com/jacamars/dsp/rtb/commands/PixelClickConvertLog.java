@@ -47,10 +47,13 @@ public class PixelClickConvertLog {
     public String tid;
     /** The deviceid, if present */
     public String deviceid;
+    
+    public int code;
 
     public static final int PIXEL = 0;
     public static final int CLICK = 1;
     public static final int CONVERT = 2;
+    public static final int LOSS = 3;
 
 
     public static void main(String[] args) {
@@ -214,6 +217,9 @@ public class PixelClickConvertLog {
                     case "deviceid":
                         deviceid = items[1];
                         break;
+                    case "code":
+                    	code = Integer.parseInt(items[1]);
+                    	break;
                     default:
                         break;
                 }
