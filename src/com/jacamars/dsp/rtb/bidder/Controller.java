@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jacamars.dsp.rtb.blocks.AwsCommander;
+import com.jacamars.dsp.rtb.blocks.LookingGlass;
 import com.jacamars.dsp.rtb.blocks.ProportionalEntry;
 import com.jacamars.dsp.rtb.commands.*;
 import com.jacamars.dsp.rtb.common.*;
@@ -149,6 +150,12 @@ public enum Controller {
     public static final int SET_WEIGHTS = 26;
 
     public static final int GET_WEIGHTS = 27;
+    
+    public static final int REMOVE_SYMBOL = 28;
+
+    public static final int LIST_SYMBOLS = 30;
+
+    public static final int LIST_SYMBOLS_RESPONSE = 31;
 
     /**
      * The JEDIS object for creating bid hash objects
@@ -339,6 +346,27 @@ public enum Controller {
         responseQueue.add(m);
 
         logger.info("Responding with: {}", m.msg);
+        return m;
+    }
+
+    public BasicCommand removeAwsObject(BasicCommand c) {
+        logger.info("RENOVING AWS OBJECT {}",c.target);
+        BasicCommand m = new BasicCommand();
+        m.to = c.from;
+        m.from = Configuration.instanceName;
+        m.id = c.id;
+        m.logtype = c.logtype;
+        LookingGlass.symbols.remove(c.target);
+        if (LookingGlass.symbols.get(c.target)==null) {
+            m.status = "Error";
+            m.msg = "AWS Remove failed: No such symbol: " + c.target;
+            responseQueue.add(m);
+        } else {
+            m.msg = "AWS Object " + c.target + " removed ok";
+            m.name = "AWS Remove Response";
+            logger.info("removeAws results: {}", m.msg);
+            responseQueue.add(m);
+        }
         return m;
     }
 
@@ -1459,6 +1487,43 @@ class CommandLoop implements com.jacamars.dsp.rtb.jmq.MessageListener<Object> {
                     thread.start();
 
                     break;
+                    
+                case Controller.REMOVE_SYMBOL:
+                    if (!controller)
+                        return;
+
+                    task = () -> {
+                        try {
+                            Controller.getInstance().removeAwsObject(item);
+                        } catch (Exception e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    };
+                    thread = new Thread(task);
+                    thread.start();
+
+                    break;
+                    
+                case Controller.LIST_SYMBOLS:
+                    try {
+                        String list = "";
+                        for (String name : LookingGlass.symbols.keySet()) {
+                            list +=  name + " ";
+                        }
+                        BasicCommand cmd = new ListSymbolsResponse(item.from, Configuration.instanceName, list);
+                        cmd.from = Configuration.instanceName;
+                        cmd.to = item.from;
+                        cmd.id = item.id;
+                        Controller.getInstance().responseQueue.add(cmd);
+
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+
+                    break;
+
 
                 case Controller.ADD_CAMPAIGNS_LIST:
                     if (!controller)
