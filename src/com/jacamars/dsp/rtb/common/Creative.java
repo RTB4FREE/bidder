@@ -150,6 +150,9 @@ public class Creative {
 	
 	/** A list of creative attributes used for describing the creative in rtb 2.5 See table 5.3 */
 	public Set<Integer> creativeAttributes;
+	
+	/** Used for video */
+	public Integer delivery;
 
 	/**
 	 * Empty constructor for creation using json.

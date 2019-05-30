@@ -45,6 +45,8 @@ public class Probe {
 	public static final String VIDEO_TOO_LONG = new String("Video Creative max duration too short\n");
 	public static final String VIDEO_PROTOCOL = new String("Video Creative protocols don't match\n");
 	public static final String VIDEO_MIME = new String("Video Creative mime type mismatch\n");
+	public static final String VIDEO_MISSING_DELIVERY = new String("Video creative missing delivery\n");
+	public static final String VIDEO_DELIVERY_MISMATCH = new String("Video creative delivery mismatch\n");
 	public static final String CREATIVE_MISMATCH = new String("Creative mismatch: ");
 	public static final String FREQUENCY_CAPPED = new String("Frequency capped\n");
 	public static final String FREQUENCY_GOVERNED = new String("Frequency governed\n");

@@ -23,6 +23,8 @@ public class Video {
 	/** The mine types I like */
 	public List<String> mimeTypes = new ArrayList<String>();
 	
+	public List<Integer> delivery;
+	
 	public Video() {
 		
 	}
