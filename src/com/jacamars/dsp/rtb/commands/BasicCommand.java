@@ -16,7 +16,7 @@ public class BasicCommand {
 	public String name = null;
 	/** Default command, -1 means uninitialized. Extending objects need to set this. */
 	public Integer cmd = -1;
-	/** The instance name obtained from the configurarion */
+	/** The instance name obtained from the configuration */
 	public String from = "na";
 	/** The id of whom the response is sent to */
 	public String to = "*";
