@@ -1416,25 +1416,31 @@ public class Configuration {
 			if (!fileName.equals("")) {
 				String name = (String) m.get("name");
 				String type = (String) m.get("type");
-				if (name.startsWith("@") == false)
-					name = "@" + name;
-				if (type.contains("NavMap") || type.contains("RangeMap")) {
-					new NavMap(name, fileName, false); // file uses ranges
-				} else if (type.contains("CidrMap")) { // file uses CIDR blocks
-					new NavMap(name, fileName, true);
-				} else if (type.contains("AdxGeoCodes")) {
-					new AdxGeoCodes(name, fileName);
-				} else if (type.contains("LookingGlass")) {
-					new LookingGlass(name, fileName);
-				} else {
-					// Ok, load it by class name
-					Class cl = Class.forName(type);
-					Constructor<?> cons = cl.getConstructor(String.class, String.class);
-					cons.newInstance(name, fileName);
-				}
-				logger.info("*** Configuration Initialized {} with {}", name, fileName);
+				
+				initObject(name,fileName,type);
 			}
 		}
+		
+	}
+	
+	public void initObject(String name, String fileName, String type) throws Exception {
+			if (name.startsWith("@") == false)
+				name = "@" + name;
+			if (type.contains("NavMap") || type.contains("RangeMap")) {
+				new NavMap(name, fileName, false); // file uses ranges
+			} else if (type.contains("CidrMap")) { // file uses CIDR blocks
+				new NavMap(name, fileName, true);
+			} else if (type.contains("AdxGeoCodes")) {
+				new AdxGeoCodes(name, fileName);
+			} else if (type.contains("LookingGlass")) {
+				new LookingGlass(name, fileName);
+			} else {
+				// Ok, load it by class name
+				Class cl = Class.forName(type);
+				Constructor<?> cons = cl.getConstructor(String.class, String.class);
+				cons.newInstance(name, fileName);
+			}
+			logger.info("*** Configuration Initialized {} with {}", name, fileName);
 	}
 
 	/**
