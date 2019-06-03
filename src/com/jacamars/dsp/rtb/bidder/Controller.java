@@ -137,7 +137,7 @@ public enum Controller {
      */
     public static final int HEARTBEAT = 21;
     /**
-     * The hearbeat message from crosstalk 22
+     * The hearbeat message from crosstalk
      */
     public static final int HEARTBEAT_CROSSTALK = 22;
 
@@ -156,6 +156,8 @@ public enum Controller {
     public static final int LIST_SYMBOLS = 30;
 
     public static final int LIST_SYMBOLS_RESPONSE = 31;
+    
+    public static final int CONFIGURE_OBJECT = 32;
 
     /**
      * The JEDIS object for creating bid hash objects
@@ -407,6 +409,32 @@ public enum Controller {
             m.msg = "AWS Object " + c.target + " loaded ok";
             m.name = "AWS Object Response";
             logger.info("ConfigureAws results: {}", m.msg);
+            responseQueue.add(m);
+        }
+        return m;
+    }
+    
+    /**
+     * Create an object from a file
+     * @param c BasicCommand. The command components. Name will be the name field, target is the filename, and logtype is the type of the object.
+     * @return BasicCommand. The returned results of the command.
+     */
+    public BasicCommand configureObject(BasicCommand c) {
+        logger.info("ADDING A FILE BASED OBJECT {}",c.target);
+        BasicCommand m = new BasicCommand();
+        m.to = c.from;
+        m.from = Configuration.instanceName;
+        m.id = c.id;
+        m.logtype = c.logtype;
+        try {
+        	Configuration.getInstance().initObject(c.name,c.target,c.logtype);
+            m.msg = "AWS Object " + c.target + " loaded ok";
+            m.name = "AWS Object Response";
+            logger.info("ConfigureAws results: {}", m.msg);
+            responseQueue.add(m);
+        } catch (Exception error) {
+            m.status = "Error";
+            m.msg = "AWS Object load failed: " + error.getMessage();
             responseQueue.add(m);
         }
         return m;
@@ -1501,6 +1529,23 @@ class CommandLoop implements com.jacamars.dsp.rtb.jmq.MessageListener<Object> {
                     task = () -> {
                         try {
                             Controller.getInstance().configureAwsObject(item);
+                        } catch (Exception e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    };
+                    thread = new Thread(task);
+                    thread.start();
+
+                    break;
+                    
+                case Controller.CONFIGURE_OBJECT:
+                    if (!controller)
+                        return;
+
+                    task = () -> {
+                        try {
+                            Controller.getInstance().configureObject(item);
                         } catch (Exception e) {
                             // TODO Auto-generated catch block
                             e.printStackTrace();
