@@ -46,6 +46,7 @@ import com.jacamars.dsp.rtb.blocks.Cuckoo;
 import com.jacamars.dsp.rtb.blocks.LookingGlass;
 import com.jacamars.dsp.rtb.blocks.NavMap;
 import com.jacamars.dsp.rtb.blocks.ProportionalEntry;
+import com.jacamars.dsp.rtb.blocks.ProportionalRandomCollection;
 import com.jacamars.dsp.rtb.blocks.SimpleMultiset;
 import com.jacamars.dsp.rtb.blocks.SimpleSet;
 import com.jacamars.dsp.rtb.db.Database;
@@ -1424,9 +1425,18 @@ public class Configuration {
 	}
 	
 	public void initObject(String name, String fileName, String type) throws Exception {
+			if (name == null)
+				throw new Exception("Symbol name is null");
+			if (fileName == null)
+				throw new Exception("File Name is null");
+			if (type== null)
+				throw new Exception("Type is null");
+			
 			if (name.startsWith("@") == false)
 				name = "@" + name;
-			if (type.contains("NavMap") || type.contains("RangeMap")) {
+			if (type.contains("Bloom") || type.contains("Bloom")) {
+				new Bloom(name, fileName); // file uses ranges
+			} else  if (type.contains("NavMap") || type.contains("RangeMap")) {
 				new NavMap(name, fileName, false); // file uses ranges
 			} else if (type.contains("CidrMap")) { // file uses CIDR blocks
 				new NavMap(name, fileName, true);
@@ -1434,7 +1444,13 @@ public class Configuration {
 				new AdxGeoCodes(name, fileName);
 			} else if (type.contains("LookingGlass")) {
 				new LookingGlass(name, fileName);
-			} else {
+			} else if (type.contains("SimpleSet")) {
+				new SimpleSet(name, fileName);
+			} else if (type.contains("ProportionalRandomCollection")) {
+				new ProportionalRandomCollection(name,fileName);
+			}
+			
+			else {
 				// Ok, load it by class name
 				Class cl = Class.forName(type);
 				Constructor<?> cons = cl.getConstructor(String.class, String.class);

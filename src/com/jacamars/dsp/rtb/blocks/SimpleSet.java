@@ -81,4 +81,10 @@ public class SimpleSet extends LookingGlass {
 	public Set<String> getSet() {
 		return set;
 	}
+
+	public Object query(Object key) {
+		if (key == null)
+			return false;
+		return set.contains(key);
+	}
 }

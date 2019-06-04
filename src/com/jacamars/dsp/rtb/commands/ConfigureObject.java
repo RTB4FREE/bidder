@@ -31,6 +31,7 @@ public class ConfigureObject extends BasicCommand {
 		super(to);
 		cmd = Controller.CONFIGURE_OBJECT;
 		status = "ok";
+		this.name = name;
 		this.target = target;
 		this.type = type;
 		msg = "A FILE OBJECT is befing configured: " + name +"/" + target + "/" + type;

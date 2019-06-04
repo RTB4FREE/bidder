@@ -6,19 +6,25 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.hash.BloomFilter;
 import com.jacamars.dsp.rtb.blocks.AwsCommander;
 import com.jacamars.dsp.rtb.blocks.LookingGlass;
+import com.jacamars.dsp.rtb.blocks.NavMap;
 import com.jacamars.dsp.rtb.blocks.ProportionalEntry;
+import com.jacamars.dsp.rtb.blocks.ProportionalRandomCollection;
 import com.jacamars.dsp.rtb.commands.*;
 import com.jacamars.dsp.rtb.common.*;
 import com.jacamars.dsp.rtb.db.Database;
 import com.jacamars.dsp.rtb.exchanges.adx.AdxFeedback;
+import com.jacamars.dsp.rtb.exchanges.adx.AdxGeoCodes;
 import com.jacamars.dsp.rtb.fraud.FraudLog;
 import com.jacamars.dsp.rtb.jmq.Ping;
 import com.jacamars.dsp.rtb.jmq.RTopic;
@@ -28,6 +34,7 @@ import com.jacamars.dsp.rtb.pojo.NobidResponse;
 import com.jacamars.dsp.rtb.pojo.WinObject;
 import com.jacamars.dsp.rtb.redisson.RedissonClient;
 import com.jacamars.dsp.rtb.tools.DbTools;
+import com.jacamars.dsp.rtb.tools.IsoTwo2Iso3;
 import com.jacamars.dsp.rtb.tools.Performance;
 
 import org.slf4j.Logger;
@@ -158,6 +165,8 @@ public enum Controller {
     public static final int LIST_SYMBOLS_RESPONSE = 31;
     
     public static final int CONFIGURE_OBJECT = 32;
+    
+    public static final int QUERY = 33;
 
     /**
      * The JEDIS object for creating bid hash objects
@@ -373,7 +382,7 @@ public enum Controller {
             m.msg = "AWS Remove failed: No such symbol: " + c.target;
             responseQueue.add(m);
         } else {
-            m.msg = "AWS Object " + c.target + " removed ok";
+            m.target = m.msg = "AWS Object " + c.target + " removed ok";
             m.name = "AWS Remove Response";
             logger.info("removeAws results: {}", m.msg);
             responseQueue.add(m);
@@ -404,9 +413,10 @@ public enum Controller {
         if (aws.errored()) {
             m.status = "Error";
             m.msg = "AWS Object load failed: " + aws.getMessage();
+            logger.info("ConfigureAws results: {}", m.msg);
             responseQueue.add(m);
         } else {
-            m.msg = "AWS Object " + c.target + " loaded ok";
+            m.msg = m.target = "AWS Object " + c.target + " loaded ok";
             m.name = "AWS Object Response";
             logger.info("ConfigureAws results: {}", m.msg);
             responseQueue.add(m);
@@ -417,27 +427,26 @@ public enum Controller {
     /**
      * Create an object from a file
      * @param c BasicCommand. The command components. Name will be the name field, target is the filename, and logtype is the type of the object.
-     * @return BasicCommand. The returned results of the command.
      */
-    public BasicCommand configureObject(BasicCommand c) {
+    public void configureObject(BasicCommand c) {
         logger.info("ADDING A FILE BASED OBJECT {}",c.target);
+        ConfigureObject x = (ConfigureObject)c;
         BasicCommand m = new BasicCommand();
         m.to = c.from;
         m.from = Configuration.instanceName;
         m.id = c.id;
         m.logtype = c.logtype;
+        m.name = "File Object Response";
         try {
-        	Configuration.getInstance().initObject(c.name,c.target,c.logtype);
-            m.msg = "AWS Object " + c.target + " loaded ok";
-            m.name = "AWS Object Response";
-            logger.info("ConfigureAws results: {}", m.msg);
-            responseQueue.add(m);
+        	Configuration.getInstance().initObject(x.name,x.target,x.type);
+            m.msg = m.target = "File Object " + c.target + " loaded ok";
         } catch (Exception error) {
+        	error.printStackTrace();
             m.status = "Error";
-            m.msg = "AWS Object load failed: " + error.getMessage();
-            responseQueue.add(m);
+            m.msg = "File Object load failed: " + error.getMessage();
         }
-        return m;
+        logger.info("Configure results: {}", m.msg);
+        responseQueue.add(m);
     }
 
     /**
@@ -463,10 +472,9 @@ public enum Controller {
             m.msg = "Campaign load failed, could not find " + c.target;
             responseQueue.add(m);
         } else {
-
             Configuration.getInstance().deleteCampaign(camp.adId);
             Configuration.getInstance().addCampaign(camp);
-            m.msg = "Campaign " + camp.owner + "/" + camp.adId + " loaded ok";
+            m.target = m.msg = "Campaign " + camp.owner + "/" + camp.adId + " loaded ok";
             m.name = "AddCampaign Response";
             responseQueue.add(m);
         }
@@ -483,7 +491,7 @@ public enum Controller {
         m.id = c.id;
         m.logtype = c.logtype;
         String rets = Configuration.getInstance().addCampaignsList(campaigns);
-        m.msg = "Campaign " + rets + "loaded ok";
+        m.target = m.msg = "Campaign " + rets + "loaded ok";
         responseQueue.add(m);
         logger.info("Responding with: {}", m.msg);
     }
@@ -504,7 +512,7 @@ public enum Controller {
                 for (Creative creat : campaign.creatives) {
                     if (creat.impid.equals(creatName)) {
                         creat.price = price;
-                        m.msg = "Price " + cmd.target + " set to " + price;
+                        m.target = m.msg = "Price " + cmd.target + " set to " + price;
                         handled = true;
                         Database db = Database.getInstance();
                         db.reload();
@@ -600,7 +608,7 @@ public enum Controller {
             m.msg = "error, no such campaign " + cmd.target;
             m.status = "error";
         } else
-            m.msg = "Campaign deleted: " +  cmd.target;
+            m.target = m.msg = "Campaign deleted: " +  cmd.target;
         m.to = cmd.from;
         m.from = Configuration.instanceName;
         m.id = cmd.id;
@@ -628,7 +636,7 @@ public enum Controller {
             m.msg = "error, no such campaign " + cmd.name;
             m.status = "error";
         } else
-            m.target = "Campaign weights set to: " +  cmd.target;
+            m.msg = m.target = "Campaign weights set to: " +  cmd.target;
         m.to = cmd.from;
         m.from = Configuration.instanceName;
         m.id = cmd.id;
@@ -652,9 +660,9 @@ public enum Controller {
             m.msg = "OK";
             e = Configuration.getInstance().getWeights(cmd.name);
             if (e == null)
-                m.target = "No weights assigned for " + cmd.name;
+                m.msg = m.target = "No weights assigned for " + cmd.name;
             else
-                m.target = "Weights for " + cmd.name + " set to: " + e.toString();
+                m.msg = m.target = "Weights for " + cmd.name + " set to: " + e.toString();
         } catch (Exception error) {
             m.status = "error";
             m.msg = error.toString();
@@ -679,7 +687,7 @@ public enum Controller {
     public void stopBidder(BasicCommand cmd) throws Exception {
         RTBServer.stopped = true;
         BasicCommand m = new BasicCommand();
-        m.msg = "stopped";
+        m.target = m.msg = "stopped";
         m.to = cmd.from;
         m.from = Configuration.instanceName;
         m.id = cmd.id;
@@ -700,7 +708,7 @@ public enum Controller {
         if (Configuration.getInstance().deadmanSwitch != null) {
             if (Configuration.getInstance().deadmanSwitch.canRun() == false) {
                 BasicCommand m = new BasicCommand();
-                m.msg = "Error, the deadmanswitch is not present";
+                m.target = m.msg = "Error, the deadmanswitch is not present";
                 m.to = cmd.from;
                 m.from = Configuration.instanceName;
                 m.id = cmd.id;
@@ -714,7 +722,7 @@ public enum Controller {
 
         RTBServer.stopped = false;
         BasicCommand m = new BasicCommand();
-        m.msg = "running";
+        m.target = m.msg = "running";
         m.to = cmd.from;
         m.from = Configuration.instanceName;
         m.id = cmd.id;
@@ -1592,6 +1600,51 @@ class CommandLoop implements com.jacamars.dsp.rtb.jmq.MessageListener<Object> {
 
                     break;
 
+                case Controller.QUERY:
+                	BasicCommand cmd = new QuerySymbol(item.from, item.name, item.target);
+                	cmd.id = item.id;
+                	cmd.from = Configuration.instanceName;
+                	cmd.to = item.from;
+                    try {
+                    	Object q;
+                    	Object  xx = LookingGlass.symbols.get(item.name);
+                    	if (xx == null) {
+                    		cmd.status = "Error";
+                    		cmd.target = cmd.msg = "Symbol does not exist: " + item.name;
+                    		Controller.logger.info("{}",cmd.msg);
+                    	} else if (xx instanceof IsoTwo2Iso3) {
+                    		q = ((IsoTwo2Iso3)xx).query(((QuerySymbol)item).key);
+                    		cmd.msg = cmd.target = DbTools.mapper.writeValueAsString(q);
+                    	} else if (xx instanceof NavMap) {
+                    		q = ((NavMap)xx).query(((QuerySymbol)item).key);
+                    		cmd.msg = cmd.target = DbTools.mapper.writeValueAsString(q);
+                    	} else if (xx instanceof AdxGeoCodes) {
+                    		q = ((AdxGeoCodes)xx).query(Integer.parseInt(((QuerySymbol)item).key));
+                    		cmd.msg = cmd.target = DbTools.mapper.writeValueAsString(q);
+                    	} else if (xx instanceof ProportionalRandomCollection) {
+                    		q = ((ProportionalRandomCollection)xx).query(((QuerySymbol)item).key);
+                    		cmd.msg = cmd.target = DbTools.mapper.writeValueAsString(q);
+                    	} else if (xx instanceof HashSet) {
+                        	q = ((Set)xx).contains(((QuerySymbol)item).key);
+                        	cmd.msg = cmd.target = DbTools.mapper.writeValueAsString(q);
+                    	} else if (xx instanceof BloomFilter) {
+                    		q = ((BloomFilter)xx).mightContain(((QuerySymbol)item).key);
+                    		cmd.msg = cmd.target = DbTools.mapper.writeValueAsString(q);
+                    	} else  {
+                    		LookingGlass x = (LookingGlass)xx;
+                    		q = x.query(item.target);
+                    		if (q == null)
+                    			cmd.msg = cmd.target = "null";
+                    		else
+                    			cmd.msg = cmd.target = DbTools.mapper.writeValueAsString(q);
+                    	}               
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        cmd.status = "Error";
+                        cmd.target = cmd.msg = "Error accessing " + item.name + ", error: " + e.getMessage();
+                    }
+                    Controller.getInstance().responseQueue.add(cmd);
+                    break;
 
                 case Controller.ADD_CAMPAIGNS_LIST:
                     if (!controller)
@@ -1617,7 +1670,7 @@ class CommandLoop implements com.jacamars.dsp.rtb.jmq.MessageListener<Object> {
                             if (c != null) 
                             	list += c.adId + " ";
                         }
-                        BasicCommand cmd = new ListCampaignsResponse(item.from, Configuration.instanceName, list);
+                        cmd = new ListCampaignsResponse(item.from, Configuration.instanceName, list);
                         cmd.from = Configuration.instanceName;
                         cmd.to = item.to;
                         cmd.id = item.id;
@@ -1639,7 +1692,7 @@ class CommandLoop implements com.jacamars.dsp.rtb.jmq.MessageListener<Object> {
                             list += bidder + " ";
                         }
 
-                        BasicCommand cmd = new ListMembersResponse(item.from, Configuration.instanceName, list);
+                        cmd = new ListMembersResponse(item.from, Configuration.instanceName, list);
                         cmd.from = Configuration.instanceName;
                         cmd.to = item.to;
                         cmd.id = item.id;
