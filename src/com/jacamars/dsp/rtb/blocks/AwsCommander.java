@@ -79,10 +79,14 @@ public class AwsCommander {
 		//	System.out.println("Part[" + i + "] = " + parts[i]);
 		//}
 		otype = parts[2]; // bloom, cache, cuckoo.
-		name = parts[4]; // filename or object
 		symbolName = parts[3]; // name of the object
-		if (!symbolName.startsWith("$"))
-			symbolName = "@" + symbolName;
+		name = parts[4]; // filename or object
+		if (!symbolName.startsWith("@")) {
+			if (symbolName.charAt(0) == '$')
+				symbolName = "@" + symbolName.substring(1);
+			else
+				symbolName = "@" + symbolName;
+		}
 
 		if (type.equals("file")) {
 			return Configuration.getInstance().initObject(symbolName,name,type);
