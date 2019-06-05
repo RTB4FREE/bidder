@@ -78,18 +78,14 @@ public class AwsCommander {
 		//for (int i=0;i<parts.length;i++) {
 		//	System.out.println("Part[" + i + "] = " + parts[i]);
 		//}
-		if (type.equalsIgnoreCase("S3")) {
-			
-			otype = parts[2]; // bloom, cache, cuckoo.
-			name = parts[4];
-			symbolName = parts[3]; // name of the object
-			if (!symbolName.startsWith("$"))
-				symbolName = "$" + symbolName;
-		} else
-			name = parts[2]; // file name
+		otype = parts[2]; // bloom, cache, cuckoo.
+		name = parts[4]; // filename or object
+		symbolName = parts[3]; // name of the object
+		if (!symbolName.startsWith("$"))
+			symbolName = "@" + symbolName;
 
 		if (type.equals("file")) {
-			return Configuration.getInstance().readData(parts[2]);
+			return Configuration.getInstance().initObject(symbolName,name,type);
 		} 
 		
 		S3Object object = Configuration.s3.getObject(new GetObjectRequest(Configuration.s3_bucket,name));

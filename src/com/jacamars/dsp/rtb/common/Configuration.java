@@ -1324,49 +1324,6 @@ public class Configuration {
 		}
 	}
 
-	public static String readData(String fileName) throws Exception {
-		String message = "";
-		int i = fileName.indexOf(".");
-		if (i == -1)
-			throw new Exception("Filename is missing type field");
-		String type = fileName.substring(i);
-		NavMap map;
-		SimpleMultiset set;
-		SimpleSet sset;
-		Bloom b;
-		Cuckoo c;
-		switch (type) {
-		case "range":
-			map = new NavMap(fileName, fileName, false);
-			message = "Added NavMap " + fileName + ": from file, has " + map.size() + " members";
-			break;
-		case "cidr":
-			map = new NavMap(fileName, fileName, true);
-			message = "Added NavMap " + fileName + ": from file, has " + map.size() + " members";
-			break;
-		case "bloom":
-			b = new Bloom(fileName, fileName);
-			message = "Initialize Bloom Filter: " + fileName + " from file, members = " + b.getMembers();
-			break;
-		case "cuckoo":
-			c = new Cuckoo(fileName, fileName);
-			break;
-		case "multiset":
-			set = new SimpleMultiset(fileName, fileName);
-			message = "Initialize Multiset " + fileName + " from file, entries = " + set.getMembers();
-			break;
-		case "set":
-			sset = new SimpleSet(fileName, fileName);
-			message = "Initialize Multiset " + fileName + " from file, entries = " + sset.size();
-			break;
-
-		default:
-			message = "Unknown type: " + type;
-		}
-		logger.info("*** {}", message);
-		return message;
-	}
-
 	public static String readData(String type, String name, S3Object object, long size) throws Exception {
 		String message = "";
 		switch (type) {
@@ -1383,7 +1340,10 @@ public class Configuration {
 			Bloom b = new Bloom(name, object, size);
 			message = "Initialize Bloom Filter: " + name + " from S3, members = " + b.getMembers();
 			break;
-
+		case "adxgeocodes":
+			new AdxGeoCodes(name, object);
+			message = "Initialize Simple Set from S3:: " + object.getBucketName() + " as " + name;
+			break;
 		case "cuckoo":
 			Cuckoo c = new Cuckoo(name, object, size);
 			message = "Initialize Cuckoo Filter: " + name + " from S3, entries = " + c.getMembers();
@@ -1392,6 +1352,11 @@ public class Configuration {
 			SimpleMultiset ms = new SimpleMultiset(name, object);
 			message = "Initialize Multiset " + name + " from S3, entries = " + ms.getMembers();
 			break;
+		case "proportionalrandomcollection":
+			ProportionalRandomCollection pr = new ProportionalRandomCollection(name,object);
+			message = "Initialize Multiset " + name + " from S3, entries = " + pr.getMembers();
+			break; 
+			
 		default:
 			message = "Unknown type: " + type;
 		}
@@ -1424,7 +1389,7 @@ public class Configuration {
 		
 	}
 	
-	public void initObject(String name, String fileName, String type) throws Exception {
+	public String initObject(String name, String fileName, String type) throws Exception {
 			if (name == null)
 				throw new Exception("Symbol name is null");
 			if (fileName == null)
@@ -1434,29 +1399,42 @@ public class Configuration {
 			
 			if (name.startsWith("@") == false)
 				name = "@" + name;
-			if (type.contains("Bloom") || type.contains("Bloom")) {
-				new Bloom(name, fileName); // file uses ranges
-			} else  if (type.contains("NavMap") || type.contains("RangeMap")) {
-				new NavMap(name, fileName, false); // file uses ranges
-			} else if (type.contains("CidrMap")) { // file uses CIDR blocks
-				new NavMap(name, fileName, true);
-			} else if (type.contains("AdxGeoCodes")) {
-				new AdxGeoCodes(name, fileName);
-			} else if (type.contains("LookingGlass")) {
-				new LookingGlass(name, fileName);
-			} else if (type.contains("SimpleSet")) {
-				new SimpleSet(name, fileName);
-			} else if (type.contains("ProportionalRandomCollection")) {
-				new ProportionalRandomCollection(name,fileName);
-			}
 			
-			else {
+			String lctype = type.toLowerCase();
+			LookingGlass g = null;
+			switch(lctype) {
+			case "cuckoo":
+				g = new Cuckoo(name, fileName); 
+				break;
+			case "bloom":
+				g = new Bloom(name, fileName); // file uses ranges
+				break;
+			case "range":
+				g = new NavMap(name, fileName, false); // file uses ranges
+				break;
+			case "cidr":
+				g = new NavMap(name, fileName, true);
+				break;
+			case "adxgeocodes":
+				g = new AdxGeoCodes(name, fileName);
+				break;
+			case "lookingglass":
+				g = new LookingGlass(name, fileName);
+				break;
+			case "set":
+				g = new SimpleSet(name, fileName);
+				break;
+			case "proportionalrandomcollection":
+				new ProportionalRandomCollection(name,fileName);
+				break;
+			default:
 				// Ok, load it by class name
 				Class cl = Class.forName(type);
 				Constructor<?> cons = cl.getConstructor(String.class, String.class);
-				cons.newInstance(name, fileName);
+				g = (LookingGlass)cons.newInstance(name, fileName);
 			}
-			logger.info("*** Configuration Initialized {} with {}", name, fileName);
+			logger.info("*** Configuration Initialized {} with {}, members = {}", name, fileName);
+			return "Initialize " + type +  " as " + name + " from " + fileName;
 	}
 
 	/**
