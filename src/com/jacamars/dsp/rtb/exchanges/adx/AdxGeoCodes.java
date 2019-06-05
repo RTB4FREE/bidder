@@ -2,9 +2,12 @@ package com.jacamars.dsp.rtb.exchanges.adx;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.amazonaws.services.s3.model.S3Object;
 import com.jacamars.dsp.rtb.blocks.LookingGlass;
 
 public class AdxGeoCodes extends LookingGlass {
@@ -14,11 +17,9 @@ public class AdxGeoCodes extends LookingGlass {
 	public AdxGeoCodes(String name, String file) throws Exception {
 		super();
 		BufferedReader br = new BufferedReader(new FileReader(file));
-		String message = null;
 
 		String[] parts = null;
 
-		message = "Initialize Adx Geocodes: " + file + " as " + name;
 		for (String line; (line = br.readLine()) != null;) {
 			parts = eatquotedStrings(line);
 			AdxGeoCode x = new AdxGeoCode(parts);
@@ -26,6 +27,20 @@ public class AdxGeoCodes extends LookingGlass {
 		}
 		symbols.put(name, this);
 	}
+	
+	public AdxGeoCodes(String name, S3Object object) throws Exception {
+		InputStream objectData = object.getObjectContent();
+		BufferedReader br=new BufferedReader(new InputStreamReader(objectData));
+		String[] parts = null;
+
+		for (String line; (line = br.readLine()) != null;) {
+			parts = eatquotedStrings(line);
+			AdxGeoCode x = new AdxGeoCode(parts);
+			geocodes.put(x.code, x);
+		}
+		symbols.put(name, this);
+	}
+	
 	
 	public AdxGeoCode query(Integer code) {
 		return geocodes.get(code);
