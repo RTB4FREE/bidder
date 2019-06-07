@@ -288,6 +288,6 @@
   }, {
     "filename" : "data/zip_codes_states.csv",
     "name" : "@ZIPCODES",
-    "type" : "com.jacamars.dsp.rtb.tools.LookingGlass"
+    "type" : "LookingGlass"
   } ]
 }
