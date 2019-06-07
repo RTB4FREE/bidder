@@ -1329,6 +1329,7 @@ public class Configuration {
 		switch (type) {
 		case "range":
 		case "cidr":
+		case "cidrmap":
 			NavMap map = new NavMap(name, object, type);
 			message = "Added NavMap " + name + ": has " + map.size() + " members";
 			break;
@@ -1413,6 +1414,7 @@ public class Configuration {
 				g = new NavMap(name, fileName, false); // file uses ranges
 				break;
 			case "cidr":
+			case "cidrmap":
 				g = new NavMap(name, fileName, true);
 				break;
 			case "adxgeocodes":
