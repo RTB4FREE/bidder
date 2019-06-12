@@ -84,9 +84,7 @@ public class AwsCommander {
 		symbolName = parts[3]; // name of the object
 		name = parts[4]; // filename or object
 		if (!symbolName.startsWith("@")) {
-			if (symbolName.charAt(0) == '$')
-				symbolName = "@" + symbolName.substring(1);
-			else
+			if (symbolName.charAt(0) != '$')
 				symbolName = "@" + symbolName;
 		}
 
@@ -94,7 +92,7 @@ public class AwsCommander {
 			return Configuration.getInstance().initObject(symbolName,name,type);
 		} 
 		
-		S3Object object = Configuration.s3.getObject(new GetObjectRequest(Configuration.s3_bucket,name));
+		S3Object object = Configuration.getInstance().s3.getObject(new GetObjectRequest(Configuration.getInstance().s3_bucket,name));
 		long size = Configuration.s3.getObjectMetadata(Configuration.s3_bucket, name).getContentLength();
 		
 		return Configuration.getInstance().readData(otype,symbolName,object, size);
