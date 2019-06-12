@@ -66,6 +66,8 @@ public class AwsCommander {
 	
 	/**
 	 * Load the file or s3 object.
+	 * Eg: load s3 bloom $name data/object
+	 * Note S3 bucket is predefined by the startup. See the docker compose file.
 	 * @param parts String[]. An array of tokens.
 	 * @return String. The message returned from the load command.
 	 * @throws Exception on I/O errirs.
