@@ -20,6 +20,7 @@ import com.jacamars.dsp.rtb.blocks.LookingGlass;
 import com.jacamars.dsp.rtb.blocks.NavMap;
 import com.jacamars.dsp.rtb.blocks.ProportionalEntry;
 import com.jacamars.dsp.rtb.blocks.ProportionalRandomCollection;
+import com.jacamars.dsp.rtb.blocks.SimpleSet;
 import com.jacamars.dsp.rtb.commands.*;
 import com.jacamars.dsp.rtb.common.*;
 import com.jacamars.dsp.rtb.db.Database;
@@ -1630,7 +1631,11 @@ class CommandLoop implements com.jacamars.dsp.rtb.jmq.MessageListener<Object> {
                     	} else if (xx instanceof BloomFilter) {
                     		q = ((BloomFilter)xx).mightContain(((QuerySymbol)item).key);
                     		cmd.msg = cmd.target = DbTools.mapper.writeValueAsString(q);
-                    	} else  {
+                    	} else if (xx instanceof SimpleSet) {
+                    		q = ((SimpleSet)xx).query(((QuerySymbol)item).key);
+                    		cmd.msg = cmd.target = DbTools.mapper.writeValueAsString(q);
+                    	}
+                    	else  {
                     		LookingGlass x = (LookingGlass)xx;
                     		q = x.query(item.target);
                     		if (q == null)
