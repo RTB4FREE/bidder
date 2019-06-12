@@ -953,12 +953,19 @@ public class Configuration {
 
 		while (address.contains("$AWSACCESSKEY"))
 			address = GetEnvironmentVariable(address, "$AWSACCESSKEY", "");
+		while (address.contains("$S3ACCESSKEY"))
+			address = GetEnvironmentVariable(address, "$S3ACCESSKEY", "");
 
 		while (address.contains("$AWSSECRETKEY"))
 			address = GetEnvironmentVariable(address, "$AWSSECRETKEY", "");
+		while (address.contains("$S3SECRETKEY"))
+			address = GetEnvironmentVariable(address, "$S3SECRETKEY", "");
 
 		while (address.contains("$AWSREGION"))
 			address = GetEnvironmentVariable(address, "$AWSREGION", Regions.US_EAST_1.getName());
+		while (address.contains("$S3REGION"))
+			address = GetEnvironmentVariable(address, "$S3REGION", Regions.US_EAST_1.getName());
+
 
 		while (address.contains("$AWSKINESIS_STREAM"))
 			address = GetEnvironmentVariable(address, "$AWS_KINESIS_STREAM", "");
