@@ -1,78 +1,74 @@
 #
-# Contains the full stack of the RTB4FREe stack (not including crosstalk, elk, mysql or campaign manager)
-# Does contain zookeeper and kafka.
+# Contains the full rtb4free stack (zookeeper, kafka, zerospike, bidder, crosstalk, db, web, elastic1, logstash1, simulator)
 #
-version: "3"
+version: '3.5'
 
 services:
 
   zookeeper:
-    image: "zookeeper"
+    image: zookeeper:3.5
     ports:
-      - "2181:2181"
+      - '2181:2181'
     networks:
-      - rtb_net
+      - r4f_net
 
   kafka:
-    image: "ches/kafka"
+    image: 'ches/kafka'
     environment:
-      ZOOKEEPER_IP: "zookeeper"
+      ZOOKEEPER_IP: 'zookeeper'
     ports:
-      - "9092:9092"
-    networks:
-      - rtb_net
+      - '9092:9092'
+    healthcheck:
+      test: ["CMD", ...]
+      interval: 30s
+      timeout: 10s
+      retries: 5
     depends_on:
       - zookeeper
+    networks:
+      - r4f_net
 
   zerospike:
-    image: "jacamars/zerospike:v1"
+    image: rtb4free/zerospike
     environment:
       BROKERLIST: "kafka:9092"
-      STATUSCHANNEL: "kafka://[$$BROKERLIST]&topic=status"
     ports:
       - "6000:6000"
       - "6001:6001"
       - "6002:6002"
       - "7001:7001"
-    #volumes:
-    #  - "./cache.db:/cache.db"
-    networks:
-      - rtb_net
     depends_on:
       - kafka
-    command: bash -c "./wait-for-it.sh $$BROKERLIST --t=120 && sleep 1; ./zerospike"
+    networks:
+      - r4f_net
+    command: bash -c "sleep 5 && ./wait-for-it.sh kafka:9092 -t 120 && sleep 1; ./zerospike"
 
   bidder:
-    image: "jacamars/rtb4free:v1"
+    image: rtb4free/bidder
     environment:
+      # GDPR mode - set to true if operating inside a region that enforces GDPR
       GDPR_MODE: "false"
-      
+      # The Kafka setup - all of the channels which to deliver events
       BROKERLIST: "kafka:9092"
-      
-      BIDSCHANNEL: "$BIDSCHANNEL"
-      WINSCHANNEL: "$WINSCHANNEL"
-      REQUESTSCHANNEL: "$REQUESTSCHANNEL"
-      CLICKSCHANNEL: "$CLICKSCHANNEL"
-      PIXELSCHANNEL: "$PIXELSCHANNEL"
-      VIDEOEVENTSCHANNEL: "$VIDEOEVENTSCHANNEL"
-      POSTBACKEVENTSCHANNEL: "$POSTBACKEVENTSCHANNEL"
-      STATUSCHANNEL: "$STATUSCHANNEL"
-      REASONSCHANNEL: "$REASONSCHANNEL"  
-      LOGCHANNEL: "$LOGCHANNEL"
-         
-      PUBSUB: "zerospike"
-      EXTERNAL: "http://localhost:8080"
-      ACCOUNTING: "NONE"
-      
+      BIDSCHANNEL: "kafka://[$$BROKERLIST]&topic=bids"
+      WINSCHANNEL: "kafka://[$$BROKERLIST]&topic=wins"
+      REQUESTSCHANNEL: "kafka://[$$BROKERLIST]&topic=requests"
+      CLICKSCHANNEL: "kafka://[$$BROKERLIST]&topic=clicks"
+      PIXELSCHANNEL: "kafka://[$$BROKERLIST]&topic=pixels"
+      VIDEOEVENTSCHANNEL: "kafka://[$$BROKERLIST]&topic=videoevents"
+      POSTBACKEVENTSCHANNEL: "kafka://[$$BROKERLIST]&topic=postbackevents"
+      STATUSCHANNEL: "kafka://[$$BROKERLIST]&topic=status"
+      REASONSCHANNEL: "kafka://[$$BROKERLIST]&topic=reasons"
+      LOGCHANNEL: "kafka://[$$BROKERLIST]&topic=logs"
+      # If using Amazon S3 to store data, enter configuration settings below
       S3BUCKET: ""
       S3REGION: ""
       S3SECRETKEY: ""
       S3ACCESSKEY: ""
-      
       AWSACCESSKEY: ""
       AWSSECRETKEY: ""
       AWSREGION: ""
-      
+      # Enter SSP information below
       GOOGLE_EKEY: ""
       GOOGLE_IKEY: ""
       OPENX_EKEY: ""
@@ -80,24 +76,39 @@ services:
       ADX_EKEY:   ""
       ADX_IKEY:   ""
       BIDSWITCH_ID: "1234"
+      # Enter information about how to access
+      PUBSUB: "zerospike"
+      EXTERNAL: "http://localhost:8080"
       ADMINPORT: "0"
+      ACCOUNTING: "accountingsystem"
+      FREQGOV: "false"
+      INDEXPAGE: "/index.html"
     ports:
       - "8080:8080"
       - "8155:8155"
       - "7379:7379"
       - "7000:7000"
-    #volumes:
-    #  - "./database.json:/database.json"
-    #  - "./payday.json:/Campaigns/payday.json"
-    networks:
-      - rtb_net
     depends_on:
       - kafka
       - zerospike
-    command: bash -c "./wait-for-it.sh $$BROKERLIST --t=120 && ./wait-for-it.sh zerospike:6000 --t 120 && sleep 1; ./rtb4free"
-    #command:  bash -c "./wait-for-it.sh kafka:9092 --timeout=120 && ./wait-for-it.sh zerospike:6000 --timeout 120 && sleep 1; ./rtb4free-jmx"
+    networks:
+      - r4f_net
+    command: bash -c "sleep 5 && ./wait-for-it.sh kafka:9092 -t 120 && ./wait-for-it.sh zerospike:6000 -t 120 && sleep 1; ./rtb4free"
 
+  # Enable if you'd like to use the bidding simulator to test connections
+  simulator:
+    image: rtb4free/bidder
+    environment:
+      BIDDER: "bidder:8080"
+      WIN:    "10"
+      PIXEL:  "95"
+      CLICK:  "2"
+      SLEEP:  "100"
+      SILENT: "-silent"
+    networks:
+      - r4f_net
+    command: bash -c "./wait-for-it.sh bidder:8080 -t 120 && sleep 60;  ./load-elastic -host $$BIDDER -win $$WIN -pixel $$PIXEL -click $$CLICK -sleep $$SLEEP"
 
 networks:
-  rtb_net:
-    external: true
+  r4f_net:
+    name: rtb4free_network

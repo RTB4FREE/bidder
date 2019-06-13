@@ -1,12 +1,146 @@
+
+[![Docker Pulls](https://img.shields.io/docker/pulls/rtb4free/bidder.svg)](https://hub.docker.com/r/rtb4free/bidder/)
+[![Docker Stars](https://img.shields.io/docker/stars/rtb4free/bidder.svg)](https://hub.docker.com/r/rtb4free/bidder/)
+[![](https://images.microbadger.com/badges/version/rtb4free/bidder.svg)](https://microbadger.com/images/rtb4free/bidder "Get your own version badge on microbadger.com")
+[![](https://images.microbadger.com/badges/image/rtb4free/bidder.svg)](https://microbadger.com/images/rtb4free/bidder "Get your own image badge on microbadger.com")
+[![Build Status](https://travis-ci.org/rtb4free/bidder.svg?branch=master)](https://travis-ci.org/rtb4free/bidder)
+
+Bidder - RTB4FREE Bidder
+========================
+
+High scale programmatic advertising bidder for [RTB4Free](http://rtb4free.com/)
+
+An image of this repo is available directly from [Docker Hub](https://hub.docker.com/r/rtb4free/bidder/)
+
+
+Getting Help
+------------
+
+User documentation can be found on [Read The Docs](https://rtb4free.readthedocs.io)
+
+
+Source Code
+-----------
+
+To start working with code, first make sure you have the following installed on your computer:
+
+* [Ruby v2.4.x](https://www.ruby-lang.org/en/downloads/releases/)
+* [Rails v4.2.x](https://guides.rubyonrails.org/v4.2/getting_started.html)
+* [MySQL](https://www.mysql.com/)
+
+Next, get the code from this Github repo:
+
+```
+git clone git@github.com:RTB4FREE/bidder.git
+cd bidder
+```
+
+The RTB4Free campaign manager is a standard [Rails 4.x application](http://guides.rubyonrails.org/v4.2/), and can be installed and managed in the standard Rails fashion:
+
+Install using Rails:
+
+```
+bundle install
+```
+
+Configure the database:
+
+```
+rake db:setup
+```
+
+Run the tests:
+
+```
+rake test
+```
+
+Start the server:
+
+```
+rails s
+```
+
+Docker Image
+------------
+
+RTB4Free bidder can be deployed using Docker.
+
+Build the Docker image:
+
+```
+docker build -t rtb4free/bidder:latest -t rtb4free/bidder:1 -t rtb4free/bidder:1.0 .
+```
+
+To push to the image to the RTB4Free repo in Docker:
+
+```
+docker push rtb4free/bidder:1.0
+docker push rtb4free/bidder:1
+docker push rtb4free/bidder:latest
+```
+
+*Note: Dockerhub automatically builds this container when code gets pushed to this Github repo*
+
+
+Docker Deployment
+-----------------
+
+The bidder can be deployed using Docker Compose.  The default `docker-compose.yml` is included in the root directory, and it can be modified to suit your needs.  To deploy the bidder using Docker Compose, run this from the root directory of this repo:
+
+```
+docker-compose up -d
+```
+This will run a Docker container, initialize the database and expose the service on port 8080.
+
+To stop the container, run the command:
+
+```
+docker-compose down
+```
+
+Using Bidder
+------------
+
+To configure the bidder locally, open a browser to the host:
+
+[http://localhost:8080](http://localhost:8080)
+
+Username: `demo@rtb4free.com`
+Password: `rtb4free`
+
+For information about the campaign manager functionality:
+
+[User Documentation](https://rtb4free.readthedocs.io)
+
+Getting Support
+---------------
+
+There are various ways of getting support:
+
+* Email us at [support@rtb4free.com](mailto://support@rtb4free.com)
+* Add a Github issue:  [github.com/rtb4free/campaignmanager/issues](https://github.com/rtb4free/campaignmanager/issues)
+* Join the [RTB4Free Slack Channel](https://join.slack.com/t/rtb4free/shared_invite/enQtNjYxNzc3NTQwMzIwLTlkNWYyMzY0NzA3MTNmMjc2M2I0NzkxYjE0NGIwYTljMjQ2YzAwYTBmMTJhNWM0ZDc0NTljNTA3NzFjNzZlNDI)
+
+
+
+
+
+
+
+
+
+
+
+
 [home](https://github.com/RTB4FREE/rtb4free/README.md) |
 [campaign manager](https://github.com/RTB4FREE/campaignmanager/README.md) |
 bidder |
 [crosstalk](https://github.com/RTB4FREE/crosstalk/README.md)
 
-<img src="https://github.com/RTB4FREE/rtb4free/blob/master/rtb4free-logo.png"
- alt="RTB4FREE logo" title="RTB4FREE" align="right" />
- 
-RTB4FREE Bidder
+<img src="https://github.com/RTB4FREE/rtb4free/blob/master/rtb4free-logo.png" alt="RTB4FREE logo" title="RTB4FREE" align="right" />
+
+RTB4Free Bidder
 ===============
 
 This is the bidder component to the RTB4FREE open source DSP.  The bidder is a JAVA 1.8 based openRTB bidding system, scalable to 25K+ QPS per node.
@@ -38,69 +172,101 @@ mvn assembly:assembly -DdescriptorId=jar-with-dependencies  -Dmaven.test.skip=tr
 *Note: Remember to submit changes back to this project via a [pull request](https://github.com/RTB4FREE/bidder/pulls)!*
 
 
-Building Docker images
+Building Docker Images
 ----------------------
 
 To make the Docker images locally:
 
 ```
-	$docker build -t jacamars/zerospike:v1 -f Docker.zerospike .
-	$docker build -t jacamars/rtb4free:v1 -f Docker.bidder .
+docker build -t rtb4free/zerospike:latest -t rtb4free/zerospike:1.1 -f Docker.zerospike .
+docker build -t rtb4free/bidder:latest -t rtb4free/bidder:3.3 -f Docker.bidder .
 ```
 
-6. If you need to push to the repo:
+To push to the repo to the RTB4Free org in Docker:
 
-   $docker push jacamars/rtb4free:v1
-   $docker push jacamars/zerospike:v1
-   
-Docker Based
-============
+```
+docker push rtb4free/zerospike:latest
+docker push rtb4free/zerospike:1.1
+docker push rtb4free/bidder:latest
+docker push rtb4free/bidder:3.3
+```
 
-The instructions below are for deploying the bidder component.  To deploy the full RTB4FREE system, please refer to the documentation in the [RTB4FREE/rtb4free](https://github.com/RTB4FREE/rtb4free/README.md) repo.  The bidder relies on the [Crosstalk](https://github.com/RTB4FREE/crosstalk/README.md), [Zerospike](https://github.com/RTB4FREE/zerospike/README.md), Kafka, and Zookeeper projects.
+Deployment Using Docker Swarm
+-----------------------------
 
-No Source Deployments
-======================
+Use Docker Swarm to run Crosstalk, Bidder, Zerospike, Kafka and Zookeeper
 
-Docker Swarm
----------------------------
-Use Docker swarm to run Crosstalk, Bidder, Zerospike, Kafka and Zookeeper
+**Step 1: Copy `docker-compose.yml` from Project's `docker/` directory**
 
-1. Copy docker-compose.yml from Project's docker/ directory.
+```
+cp docker/docker-compose.yml .
+```
 
-2. Start the swarm
+**Step 2: Start the swarm**
 
-   $docker swarm init
-   
-3. Start the network
+```
+$docker swarm init
+```
 
-   $docker network create --driver overlay rtb_net --subnet=10.0.9.0/24
-   
-4. Deploy
+**Step 3: Start the network**
 
-   $docker stack deploy -c docker-compose.yml bidder
-   
-Docker Compose
+```
+$docker network create --driver overlay rtb_net --subnet=10.0.9.0/24
+```
+
+**Step 4: Deploy**
+
+```
+$docker stack deploy -c docker-compose.yml bidder
+```
+
+Deployment Using Docker Compose
 -------------------------------
 Use Docker Compose to run Crosstalk, Bidder, Zerospike, Kafka and Zookeeper in a single console window:
 
-1. Copy docker-compose.yml from Project's docker/ directory.
-   
-2. Start the network
+**Step 1: Copy `docker-compose.yml` from Project's docker/ directory**
 
-   $docker network create rtb_net
-   
+**Step 2: Start the network**
+
+```
+docker network create rtb_net
+```
+
 4. Deploy
 
-   $docker-compose up 
-   
+   $docker-compose up
+
+Testing Your Stack
+------------------
+You may want to make sure your stack is running correctly, that networking is working and your security groups are configured.  Here is how to quickly make sure each component is working:
+
+**Kafka**
+The easiest thing to do is to Telnet into your Kafka instance and make sure it is listening:
+
+```
+telnet ipaddress 9092
+```
+*Note: change `ipaddress` for the actual IP address of your RTB4Free cluster*
+
+You should get a response similar to the following:
+
+```
+Trying ipaddress...
+Connected to ipaddress.
+Escape character is '^]'.
+```
+
+
 
 Changing Operational Parameters
--------------------------------------
-The bidder uses a container based file in Campaigns/payday.json. If you need to change the parameters within it
-do it in your own copy and use volumes command to mount into it. Example, suppose you made your own copy of payday.json
-and modified it and you called it ./myconfig.json. You modify the bidder services section in docker-compose.yml to
+-------------------------------
+The bidder uses a container based file in Campaigns/payday.json. If you need to change the parameters within it, do it in your own copy and use volumes command to mount into it.
+
+For example, suppose you made your own copy of `payday.json`, modified it and called it
+`./myconfig.json`.  In this case, modify the bidder services section in `docker-compose.yml` to
 mount. Note the volumes directive:
 
+```
   bidder:
     image: "jacamars/rtb4free:v1"
     environment:
@@ -120,10 +286,11 @@ mount. Note the volumes directive:
       - crosstalk
       - zerospike
     command: bash -c "./wait-for-it.sh kafka:9092 -t 120 && ./wait-for-it.sh zerospike:6000 -t 120 && sleep 1; ./rtb4free"
+```
 
-Zerospike uses a cache.db file located within the container. For operational use, the real cache.db must be mounted
-using the volumes command. Example, suppose you wanted to use the file mycache.db in your current working directory:
+Zerospike uses a `cache.db` file located within the container. For operational use, the real `cache.db` must be mounted using the volumes command.  For example, suppose you wanted to use the file `mycache.db` in your current working directory.  The `docker-compose.yml` file would be modified as follows:
 
+```
   zerospike:
     image: "jacamars/zerospike"
     environment:
@@ -139,10 +306,9 @@ using the volumes command. Example, suppose you wanted to use the file mycache.d
     depends_on:
       - kafka
     command: bash -c "./wait-for-it.sh kafka:9092 -t 120 && sleep 1; ./zerospike"
+```
 
-Changing port assignments is not encouraged. Stick to the defaults to keep from losing your mind. There are 
-a lot of interdependencies.
-
+Changing port assignments is not encouraged. Stick to the defaults to keep from losing your mind. There are a lot of interdependencies.
 
 Connect Intellij Debugger to Bidder, Crosstalk or Zerospike
 -----------------------------------------
@@ -159,17 +325,18 @@ In the service for the crosstalk in docker-compose.yml, use ./crosstalk-jmx inst
 
 
 
-CONFIGURING THE BIDDER.
-=====================================
+CONFIGURING THE BIDDER
+======================
 In order to run the bidder, you will need to load a campaign into the bidders memory and setup some operational parameters.
- These parameters are stored in a JSON file the bidder uses when it starts. There is a sample initialization file called 
-"./Campaigns/payday.json' you can use to get started. The file describes the operational parameters of the bidder. 
+ These parameters are stored in a JSON file the bidder uses when it starts. There is a sample initialization file called
+"./Campaigns/payday.json' you can use to get started. The file describes the operational parameters of the bidder.
 Look in http://rtb4free.com/details_new.html for an in depth analysis of the configuration file. Also, once you get the
 bidder running, you can use the System Consolse to change the parameters using the web interface, described here:
 http://rtb4free.com/admin-mgmt.html
 
 However, here is an example file, and a brief overview
 
+```
 {
   "app" : {
     "concurrency" : "1",
@@ -320,15 +487,15 @@ However, here is an example file, and a brief overview
   }, {
     "name" : "adventurefeeds",
     "id" : "adventurefeedid",These are the Docker instructions for working with Bidder, Crosstalk, Zerospike, Kafka and Zookeeper.
-
+```
 
 THEORY OF OPERATION
 =====================================
-Zerospike is used as the shared context  between all bidders. All shared data is kept in Zerospike, and all  bidders connect to this 
+Zerospike is used as the shared context  between all bidders. All shared data is kept in Zerospike, and all  bidders connect to this
 service to share data. Specifically, the response to a bid request, a 'bid', is stored
 in Zerospike after it is made, because on the win notification, a completely separate bidder may process the win, and the
 original bid must be retrieved as quickly as possible to complete the transaction. A database query is far to slow to accomplish
-this. The frequency caps are also kept in Zerospike. 
+this. The frequency caps are also kept in Zerospike.
 
 ZeroMQ is used as the publish/subscribe system. Commands are sent to running bidders over ZeroMQ publish channel.
 Likewise responses to commands are sent back on another ZeroMq channel, 'responses'. Clickthrough, wins, and pixel-file notification is sent on yet channels, as set forth in the app.zeromq object.
@@ -336,12 +503,12 @@ Likewise responses to commands are sent back on another ZeroMq channel, 'respons
 Shared Database
 -------------------------------
 A database of Users and their campaigns is kept in a  ConcurrentHashMap, that is stored in Zerospike as a Map. This
-allows the bidders to maintain a shared database. 
+allows the bidders to maintain a shared database.
 
 Configuration
 --------------------------------
-A configuration file is used to set up the operating parameters of the bidder (such as Aerospike host and ZeroMQ 
-addresses), located at ./XRTB/SampleCampaigns/payday.json;  and is used to load any initial campaigns from the Database Aerospike. Upon loading the configuration file into the Configuration class, the campaigns are created, using a set of 
+A configuration file is used to set up the operating parameters of the bidder (such as Aerospike host and ZeroMQ
+addresses), located at ./XRTB/SampleCampaigns/payday.json;  and is used to load any initial campaigns from the Database Aerospike. Upon loading the configuration file into the Configuration class, the campaigns are created, using a set of
 Node objects that describe the JSON name to look for in the RTB bid, and the acceptable values for that constraint.
 
 For details look here: http://rtb4free.com/admin-mgmt.html#configuration-section
@@ -410,8 +577,4 @@ There is a test page located at http://localhost:8080
 
 It provides a system console, a campaign manager, and bid test page.
 
-For information on the ZerpMQ based commands for the RTB4FREE bidder look here: http://rtb4free.com/details_new.html#ZEROMQ
-
-
-
-
+For information on the ZeroMQ based commands for the RTB4FREE bidder look here: http://rtb4free.com/details_new.html#ZEROMQ
