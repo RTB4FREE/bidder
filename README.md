@@ -8,7 +8,7 @@
 Bidder - RTB4FREE Bidder
 ========================
 
-High scale programmatic advertising bidder for [RTB4Free](http://rtb4free.com/)
+This is the bidder component to the [RTB4Free open source DSP](http://rtb4free.com/).  The bidder is a JAVA 1.8 based openRTB bidding system, scalable to 25K+ QPS per node.
 
 An image of this repo is available directly from [Docker Hub](https://hub.docker.com/r/rtb4free/bidder/)
 
@@ -24,9 +24,8 @@ Source Code
 
 To start working with code, first make sure you have the following installed on your computer:
 
-* [Ruby v2.4.x](https://www.ruby-lang.org/en/downloads/releases/)
-* [Rails v4.2.x](https://guides.rubyonrails.org/v4.2/getting_started.html)
-* [MySQL](https://www.mysql.com/)
+* [Java v1.8.x](https://www.java.com/en/download/)
+* [Apache Maven](https://maven.apache.org/)
 
 Next, get the code from this Github repo:
 
@@ -35,31 +34,32 @@ git clone git@github.com:RTB4FREE/bidder.git
 cd bidder
 ```
 
-The RTB4Free campaign manager is a standard [Rails 4.x application](http://guides.rubyonrails.org/v4.2/), and can be installed and managed in the standard Rails fashion:
-
-Install using Rails:
+Make a sample database, and use default settings:
 
 ```
-bundle install
+cp database-sample.json database.json
+cp Campaigns/payday-default.json payday.json
 ```
 
-Configure the database:
+Install using Maven:
 
 ```
-rake db:setup
+mvn assembly:assembly -DdescriptorId=jar-with-dependencies  -Dmaven.test.skip=true
 ```
 
 Run the tests:
 
 ```
-rake test
+(enter mvn test script here)
 ```
 
-Start the server:
+Start the bidder:
 
 ```
-rails s
+./tools/rtb4free
 ```
+
+*Note: Remember to submit changes back to this project via a [pull request](https://github.com/RTB4FREE/bidder/pulls)!*
 
 Docker Image
 ------------
@@ -119,77 +119,13 @@ Getting Support
 There are various ways of getting support:
 
 * Email us at [support@rtb4free.com](mailto://support@rtb4free.com)
-* Add a Github issue:  [github.com/rtb4free/campaignmanager/issues](https://github.com/rtb4free/campaignmanager/issues)
+* Add a Github issue:  [github.com/rtb4free/bidder/issues](https://github.com/rtb4free/bidder/issues)
 * Join the [RTB4Free Slack Channel](https://join.slack.com/t/rtb4free/shared_invite/enQtNjYxNzc3NTQwMzIwLTlkNWYyMzY0NzA3MTNmMjc2M2I0NzkxYjE0NGIwYTljMjQ2YzAwYTBmMTJhNWM0ZDc0NTljNTA3NzFjNzZlNDI)
 
 
 
 
 
-
-
-
-
-
-
-
-[home](https://github.com/RTB4FREE/rtb4free/README.md) |
-[campaign manager](https://github.com/RTB4FREE/campaignmanager/README.md) |
-bidder |
-[crosstalk](https://github.com/RTB4FREE/crosstalk/README.md)
-
-<img src="https://github.com/RTB4FREE/rtb4free/blob/master/rtb4free-logo.png" alt="RTB4FREE logo" title="RTB4FREE" align="right" />
-
-RTB4Free Bidder
-===============
-
-This is the bidder component to the RTB4FREE open source DSP.  The bidder is a JAVA 1.8 based openRTB bidding system, scalable to 25K+ QPS per node.
-
-Working with source code
-------------------------
-
-If you want to modify the code:
-
-**Step 1:  Clone this Github repo**
-
-```
-git clone git@github.com:RTB4FREE/bidder.git
-cd bidder
-```
-
-**Step 2: Make sure you have a sample database for use with QA tests**
-
-```
-cp sampledb.json database.json
-```
-
-**Step 3: Run Maven**
-
-```
-mvn assembly:assembly -DdescriptorId=jar-with-dependencies  -Dmaven.test.skip=true
-```
-
-*Note: Remember to submit changes back to this project via a [pull request](https://github.com/RTB4FREE/bidder/pulls)!*
-
-
-Building Docker Images
-----------------------
-
-To make the Docker images locally:
-
-```
-docker build -t rtb4free/zerospike:latest -t rtb4free/zerospike:1.1 -f Docker.zerospike .
-docker build -t rtb4free/bidder:latest -t rtb4free/bidder:3.3 -f Docker.bidder .
-```
-
-To push to the repo to the RTB4Free org in Docker:
-
-```
-docker push rtb4free/zerospike:latest
-docker push rtb4free/zerospike:1.1
-docker push rtb4free/bidder:latest
-docker push rtb4free/bidder:3.3
-```
 
 Deployment Using Docker Swarm
 -----------------------------
@@ -218,42 +154,6 @@ $docker network create --driver overlay rtb_net --subnet=10.0.9.0/24
 
 ```
 $docker stack deploy -c docker-compose.yml bidder
-```
-
-Deployment Using Docker Compose
--------------------------------
-Use Docker Compose to run Crosstalk, Bidder, Zerospike, Kafka and Zookeeper in a single console window:
-
-**Step 1: Copy `docker-compose.yml` from Project's docker/ directory**
-
-**Step 2: Start the network**
-
-```
-docker network create rtb_net
-```
-
-4. Deploy
-
-   $docker-compose up
-
-Testing Your Stack
-------------------
-You may want to make sure your stack is running correctly, that networking is working and your security groups are configured.  Here is how to quickly make sure each component is working:
-
-**Kafka**
-The easiest thing to do is to Telnet into your Kafka instance and make sure it is listening:
-
-```
-telnet ipaddress 9092
-```
-*Note: change `ipaddress` for the actual IP address of your RTB4Free cluster*
-
-You should get a response similar to the following:
-
-```
-Trying ipaddress...
-Connected to ipaddress.
-Escape character is '^]'.
 ```
 
 

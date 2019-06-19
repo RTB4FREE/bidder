@@ -96,18 +96,18 @@ services:
     command: bash -c "sleep 5 && ./wait-for-it.sh kafka:9092 -t 120 && ./wait-for-it.sh zerospike:6000 -t 120 && sleep 1; ./rtb4free"
 
   # Enable if you'd like to use the bidding simulator to test connections
-  simulator:
-    image: rtb4free/bidder
-    environment:
-      BIDDER: "bidder:8080"
-      WIN:    "10"
-      PIXEL:  "95"
-      CLICK:  "2"
-      SLEEP:  "100"
-      SILENT: "-silent"
-    networks:
-      - r4f_net
-    command: bash -c "./wait-for-it.sh bidder:8080 -t 120 && sleep 60;  ./load-elastic -host $$BIDDER -win $$WIN -pixel $$PIXEL -click $$CLICK -sleep $$SLEEP"
+  # simulator:
+  #   image: rtb4free/bidder
+  #   environment:
+  #     BIDDER: "bidder:8080"
+  #     WIN:    "10"
+  #     PIXEL:  "95"
+  #     CLICK:  "2"
+  #     SLEEP:  "100"
+  #     SILENT: "-silent"
+  #   networks:
+  #     - r4f_net
+  #   command: bash -c "./wait-for-it.sh bidder:8080 -t 120 && sleep 60;  ./load-elastic -host $$BIDDER -win $$WIN -pixel $$PIXEL -click $$CLICK -sleep $$SLEEP"
 
 networks:
   r4f_net:
