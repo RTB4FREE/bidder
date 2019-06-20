@@ -35,7 +35,7 @@ public class TestVideoEvent {
         assertTrue(v.impid.equals("210993398098301"));
         assertTrue(v.vastevent.equals("creativeView"));
 
-        System.out.println(DbTools.mapper.writer().withDefaultPrettyPrinter().writeValueAsString(v));
+//        System.out.println(DbTools.mapper.writer().withDefaultPrettyPrinter().writeValueAsString(v));
     }
 
 }

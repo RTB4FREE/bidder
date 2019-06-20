@@ -175,7 +175,7 @@ public class TestCache {
 
         while(service.getSize()<1000) {
             Thread.sleep(1000);
-            System.out.println("Count: " + service.getSize());
+//            System.out.println("Count: " + service.getSize());
         }
 
 
@@ -187,4 +187,3 @@ public class TestCache {
 
 
 }
-

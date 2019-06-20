@@ -35,7 +35,7 @@ COPY www/css/* /www/css/
 COPY www/SSI /www/SSI/
 COPY www/jsoneditor/ /www/jsoneditor
 COPY www/images/320* /www/images/
-copy www/images/alien* www/images/
+COPY www/images/alien* www/images/
 
 COPY web/* /web/
 COPY log4j.properties /

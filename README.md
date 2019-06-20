@@ -50,7 +50,7 @@ mvn assembly:assembly -DdescriptorId=jar-with-dependencies  -Dmaven.test.skip=tr
 Run the tests:
 
 ```
-(enter mvn test script here)
+mvn test
 ```
 
 Start the bidder:

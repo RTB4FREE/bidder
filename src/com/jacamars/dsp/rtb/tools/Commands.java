@@ -323,7 +323,7 @@ public class Commands {
                             .writer()
                             .withDefaultPrettyPrinter()
                             .writeValueAsString(msg);
-                    System.out.println("<<<<<" + content + "\n");
+//                    System.out.println("<<<<<" + content + "\n");
 
                     if (msg.cmd != Controller.ECHO)
                         return;
@@ -335,8 +335,8 @@ public class Commands {
                 }
             }
         });
-        System.out.println("Commands: " + send);
-        System.out.println("Responses: " + rcv);
+//        System.out.println("Commands: " + send);
+//        System.out.println("Responses: " + rcv);
         commands = new ZPublisher(send);
     }
 
@@ -384,11 +384,11 @@ public class Commands {
             List<Campaign> list = mapper.readValue(content,
                     mapper.getTypeFactory().constructCollectionType(List.class, Campaign.class));
             shared.putCampaigns(list);
-            System.out.println(content);
-            System.out.println("------ Campaigns -------");
-            for (Campaign c : list) {
-                System.out.println(c.adId);
-            }
+//            System.out.println(content);
+//            System.out.println("------ Campaigns -------");
+//            for (Campaign c : list) {
+//                System.out.println(c.adId);
+//            }
         } catch (Exception error) {
             error.printStackTrace();
         }
@@ -521,7 +521,7 @@ public class Commands {
         cmd.from = uuid;
         commands.add(cmd);
     }
-    
+
     public void sendGetWeights(String who, String cid) {
         GetWeights cmd = new GetWeights(who,cid);
         cmd.from = uuid;

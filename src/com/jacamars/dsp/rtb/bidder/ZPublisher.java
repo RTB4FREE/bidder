@@ -221,7 +221,7 @@ public class ZPublisher implements Runnable, Callback {
         if (producer == null && !isPipe)
             ping = new Pinger(this);
     }
-    
+
     void doKineses(String address) throws Exception {
         kinesis = new KinesisConfig(address);
     }
@@ -462,7 +462,7 @@ public class ZPublisher implements Runnable, Callback {
             error.printStackTrace();
         }
     }
-    
+
     /**
      * Run the kineses logger in a loop
      */
@@ -518,7 +518,7 @@ public class ZPublisher implements Runnable, Callback {
             }
         }
     }
-    
+
     public String serialize(Object msg) {
         if (msg instanceof String)
             return (String) msg;

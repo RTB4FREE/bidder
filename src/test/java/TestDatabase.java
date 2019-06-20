@@ -35,13 +35,13 @@ public class TestDatabase {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@AfterClass
 	public static void stop() {
 		Config.teardown();
 	}
-	
-	
+
+
 	/**
 	 * Test making a campaign from a raw json file.
 	 * @throws Exception if the values obejct is not recognized.
@@ -62,23 +62,23 @@ public class TestDatabase {
 		List<User>  list = new ArrayList();
 		User u = new User("ben");
 		list.add(u);
-		
+
 		String content = new String(Files.readAllBytes(Paths.get("stub.json")));
 		Campaign c = new Campaign(content);
 		c.adId = "ben:new-campaign";
 		u.campaigns.add(c);
-		
+
 		assertTrue(c.date.size()==2);
-		
-		
+
+
 		content = DbTools.mapper.writer().withDefaultPrettyPrinter().writeValueAsString(list);
-		
-		System.out.println(content);;
-		System.out.println("-------------------------");
-		
+
+//		System.out.println(content);;
+//		System.out.println("-------------------------");
+
 		List<User> x = DbTools.mapper.readValue(content,
 				DbTools.mapper.getTypeFactory().constructCollectionType(List.class, User.class));
 		User z = x.get(0);
-		System.out.println(z);
+//		System.out.println(z);
 	}
 }

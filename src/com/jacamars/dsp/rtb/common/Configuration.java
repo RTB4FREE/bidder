@@ -69,9 +69,9 @@ import org.slf4j.LoggerFactory;
  * The singleton class that makes up the Configuration object. A configuration
  * is a JSON file that describes the campaigns and operational parameters needed
  * by the bidding engine.
- * 
+ *
  * All classes needing config data retrieve it here.
- * 
+ *
  * @author Ben M. Faul
  *
  */
@@ -334,7 +334,7 @@ public class Configuration {
 
 	/**
 	 * Initialize the system from the JSON or Aerospike configuration file.
-	 * 
+	 *
 	 * @param path      String - The file name containing the Java Bean Shell code.
 	 * @param shard     Strimg. The shard name
 	 * @param port      int. The port the web access listens on
@@ -400,7 +400,7 @@ public class Configuration {
 		str = Charset.defaultCharset().decode(ByteBuffer.wrap(encoded)).toString();
 
 		str = Configuration.substitute(str);
-		System.out.println("AFTER SUBSTITUTIONS, CONFIGURATION:\n" + str);
+//		System.out.println("AFTER SUBSTITUTIONS, CONFIGURATION:\n" + str);
 
 		Map<?, ?> m = DbTools.mapper.readValue(str, Map.class);
 		/*******************************************************************************/
@@ -799,7 +799,7 @@ public class Configuration {
 		if (m.get("ttl") != null) {
 			ttl = (Integer) m.get("ttl");
 		}
-		
+
 		if (m.get("demodb") != null) {
 			String demodb = (String) m.get("demodb");
 			if (demodb.length() > 0) {
@@ -879,7 +879,7 @@ public class Configuration {
 
 	/**
 	 * Substitute the macros and environment variables found in the the string.
-	 * 
+	 *
 	 * @param address String. The address being queries/
 	 * @return String. All found environment vars will be substituted.
 	 * @throws Exception on parsing errors.
@@ -1044,7 +1044,7 @@ public class Configuration {
 
 	/**
 	 * Retrieve a variable from the environment variables
-	 * 
+	 *
 	 * @param address String. The address string to change.
 	 * @param varName String. The name of the environment variable, begins with $
 	 * @return String. The address string modified.
@@ -1065,7 +1065,7 @@ public class Configuration {
 	/**
 	 * Retrieve a variable from the environment variables, and if it exists, use
 	 * that, else use the alternate.
-	 * 
+	 *
 	 * @param address String. The address string to change.
 	 * @param varName String. The name of the environment variable, begins with $
 	 * @param altName String. The name to use if the environment variables is not
@@ -1083,7 +1083,7 @@ public class Configuration {
 	/**
 	 * Get the first IP address from a specified interface, in the form
 	 * $IPADRESS#IFACE-NAME#
-	 * 
+	 *
 	 * @param address String. The address we are looking at
 	 * @return String. The first occurrance of $IPADDRESS#XXX# will be substituted,
 	 *         if found
@@ -1112,7 +1112,7 @@ public class Configuration {
 
 	/**
 	 * Return macros defined in the configuration file
-	 * 
+	 *
 	 * @param macro String. The name of the macro.
 	 * @return String. The returned value.
 	 */
@@ -1122,7 +1122,7 @@ public class Configuration {
 
 	/**
 	 * Return the bid request log strategy as a string
-	 * 
+	 *
 	 * @return String. The strategy we are currently using.
 	 */
 	public String requstLogStrategyAsString() {
@@ -1211,7 +1211,7 @@ public class Configuration {
 
 	/**
 	 * Initialized a template bid request. This is added to the seatlist.
-	 * 
+	 *
 	 * @param x Map. Definition of the seat.
 	 * @throws Exception on parsing errors.
 	 */
@@ -1432,7 +1432,7 @@ public class Configuration {
 	/**
 	 * Purpose is to test if the Cache2k system is usable with the win URL specified
 	 * in the configuration file.
-	 * 
+	 *
 	 * @throws Exception if the Win URL is not set to this instance.
 	 */
 	public void testWinUrlWithCache2k() throws Exception {
@@ -1457,7 +1457,7 @@ public class Configuration {
 	 * Used to load ./database.json into Cache2k. This is used when aerospike is not
 	 * present. This instance will handle its own cache, and do its own win
 	 * processing.
-	 * 
+	 *
 	 * @param fname String. The file name of the database.
 	 * @throws Exception on file or cache2k errors.
 	 */
@@ -1486,7 +1486,7 @@ public class Configuration {
 	/**
 	 * Return the instance of Configuration, and if necessary, instantiates it
 	 * first.
-	 * 
+	 *
 	 * @param fileName String. The name of the initialization file.
 	 * @return Configuration. The instance of this singleton.
 	 * @throws Exception on JSON errors.
@@ -1512,7 +1512,7 @@ public class Configuration {
 	/**
 	 * Get an instance of the configuration object, using the specified config file,
 	 * shard name and http poty
-	 * 
+	 *
 	 * @param fileName String. The filename of the configuration file.
 	 * @param shard    String. The shard name for this instance.
 	 * @param port     int. The HTTP port byumber
@@ -1583,7 +1583,7 @@ public class Configuration {
 
 	/**
 	 * Encode the smaato campaign variables.
-	 * 
+	 *
 	 * @param value String. The string of javascript to execute.
 	 * @throws Exception on JavaScript errors.
 	 */
@@ -1606,7 +1606,7 @@ public class Configuration {
 
 	/**
 	 * Return the configuration instance.
-	 * 
+	 *
 	 * @return The instance.
 	 */
 	public static Configuration getInstance() {
@@ -1618,7 +1618,7 @@ public class Configuration {
 
 	/**
 	 * Is the configuration object initialized.
-	 * 
+	 *
 	 * @return boolean. Returns true of initialized, else returns false.
 	 */
 	public static boolean isInitialized() {
@@ -1630,7 +1630,7 @@ public class Configuration {
 
 	/**
 	 * Returns an input stream from the file of the given name.
-	 * 
+	 *
 	 * @param fname String. The fully qualified file name.
 	 * @return InputStream. The stream to read from.
 	 * @throws Exception on file errors.
@@ -1643,7 +1643,7 @@ public class Configuration {
 	/**
 	 * Can this campaign id bid? If it's instantaneous spend rate exceeds the
 	 * campaign setting, then no, it can't/
-	 * 
+	 *
 	 * @param adid String. The adid of the campaign.
 	 * @return boolean. Returns true if the campaign can bid.
 	 */
@@ -1676,7 +1676,7 @@ public class Configuration {
 
 	/**
 	 * Set the weights of a campaign.
-	 * 
+	 *
 	 * @param name    String. The name of the campaign.
 	 * @param weights String weights. In the form crid=x,crid=y,crid=z...
 	 * @return boolean. Returns true if the assignment worked, else it returns
@@ -1696,7 +1696,7 @@ public class Configuration {
 
 	/**
 	 * Get the weights set on a campaign.
-	 * 
+	 *
 	 * @param name String. The name of the campaign,
 	 * @return ProportionalEntry. The PE weights.
 	 * @throws Exception if campaign is not found.
@@ -1733,7 +1733,7 @@ public class Configuration {
 	/**
 	 * Return the EFFECTIVE campaigns list. If this is not an exchange specific
 	 * list, then returns the campaignsList, otherwise it returns the overrideList.
-	 * 
+	 *
 	 * @return List. The list of campaigns.
 	 */
 	public List<Campaign> getCampaignsList() {
@@ -1769,7 +1769,7 @@ public class Configuration {
 
 	/**
 	 * Return the actual backing campaigmsList
-	 * 
+	 *
 	 * @return List. The Campaigns list.
 	 */
 	public List<Campaign> getCampaignsListReal() {
@@ -1784,7 +1784,7 @@ public class Configuration {
 	/**
 	 * Add a campaign to the list of campaigns we are running. Does not add to
 	 * Aerospike.
-	 * 
+	 *
 	 * @param c Campaign. The campaign to add into the accounting.
 	 * @throws Exception if the encoding of the attributes fails.
 	 */
@@ -1854,7 +1854,7 @@ public class Configuration {
 
 	/**
 	 * A horrible hack to find out the ad type.
-	 * 
+	 *
 	 * @param adid String. The ad id.
 	 * @param crid String. The creative id.
 	 * @return String. Returns the type, or, null if anything goes wrong.
@@ -1893,7 +1893,7 @@ public class Configuration {
 
 	/**
 	 * Is the identified campaign running?
-	 * 
+	 *
 	 * @param owner String. The campaign owner
 	 * @param name  String. The campaign adid.
 	 * @return boolean. Rewturns true if it is loaded, else false.
@@ -1909,7 +1909,7 @@ public class Configuration {
 
 	/**
 	 * Returns a list of all the campaigns that are running
-	 * 
+	 *
 	 * @return List. The list of campaigns, byadIds, that are running.
 	 */
 	public List<String> getLoadedCampaignNames() {
@@ -1923,7 +1923,7 @@ public class Configuration {
 	/**
 	 * Add a campaign to the campaigns list using the shared map database of
 	 * campaigns
-	 * 
+	 *
 	 * @param name String. The name of the campaign.
 	 * @throws Exception if the addition of this campaign fails.
 	 */
@@ -1941,7 +1941,7 @@ public class Configuration {
 	/**
 	 * Quickly load a campaign to the campaigns list using the shared map database
 	 * of campaigns. Use this on initial loads, it avoids checks and recompiles.
-	 * 
+	 *
 	 * @param name String. The name of the campaign.
 	 * @throws Exception if the addition of this campaign fails.
 	 */
@@ -1957,7 +1957,7 @@ public class Configuration {
 
 	/**
 	 * Return your IP address by posting to api.externalip.net
-	 * 
+	 *
 	 * @return String. The IP address of this instance.
 	 */
 	public static String getIpAddress() {
