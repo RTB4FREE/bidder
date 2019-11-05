@@ -21,8 +21,8 @@ import com.jacamars.dsp.rtb.tools.MacroProcessing;
  * A class that handles RTB2 bid response. The BidResponse is built up using a
  * String buffer. At the close of the construction, macro substitutions are
  * applied and then it is converted to a string to be used in the HTTP response.
- * 
- * 
+ *
+ *
  * @author Ben M. Faul
  */
 public class BidResponse {
@@ -79,7 +79,7 @@ public class BidResponse {
 
 	/** Will be set by the macro sub phase */
 	public double cost;
-	
+
 	/** The time of the bid response */
 	public long timestamp;
 
@@ -90,13 +90,13 @@ public class BidResponse {
 
 	/** A copy of the  frequency cap specification used by the campaign responding */
 	transient public List<FrequencyCap> frequencyCap;
-	
+
 	/** The name of the instance this originated from */
 	public String origin =  Configuration.instanceName;
-	
+
 	/** type of ad, video, banner, native. Was 'type', elastic search doesn;t like that */
 	public String adtype;
-	
+
 	/** adx protobuf */
 	public String protobuf;            // Will be null except for Adx
 	// The type field, used in logging
@@ -106,7 +106,7 @@ public class BidResponse {
 
 	/**
 	 * Constructor for a bid response.
-	 * 
+	 *
 	 * @param br
 	 *            . BidRequest - the request this response is mated to.
 	 * @param creat
@@ -148,10 +148,10 @@ public class BidResponse {
 		makeResponse(price);
 
 	}
-	
+
 	/**
-	 * Bid response object for multiple bids per request support. 
-	 * @param br BidRequest used 
+	 * Bid response object for multiple bids per request support.
+	 * @param br BidRequest used
 	 * @param multi List. The multiple creatives that bid.
 	 * @param xtime int. The time to process.
 	 * @throws Exception
@@ -164,11 +164,11 @@ public class BidResponse {
 		this.timestamp = System.currentTimeMillis();
 
 		/******************************************/
-		
+
 		/** The configuration used for generating this response */
 		Configuration config = Configuration.getInstance();
 		StringBuilder nurl = new StringBuilder();
-		
+
 		///////////////////////////// PROB NOT NEEDED /////////////////////
 		StringBuilder linkUrlX = new StringBuilder();
 		linkUrlX.append(config.redirectUrl);
@@ -192,11 +192,11 @@ public class BidResponse {
 		response.append("\",\"seatbid\":[{\"seat\":\"");
 		response.append(Configuration.getInstance().seats.get(exchange));
 		response.append("\",");
-		
+
 		response.append("\"bid\":[");
-			
+
 		for (int i=0; i<multi.size();i++) {
-			
+
 			SelectedCreative x = multi.get(i);
 			this.camp = x.getCampaign();
 			this.creat = x.getCreative();
@@ -217,19 +217,19 @@ public class BidResponse {
 				this.adtype="video";
 			else
 				this.adtype="banner";
-			
+
 			makeMultiResponse();
 			if (i+1 < multi.size()) {
 				response.append(",");
 			}
 		}
-		
+
 		response.append("]}]}");
 
 		this.cost = creat.price; // pass this along so the bid response object // has a copy of the price
 		macroSubs(response);
 	}
-	
+
 	/**
 	 * Make a multi bid response. It has multiple bids in the seatbid.
 	 * @throws Exception
@@ -251,21 +251,21 @@ public class BidResponse {
 		response.append(",\"price\":");
 		response.append(price);
 		response.append(",\"adid\":\"");
-		
+
 		// Use SSP assignd adid
 		if (creat.alternateAdId == null)
 			response.append(adid);
 		else
 			response.append(adid);
-		
-		
+
+
 		if (BidRequest.usesPiggyBackedWins(exchange)) {
 			// don't do anything
 		} else {
 			response.append("\",\"nurl\":\"");
 			response.append(snurl);
 		}
-		
+
 		response.append("\",\"cid\":\"");
 		response.append(adid);
 		response.append("\",\"crid\":\"");
@@ -280,7 +280,7 @@ public class BidResponse {
 		response.append(camp.adomain);
 
 		response.append("\"],\"adm\":\"");
-		
+
 		if (this.creat.isVideo()) {
 			if (br.usesEncodedAdm) {
 				response.append(this.creat.encodedAdm);
@@ -323,7 +323,7 @@ public class BidResponse {
 
 	/**
 	 * Return the StringBuilder of the template
-	 * 
+	 *
 	 * @return The StringBuilder of the template
 	 */
 	@JsonIgnore
@@ -379,7 +379,7 @@ public class BidResponse {
 	/**
 	 * While we can't uuencode the adm for smaato (pesky XML tags, we have to
 	 * change & to &amp;
-	 * 
+	 *
 	 * @param sb
 	 *            StringBuilder. The string to escape the &.
 	 */
@@ -449,7 +449,7 @@ public class BidResponse {
 	/**
 	 * Return the adm as a string. If video, use the encoded one in the
 	 * creative, otherwise jusr return
-	 * 
+	 *
 	 * @return String the adm to return to the exchange.
 	 */
 	@JsonIgnore
@@ -465,14 +465,14 @@ public class BidResponse {
 
 		return admAsString;
 	}
-	
+
 	public void setAdmAsString(String s) {
 		admAsString = s;
 	}
 
 	/**
 	 * Apply standard macro substitutions to the adm field.
-	 * 
+	 *
 	 * @param sb
 	 *            StringBuilder. The adm field being substituted into.
 	 */
@@ -497,18 +497,18 @@ public class BidResponse {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public StringBuilder getResponseBuffer() {
 		return response;
 	}
-	
+
 	public void setResponseBuffer(String s) {
 		response = new StringBuilder(s);
 	}
 
 	/**
 	 * Replace a single instance of string.
-	 * 
+	 *
 	 * @param x
 	 *            StringBuilder. The buffer to do replacements in.
 	 * @param what
@@ -528,7 +528,7 @@ public class BidResponse {
 
 	/**
 	 * Replace All instances of a string.
-	 * 
+	 *
 	 * @param x
 	 *            StringBuilder. The buffer to do replacements in.
 	 * @param what
@@ -548,7 +548,7 @@ public class BidResponse {
 
 	/**
 	 * Returns the nurl for this response.
-	 * 
+	 *
 	 * @return String. The nurl field formatted for use in the bid response.
 	 */
 	public String getNurl() {
@@ -559,7 +559,7 @@ public class BidResponse {
 
 	/**
 	 * Return the JSON of this bid response.
-	 * 
+	 *
 	 * @return String. The JSON to send back to the exchange.
 	 */
 	public String prettyPrint() {
@@ -587,7 +587,7 @@ public class BidResponse {
 	 * Makes the RTB bid response's JSON response and URL.
 	 */
 	public void makeResponse(double price) throws Exception {
-		
+
 		/** Set the response type ****************/
 		if (imp.nativead)
 			this.adtype="native";
@@ -597,7 +597,7 @@ public class BidResponse {
 		else
 			this.adtype="banner";
 		/******************************************/
-		
+
 		/** The configuration used for generating this response */
 		Configuration config = Configuration.getInstance();
 		StringBuilder nurl = new StringBuilder();
@@ -642,7 +642,7 @@ public class BidResponse {
 		response = new StringBuilder("{\"seatbid\":[{\"seat\":\"");
 		response.append(Configuration.getInstance().seats.get(exchange));
 		response.append("\",");
-		
+
 		response.append("\"bid\":[{\"impid\":\"");
 		response.append(impid);							// the impression id from the request
 		response.append("\",\"id\":\"");
@@ -670,13 +670,13 @@ public class BidResponse {
 		response.append(",\"price\":");
 		response.append(price);
 		response.append(",\"adid\":\"");
-		
+
 		if (creat.alternateAdId == null)
 			response.append(adid);
 		else
 			response.append(creat.alternateAdId);
-		
-		
+
+
 		/** If this exchange does not use a win url, omit it */
 		if (BidRequest.usesPiggyBackedWins(exchange)) {
 			// don't do anything
@@ -684,7 +684,7 @@ public class BidResponse {
 			response.append("\",\"nurl\":\"");
 			response.append(snurl);
 		}
-		
+
 		response.append("\",\"cid\":\"");
 		response.append(adid);
 		response.append("\",\"crid\":\"");
@@ -697,7 +697,7 @@ public class BidResponse {
 		response.append(imageUrl);
 		response.append("\",\"adomain\": [\"");
 		response.append(camp.adomain);
-	
+
 		response.append("\"],\"adm\":\"");
 		if (this.creat.isVideo()) {
 			if (br.usesEncodedAdm) {
@@ -724,17 +724,17 @@ public class BidResponse {
 		response.append(oidStr); // backwards?
 		response.append("\",\"bidid\":\"");
 		response.append(br.id);
-		
+
 		response.append("\",\"cur\":\"");
 		response.append(creat.cur);
-		
+
 		response.append("\"}");
 
 		this.cost = price; // pass this along so the bid response object
 									// has a copy of the price
 		macroSubs(response);
 	}
-	
+
 	/**
 	 * Instantiate a bid response from a JSON object
 	 * @param content - String. The JSON object.
@@ -757,11 +757,15 @@ public class BidResponse {
 	public void writeTo(HttpServletResponse res) throws Exception {
 		res.getOutputStream().write(response.toString().getBytes());
 	}
-	
+
 	public void writeTo(HttpServletResponse res, String json) throws Exception {
 		res.getOutputStream().write(json.getBytes());
 	}
-	
+
+	public String getResponseString() throws Exception {
+		return response.toString();
+	}
+
 	/**
 	 * Return whether this is a no bid. For openRTB it always returns false because we won't make this object when
 	 * http response code is 204. Adx always returns 200.

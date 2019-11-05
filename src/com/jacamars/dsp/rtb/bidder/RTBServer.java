@@ -141,7 +141,7 @@ public class RTBServer implements Runnable {
     // wide open at
     // 100, closed
     // at 0
-    
+
     public static volatile boolean GDPR_MODE = false;
 
     /**
@@ -208,7 +208,7 @@ public class RTBServer implements Runnable {
      * Fraud counter
      */
     public volatile static long fraud = 0;
-    
+
     /**
      * CIDR blocked counter
      */
@@ -285,10 +285,10 @@ public class RTBServer implements Runnable {
      * Bid target to exchange class map
      */
     public static Map<String, BidRequest> exchanges = new HashMap();
-    
+
     /** Trace stuff coming in to the bidder */
     public static volatile boolean trace = false;
-    
+
 
 
     /**
@@ -488,7 +488,7 @@ public class RTBServer implements Runnable {
         // QPS the exchanges
         BidRequest.getExchangeCounts();
     }
-    
+
     static volatile Map<String,Long> spurious = new ConcurrentHashMap();
     /**
      * Track chatty errors so we don't bombard the log with spurious output
@@ -502,13 +502,13 @@ public class RTBServer implements Runnable {
     		spurious.put(key,System.currentTimeMillis());
     		return false;
     	}
-    	
+
     	v = System.currentTimeMillis() - v;
     	v /= 1000;
     	if (v > value) {
     		spurious.put(key,System.currentTimeMillis());
     		return false;
-    	} 
+    	}
     	return true;
     }
 
@@ -1147,11 +1147,11 @@ class Handler extends AbstractHandler {
                     	RTBServer.request--;
                     	return;
                     }
-                    
+
                     br.incrementRequests();
                     if (RTBServer.GDPR_MODE)
                     	br.enforceGDPR();
-                    
+
                     if (!br.enforceMasterCIDR()==false) {
                     	response.setStatus(br.returnNoBidCode());
                         response.setContentType(br.returnContentType());
@@ -1203,7 +1203,7 @@ class Handler extends AbstractHandler {
                         RTBServer.request--;
                         return;
                     }
-                    if (Configuration.getInstance().getCampaignsList().size() == 0) {                  	
+                    if (Configuration.getInstance().getCampaignsList().size() == 0) {
                         logger.debug("No campaigns loaded");
                         json = br.returnNoBid("No campaigns loaded");
                         code = RTBServer.NOBID_CODE;
@@ -1229,7 +1229,7 @@ class Handler extends AbstractHandler {
                             json = br.returnNoBid("No matching campaign");
                             code = RTBServer.NOBID_CODE;
                             RTBServer.nobid++;
-                            
+
                             Controller.getInstance().sendRequest(br, false);
                             Controller.getInstance().sendNobid(new NobidResponse(br.id, br.getExchange()));
                         } else {
@@ -1270,8 +1270,13 @@ class Handler extends AbstractHandler {
                     RTBServer.totalBidTime.addAndGet(time);
                     RTBServer.bidCountWindow.incrementAndGet();
                     response.setStatus(code);
-                    if (bresp != null)
+                    if (bresp != null){
+                      if (request.getHeader("Accept-Encoding") != null && request.getHeader("Accept-Encoding").contains("gzip")) {
+                        sendResponse(response, bresp.getResponseString());
+                      } else {
                         bresp.writeTo(response);
+                      }
+                    }
                 } else {
                     RTBServer.totalNoBidTime.addAndGet(time);
                     RTBServer.nobidCountWindow.incrementAndGet();
@@ -1313,7 +1318,7 @@ class Handler extends AbstractHandler {
                 response.getWriter().println("1");
                 return;
             }
-            
+
             if (target.contains("/callback")) {
                 response.setContentType("image/bmp;charset=utf-8");
                 response.setStatus(HttpServletResponse.SC_OK);
@@ -1599,7 +1604,7 @@ class Handler extends AbstractHandler {
                   return "Deleted RTB cookie: " + c.getValue() + ". Restart your browser to take effect.";
               }
           }
-          return "No RTB cookie found"; 
+          return "No RTB cookie found";
     }
 
     void handleJsAndCss(HttpServletResponse response, File file) throws Exception {
@@ -1830,12 +1835,12 @@ class AdminHandler extends Handler {
         long time = System.currentTimeMillis();
         boolean isGzip = false;
 
-        response.setHeader("X-INSTANCE", config.instanceName);      
+        response.setHeader("X-INSTANCE", config.instanceName);
 
         try {
             if (request.getHeader("Content-Encoding") != null && request.getHeader("Content-Encoding").equals("gzip"))
                 isGzip = true;
-            
+
 
             if (RTBServer.trace)
                 logger.info("Trace: {}",target);
