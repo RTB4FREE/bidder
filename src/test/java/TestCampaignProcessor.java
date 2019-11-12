@@ -66,7 +66,7 @@ public class TestCampaignProcessor  {
 		
 		AbortableCountDownLatch latch = new AbortableCountDownLatch(1,1);
 		CountDownLatch flag = new CountDownLatch(1);
-		CampaignProcessor proc = new CampaignProcessor(null,request,flag,latch);
+		CampaignProcessor proc = new CampaignProcessor(null,request, null,flag,latch);
 		flag.countDown();
 		proc.run();
 		List<SelectedCreative> resp = proc.getSelectedCreative();
@@ -95,7 +95,7 @@ public class TestCampaignProcessor  {
 		
 		AbortableCountDownLatch latch = new AbortableCountDownLatch(1,1);
 		CountDownLatch flag = new CountDownLatch(1);
-		CampaignProcessor proc = new CampaignProcessor(c,request,  flag, latch);
+		CampaignProcessor proc = new CampaignProcessor(c,request, null, flag, latch);
 		flag.countDown();
 		latch.await();
 		List<SelectedCreative> resp = proc.getSelectedCreative();

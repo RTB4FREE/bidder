@@ -268,7 +268,7 @@ class SelectionWorker implements Runnable {
                         e.printStackTrace();
                     }
                 } else {
-                    CampaignProcessor p = new CampaignProcessor(test, br, null, null);
+                    CampaignProcessor p = new CampaignProcessor(test, br, capSpecs, null, null);
                     p.run();
 
                     select = p.getSelectedCreative();
@@ -290,6 +290,11 @@ class SelectionWorker implements Runnable {
 
                             for (int ii = 0; ii < select.size(); ii++) {
                                 candidates.add(select.get(ii));
+                                if(select.get(ii).creative.frequencyCap != null){
+                                    FrequencyCap f = select.get(ii).creative.frequencyCap.copy();
+                                    f.capKey = capSpecs.get(select.get(ii).creative.impid.concat("B_"));
+                                    frequencyCap.add(f);
+                                }
                             }
                             if (!(br.multibid || test.weights == null)) {
                                 flag.setValue(true);
