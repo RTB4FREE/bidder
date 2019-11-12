@@ -47,6 +47,7 @@ public class Probe {
 	public static final String VIDEO_MIME = new String("Video Creative mime type mismatch\n");
 	public static final String CREATIVE_MISMATCH = new String("Creative mismatch: ");
 	public static final String FREQUENCY_CAPPED = new String("Frequency capped\n");
+	public static final String FREQUENCY_CAPPED_CREATIVE = new String("Creative frequency capped\n");
 	public static final String FREQUENCY_GOVERNED = new String("Frequency governed\n");
 	public static final String CREATIVE_NOTACTIVE = new String("Creative is not in active state\n");
 	public static final String WRONG_EXCHANGE = new String("Wrong exchange\n");

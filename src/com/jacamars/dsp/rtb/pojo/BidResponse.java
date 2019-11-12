@@ -718,8 +718,20 @@ public class BidResponse {
 		} else {
 			response.append(getTemplate());
 		}
+		response.append('"');
 
-		response.append("\"}]}],");
+		// Categories
+		if (creat.categories != null && creat.categories.size() > 0) {
+			response.append(",\"cat\":[");
+			for (int i=0;i<creat.categories.size();i++) {
+				response.append("\"").append(creat.categories.get(i)).append("\"");
+				if (i+1 < creat.categories.size())
+					response.append(",");
+			}
+			response.append("]");
+		}
+
+		response.append("}]}],");
 		response.append("\"id\":\"");
 		response.append(oidStr); // backwards?
 		response.append("\",\"bidid\":\"");
