@@ -610,7 +610,7 @@ public class Creative {
 		}
 
 		// Creative frequency cap check
-		if (isCapped(br, capSpecs)) {
+		if (isCapped(br, capSpecs,  adId)) {
 			if (errorString != null) {
 				errorString.append("Creative capped by frequency cap ");
 			}
@@ -704,12 +704,13 @@ public class Creative {
 	 * Is this creative capped on the item in this bid request?
 	 * @param br BidRequest. The bid request to query.
 	 * @param capSpecs Map. The current cap spec.
+	 * @param adId String. The adId needed to form the key
 	 * @return boolean. Returns true if the item is capped, else false.
 	 */
-	public boolean isCapped(BidRequest br, Map<String, String> capSpecs) {
+	public boolean isCapped(BidRequest br, Map<String, String> capSpecs, String adId) {
 		if (frequencyCap == null)
 			return false;
-		return frequencyCap.isCapped(br,capSpecs,impid.concat("B_"));
+		return frequencyCap.isCapped(br,capSpecs,adId.concat("B").concat(impid).concat("_"));
 	}
 
 }
