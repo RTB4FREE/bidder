@@ -86,11 +86,6 @@ public class MacroProcessing {
         macroList.add("%7Bcreative_ad_width%7D");
         macroList.add("{creative_ad_width_enc}");
 
-        macroList.add("{creative_ad_height}");
-        macroList.add("%7Bcreative_ad_height%7D");
-        macroList.add("{creative_ad_height_enc}");
-
-
         macroList.add("{impression_width}");
         macroList.add("%7Bimpression_width%7D");
         macroList.add("{impression_width_enc}");
@@ -210,6 +205,14 @@ public class MacroProcessing {
         macroList.add("{publisher}");
         macroList.add("{publisher_enc}");
         macroList.add("%7Bpublisher%7D");
+
+        macroList.add("{publisher_id}");
+        macroList.add("{publisher_id_enc}");
+        macroList.add("%7Bpublisher_id%7D");
+
+        macroList.add("{publisher_name}");
+        macroList.add("{publisher_name_enc}");
+        macroList.add("%7Bpublisher_name%7D");
 
         macroList.add("{adsize}");
         macroList.add("{adsize_enc}");
@@ -652,6 +655,34 @@ public class MacroProcessing {
                     o = br.interrogate("site.name");
                     if (o == null)
                         o = br.interrogate("app.name");
+                    if (o != null)
+                        value = BidRequest.getStringFrom(o);
+                    else
+                        value = "";
+                    value = encodeIfRequested(item, value);
+                    replaceAll(sb, item, value);
+                    break;
+
+                case "{publisher_id}":
+                case "{publisher_id_enc}":
+                case "%7Bpublisher_id%7D":
+                    o = br.interrogate("site.publisher.id");
+                    if (o == null)
+                        o = br.interrogate("app.publisher.id");
+                    if (o != null)
+                        value = BidRequest.getStringFrom(o);
+                    else
+                        value = "";
+                    value = encodeIfRequested(item, value);
+                    replaceAll(sb, item, value);
+                    break;
+
+                case "{publisher_name}":
+                case "{publisher_name_enc}":
+                case "%7Bpublisher_name%7D":
+                    o = br.interrogate("site.publisher.name");
+                    if (o == null)
+                        o = br.interrogate("app.publisher.name");
                     if (o != null)
                         value = BidRequest.getStringFrom(o);
                     else

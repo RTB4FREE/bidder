@@ -71,6 +71,9 @@ public class CampaignProcessor implements Runnable {
 	/** The logging object */
 	static final Logger logger = LoggerFactory.getLogger(CampaignProcessor.class);
 
+	/** Map to check creative caps */
+	Map<String, String> capSpecs;
+
 	/**
 	 * Constructor.
 	 * 
@@ -79,12 +82,12 @@ public class CampaignProcessor implements Runnable {
 	 * @param br
 	 *            . BidRequest. The bid request to apply to this campaign.
 	 */
-	public CampaignProcessor(Campaign camp, BidRequest br, CountDownLatch flag,
-			AbortableCountDownLatch latch) {
+	public CampaignProcessor(Campaign camp, BidRequest br, Map<String, String> capSpecs, CountDownLatch flag, AbortableCountDownLatch latch) {
 		this.camp = camp;
 		this.br = br;
 		this.latch = latch;
 		this.flag = flag;
+		this.capSpecs = capSpecs;
 		
 		if (latch != null)
 			start();
@@ -181,7 +184,7 @@ public class CampaignProcessor implements Runnable {
 			for (int i=0; i<creatives.size();i++) {
 			    Creative create = creatives.get(i);
 				SelectedCreative sc = null;
-				if ((sc = create.process(br, camp.adId, err, probe)) != null) {
+				if ((sc = create.process(br, camp.adId, err, probe, capSpecs)) != null) {
 					sc.campaign = this.camp;
 					probe.process(br.getExchange(), camp.adId, sc.impid);
 					selected.add(sc);

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.io.JsonStringEncoder;
@@ -143,6 +144,8 @@ public class Creative {
 
 	/** A sorter for the campaign/creative attributes, who is most likely to cause a false will bubble up */
 	private SortNodesFalseCount nodeSorter = new SortNodesFalseCount();
+
+	public FrequencyCap frequencyCap = null;
 	
 
 	/**
@@ -178,6 +181,7 @@ public class Creative {
 		c.imageurl = imageurl;
 		c.dimensions = dimensions;
 		c.categories = categories;
+		c.frequencyCap = frequencyCap;
 
 		c.encodeUrl();
 		return c;
@@ -302,17 +306,6 @@ public class Creative {
 		//strW = Integer.toString(w);
 		//strH = Integer.toString(h);
 		strPrice = Double.toString(price);
-		
-		if (extensions != null) {
-			String cat = extensions.get("categories");
-			if (cat != null) {
-				categories = new ArrayList();
-				String[] cats = cat.split(",");
-				for (String c : cats) {
-					categories.add(c.trim());
-				}
-			}
-		}
 		
 		/**
 		 * Always contain these!
@@ -523,7 +516,7 @@ public class Creative {
 	 * @return boolean. Returns true of this campaign matches the bid request,
 	 *         ie eligible to bid
 	 */
-	public SelectedCreative process(BidRequest br, String adId, StringBuilder errorString , Probe probe) throws Exception {
+	public SelectedCreative process(BidRequest br, String adId, StringBuilder errorString , Probe probe,  Map<String, String> capSpecs) throws Exception {
 
         /**
          * Fixed nodes do not access deals or the br impressions
@@ -544,7 +537,7 @@ public class Creative {
 	
 		for (int i=0; i<n;i++) {
 			imp = br.getImpression(i);
-			SelectedCreative cr = xproc(br,adId,imp,errorString, probe);
+			SelectedCreative cr = xproc(br,adId,imp,errorString, probe, capSpecs);
 			if (cr != null) {
 				cr.setImpression(imp);
 				return cr;
@@ -553,7 +546,7 @@ public class Creative {
 		return null;
 	}
 	
-	public SelectedCreative xproc(BidRequest br, String adId, Impression imp, StringBuilder errorString, Probe probe) throws Exception {
+	public SelectedCreative xproc(BidRequest br, String adId, Impression imp, StringBuilder errorString, Probe probe,  Map<String, String> capSpecs) throws Exception {
 		//List<Deal> newDeals = null;
 		String dealId = null;
 		double xprice = price;
@@ -614,6 +607,15 @@ public class Creative {
 				probe.process(br.getExchange(), adId, impid, Probe.BID_FLOOR);
 				return null;
 			}
+		}
+
+		// Creative frequency cap check
+		if (isCapped(br, capSpecs,adId)) {
+			if (errorString != null) {
+				errorString.append("Creative capped by frequency cap ");
+			}
+			probe.process(br.getExchange(), adId, impid, Probe.FREQUENCY_CAPPED_CREATIVE);
+			return null;
 		}
 
 		return new SelectedCreative(this, dealId, xprice, impid);
@@ -697,4 +699,17 @@ public class Creative {
 		}
 		return null;
 	}
+
+	/**
+	 * Is this creative capped on the item in this bid request?
+	 * @param br BidRequest. The bid request to query.
+	 * @param capSpecs Map. The current cap spec.
+	 * @return boolean. Returns true if the item is capped, else false.
+	 */
+	public boolean isCapped(BidRequest br, Map<String, String> capSpecs, String adId) {
+		if (frequencyCap == null)
+			return false;
+		return frequencyCap.isCapped(br,capSpecs,adId.concat("B").concat(impid).concat("_"));
+	}
+
 }

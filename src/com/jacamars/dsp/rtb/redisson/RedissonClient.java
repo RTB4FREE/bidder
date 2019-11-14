@@ -29,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A Replacement for the Redisson object. This class is a serialized (JSON) interface to the Aerospike/Cache2k database.
+ * A Replacement for the JEDIS object. This class is a serialized (JSON) interface to the Aerospike/Cache2k database.
  *
  * @author Ben M. Faul
  */
@@ -321,7 +321,7 @@ public class RedissonClient implements EventIF {
     }
 
     /**
-     * Mimic a REDIS mhset operation.
+     * Mimic a REDIS hmset operation.
      *
      * @param id String. The key of the map.
      * @param m  Map. The map to set.
